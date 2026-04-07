@@ -59,7 +59,7 @@ export default function Home() {
           <img src={logoUcr} alt="UCR" className="h-20 w-auto object-contain drop-shadow" />
           <div className="text-center sm:text-left">
             <h1 className="text-white text-2xl sm:text-3xl font-bold leading-tight">
-              Bienvenido al Simposio UCR
+              Bienvenido al Simposio XIV de la Universidad de Costa Rica
             </h1>
             {user && (
               <p className="text-blue-200 text-sm mt-1">

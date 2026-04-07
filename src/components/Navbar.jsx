@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '../context/useAuth'
 import logoUcr from '../assets/logo_ucr.png'
@@ -31,7 +31,7 @@ export default function Navbar() {
           <div className="flex items-center gap-3 flex-shrink-0">
             <img src={logoUcr} alt="UCR" className="h-10 w-auto" />
             <span className="text-white font-bold text-base leading-tight hidden sm:block">
-              Simposio UCR
+              Simposio XIV
             </span>
           </div>
 
