@@ -24,7 +24,6 @@ export default function Perfil() {
             {[
               { label: 'Nombre completo', value: user?.name },
               { label: 'Correo electrónico', value: user?.email },
-              { label: 'Rol', value: user?.role ?? 'Participante' },
             ].map(({ label, value }) => (
               <div key={label} className="py-3 flex flex-col sm:flex-row sm:gap-4">
                 <dt className="text-sm font-medium text-gray-500 sm:w-40 flex-shrink-0">{label}</dt>
