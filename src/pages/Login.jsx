@@ -1,5 +1,9 @@
 import { useState } from 'react'
 import { useAuth } from '../context/useAuth'
+import AlertMessage from '../components/ui/AlertMessage'
+import Spinner from '../components/ui/Spinner'
+import { INPUT_CLASS } from '../constants/formStyles'
+import { getApiErrorMessage } from '../utils/apiErrors'
 import logoUcr from '../assets/logo_ucr.png'
 
 export default function Login() {
@@ -19,12 +23,7 @@ export default function Login() {
     try {
       await login(form)
     } catch (err) {
-      const msg =
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        err.message ||
-        'Credenciales inválidas. Intente de nuevo.'
-      setError(msg)
+      setError(getApiErrorMessage(err, 'Credenciales inválidas. Intente de nuevo.'))
     } finally {
       setLoading(false)
     }
@@ -61,11 +60,7 @@ export default function Login() {
               Iniciar sesión
             </h2>
 
-            {error && (
-              <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                {error}
-              </div>
-            )}
+            <AlertMessage message={error} />
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
@@ -84,7 +79,7 @@ export default function Login() {
                   value={form.identifier}
                   onChange={handleChange}
                   placeholder="B12345 o usuario@ucr.ac.cr"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ucr-blue focus:border-transparent transition placeholder-gray-400"
+                  className={INPUT_CLASS}
                 />
               </div>
 
@@ -104,7 +99,7 @@ export default function Login() {
                   value={form.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ucr-blue focus:border-transparent transition placeholder-gray-400"
+                  className={INPUT_CLASS}
                 />
               </div>
 
@@ -115,7 +110,7 @@ export default function Login() {
               >
                 {loading ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <Spinner size="md" />
                     Ingresando...
                   </>
                 ) : (

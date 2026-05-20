@@ -1,4 +1,6 @@
 import axios from 'axios'
+import { getAuthToken, removeAuthToken } from '../utils/authStorage'
+import { notifyUnauthorized, shouldHandleUnauthorized } from '../utils/authSession'
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
@@ -9,7 +11,7 @@ const apiClient = axios.create({
 })
 
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('auth_token')
+  const token = getAuthToken()
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -19,9 +21,9 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('auth_token')
-      window.location.href = '/login'
+    if (shouldHandleUnauthorized(error)) {
+      removeAuthToken()
+      notifyUnauthorized()
     }
     return Promise.reject(error)
   }

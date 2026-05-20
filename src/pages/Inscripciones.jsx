@@ -1,216 +1,174 @@
-import { useEffect, useMemo, useState } from 'react'
-import EventoCard from '../components/EventoCard'
-import { fetchEventos } from '../api/eventos'
+import { useMemo, useState } from 'react'
+import EventoSlotCarousel from '../components/EventoSlotCarousel'
+import EventoCardInscripcion from '../components/inscripciones/EventoCardInscripcion'
+import AlertMessage from '../components/ui/AlertMessage'
+import EmptyState from '../components/ui/EmptyState'
+import FetchingBanner from '../components/ui/FetchingBanner'
+import LoadingState from '../components/ui/LoadingState'
+import PageHeader from '../components/ui/PageHeader'
+import SelectField from '../components/ui/SelectField'
+import { FILTRO_DIAS, FILTRO_TIPOS } from '../constants/eventos'
+import { VISTAS_INSCRIPCIONES } from '../constants/inscripciones'
+import { useInscripcionMutations } from '../hooks/mutations/useInscripcionMutations'
+import { useEventos } from '../hooks/queries/useEventos'
+import { useMisInscripciones } from '../hooks/queries/useMisInscripciones'
+import { useTimedFeedback } from '../hooks/useTimedFeedback'
+import { getApiErrorMessage } from '../utils/apiErrors'
+import { buildEventosApiFilters } from '../utils/eventoFilters'
 import {
-  fetchMisInscripciones,
-  inscribirseEvento,
-  cancelarInscripcion,
-} from '../api/inscripciones'
-
-const TIPOS = [
-  { value: '', label: 'Todos los tipos' },
-  { value: 'apertura', label: 'Apertura' },
-  { value: 'clausura', label: 'Clausura' },
-  { value: 'taller', label: 'Talleres' },
-  { value: 'charla', label: 'Charlas' },
-]
-
-const DIAS = [
-  { value: '', label: 'Todos los días' },
-  { value: '1', label: 'Día 1' },
-  { value: '2', label: 'Día 2' },
-  { value: '3', label: 'Día 3' },
-]
+  etiquetaFranjaHoraria,
+  groupEventosPorFranjaHoraria,
+  ordenarEventosPlano,
+} from '../utils/eventoGrouping'
+import { buildInscripcionesPorEvento } from '../utils/inscripciones'
+import { pluralize } from '../utils/pluralize'
 
 export default function Inscripciones() {
-  const [eventos, setEventos] = useState([])
-  const [inscripciones, setInscripciones] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [feedback, setFeedback] = useState(null) // { type: 'success'|'error', message }
+  const { feedback, showFeedback, clearFeedback } = useTimedFeedback(null, 6000)
   const [accion, setAccion] = useState({ eventoId: null, inscripcionId: null, tipo: null })
 
-  // Filtros
   const [filtroDia, setFiltroDia] = useState('')
   const [filtroTipo, setFiltroTipo] = useState('')
   const [soloDisponibles, setSoloDisponibles] = useState(false)
+  const [vistaPresentacion, setVistaPresentacion] = useState('franjas')
+  const [appliedFilters, setAppliedFilters] = useState({})
 
-  // Mapa rápido evento_id => inscripcion (sólo confirmadas)
-  const inscripcionesPorEvento = useMemo(() => {
-    const map = new Map()
-    for (const i of inscripciones) {
-      if (i.estado === 'confirmado') {
-        map.set(i.evento_id, i)
-      }
-    }
-    return map
-  }, [inscripciones])
+  const eventosQuery = useEventos(appliedFilters)
+  const inscripcionesQuery = useMisInscripciones()
 
-  const cargarDatos = (filtros = {}) => {
-    setLoading(true)
-    setError('')
-    return Promise.all([fetchEventos(filtros), fetchMisInscripciones()])
-      .then(([eventosData, misInscripciones]) => {
-        setEventos(eventosData)
-        setInscripciones(misInscripciones)
-      })
-      .catch((err) => {
-        setError(err.response?.data?.message || err.message || 'No se pudieron cargar los eventos.')
-      })
-      .finally(() => {
-        setLoading(false)
-      })
-  }
+  const eventos = useMemo(() => eventosQuery.data ?? [], [eventosQuery.data])
+  const inscripciones = useMemo(() => inscripcionesQuery.data ?? [], [inscripcionesQuery.data])
 
-  useEffect(() => {
-    Promise.all([fetchEventos(), fetchMisInscripciones()])
-      .then(([eventosData, misInscripciones]) => {
-        setEventos(eventosData)
-        setInscripciones(misInscripciones)
-      })
-      .catch((err) => {
-        setError(err.response?.data?.message || err.message || 'No se pudieron cargar los eventos.')
-      })
-      .finally(() => {
-        setLoading(false)
-      })
-  }, [])
+  const loadingInicial = eventosQuery.isLoading || inscripcionesQuery.isLoading
+  const refrescandoEventos = eventosQuery.isFetching && !eventosQuery.isLoading
+
+  const error =
+    (eventosQuery.error &&
+      getApiErrorMessage(eventosQuery.error, 'No se pudieron cargar los eventos.')) ||
+    (inscripcionesQuery.error &&
+      getApiErrorMessage(inscripcionesQuery.error, 'No se pudieron cargar los eventos.')) ||
+    ''
+
+  const inscripcionesPorEvento = useMemo(
+    () => buildInscripcionesPorEvento(inscripciones),
+    [inscripciones],
+  )
+
+  const { inscribirMutation, cancelarMutation } = useInscripcionMutations({
+    appliedFilters,
+    showFeedback,
+  })
 
   const aplicarFiltros = () => {
-    cargarDatos({
-      dia: filtroDia || undefined,
-      tipo: filtroTipo || undefined,
-      solo_disponibles: soloDisponibles || undefined,
-    })
+    clearFeedback()
+    setAppliedFilters(
+      buildEventosApiFilters({
+        dia: filtroDia,
+        tipo: filtroTipo,
+        soloDisponibles,
+      }),
+    )
   }
 
   const limpiarFiltros = () => {
     setFiltroDia('')
     setFiltroTipo('')
     setSoloDisponibles(false)
-    cargarDatos()
+    clearFeedback()
+    setAppliedFilters({})
   }
 
-  const mostrarFeedback = (type, message) => {
-    setFeedback({ type, message })
-    setTimeout(() => setFeedback(null), 4000)
-  }
-
-  const extraerMensajeError = (err, fallback) => {
-    const data = err.response?.data
-    if (data?.errors?.evento_id?.[0]) return data.errors.evento_id[0]
-    if (data?.message) return data.message
-    return err.message || fallback
-  }
-
-  const handleInscribirse = async (evento) => {
+  const handleInscribirse = (evento) => {
+    clearFeedback()
     setAccion({ eventoId: evento.id, inscripcionId: null, tipo: 'inscribir' })
-    try {
-      const inscripcion = await inscribirseEvento(evento.id)
-      // Actualizar lista localmente
-      setInscripciones((prev) => {
-        const sin = prev.filter((i) => i.evento_id !== evento.id)
-        return [...sin, inscripcion]
-      })
-      setEventos((prev) =>
-        prev.map((e) =>
-          e.id === evento.id
-            ? {
-                ...e,
-                numero_inscritos: e.numero_inscritos + 1,
-                cupos_disponibles: Math.max(0, e.cupos_disponibles - 1),
-                tiene_capacidad_disponible: e.cupos_disponibles - 1 > 0,
-                usuario_inscrito: true,
-              }
-            : e,
-        ),
-      )
-      mostrarFeedback('success', `Te inscribiste a "${evento.titulo}".`)
-    } catch (err) {
-      mostrarFeedback('error', extraerMensajeError(err, 'No se pudo inscribir.'))
-    } finally {
-      setAccion({ eventoId: null, inscripcionId: null, tipo: null })
-    }
+    inscribirMutation.mutate(evento, {
+      onSettled: () => setAccion({ eventoId: null, inscripcionId: null, tipo: null }),
+    })
   }
 
-  const handleCancelar = async (inscripcionId, evento) => {
+  const handleCancelar = (inscripcionId, evento) => {
     if (!inscripcionId) return
+    clearFeedback()
     setAccion({ eventoId: evento.id, inscripcionId, tipo: 'cancelar' })
-    try {
-      await cancelarInscripcion(inscripcionId)
-      setInscripciones((prev) =>
-        prev.map((i) => (i.id === inscripcionId ? { ...i, estado: 'cancelado' } : i)),
-      )
-      setEventos((prev) =>
-        prev.map((e) =>
-          e.id === evento.id
-            ? {
-                ...e,
-                numero_inscritos: Math.max(0, e.numero_inscritos - 1),
-                cupos_disponibles: e.cupos_disponibles + 1,
-                tiene_capacidad_disponible: true,
-                usuario_inscrito: false,
-              }
-            : e,
-        ),
-      )
-      mostrarFeedback('success', `Cancelaste tu inscripción a "${evento.titulo}".`)
-    } catch (err) {
-      mostrarFeedback('error', extraerMensajeError(err, 'No se pudo cancelar la inscripción.'))
-    } finally {
-      setAccion({ eventoId: null, inscripcionId: null, tipo: null })
-    }
+    cancelarMutation.mutate(
+      { inscripcionId, evento },
+      {
+        onSettled: () => setAccion({ eventoId: null, inscripcionId: null, tipo: null }),
+      },
+    )
   }
 
   const totalInscrito = inscripcionesPorEvento.size
+  const franjasOrdenadas = useMemo(() => groupEventosPorFranjaHoraria(eventos), [eventos])
+  const eventosPlanoOrdenados = useMemo(() => ordenarEventosPlano(eventos), [eventos])
+
+  const cardProps = {
+    inscripcionesPorEvento,
+    accion,
+    feedback,
+    onInscribirse: handleInscribirse,
+    onCancelar: handleCancelar,
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-6">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
-          <div className="flex items-center gap-3">
-            <div className="w-1 h-8 bg-ucr-blue rounded-full" />
-            <h1 className="text-2xl font-bold text-ucr-blue-dark">Inscripciones</h1>
-          </div>
-          <div className="text-sm text-gray-600">
+      <PageHeader
+        title="Inscripciones"
+        badge={
+          <>
             <span className="font-semibold text-ucr-blue">{totalInscrito}</span>{' '}
-            {totalInscrito === 1 ? 'evento' : 'eventos'} inscritos
-          </div>
-        </div>
-        <p className="text-sm text-gray-600 mb-6">
-          Explora los eventos del Simposio XIV y reserva tu cupo. Los cupos se asignan por orden de inscripción.
-        </p>
-
-        {/* Filtros */}
+            {pluralize(totalInscrito, 'evento inscrito', 'eventos inscritos')}
+          </>
+        }
+        description={
+          <>
+            Explora los eventos del Simposio XIV y reserva tu cupo. Los cupos se asignan por orden de
+            inscripción. La vista por defecto es la agenda por horario; si preferís ver todas las
+            tarjetas a la vez, elegí{' '}
+            <span className="font-medium text-gray-800">Todos los eventos</span> en Vista.
+          </>
+        }
+      >
         <div className="flex flex-col sm:flex-row sm:items-end gap-3 sm:flex-wrap">
-          <div className="flex-1 min-w-[140px]">
-            <label className="block text-xs font-medium text-gray-700 mb-1">Día</label>
-            <select
-              value={filtroDia}
-              onChange={(e) => setFiltroDia(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ucr-blue focus:border-transparent"
-            >
-              {DIAS.map((d) => (
-                <option key={d.value} value={d.value}>
-                  {d.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex-1 min-w-[140px]">
-            <label className="block text-xs font-medium text-gray-700 mb-1">Tipo</label>
-            <select
-              value={filtroTipo}
-              onChange={(e) => setFiltroTipo(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ucr-blue focus:border-transparent"
-            >
-              {TIPOS.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SelectField
+            label="Día"
+            htmlFor="filtro-dia"
+            value={filtroDia}
+            onChange={(e) => setFiltroDia(e.target.value)}
+            className="flex-1 min-w-[140px]"
+          >
+            {FILTRO_DIAS.map((d) => (
+              <option key={d.value} value={d.value}>
+                {d.label}
+              </option>
+            ))}
+          </SelectField>
+          <SelectField
+            label="Tipo"
+            htmlFor="filtro-tipo"
+            value={filtroTipo}
+            onChange={(e) => setFiltroTipo(e.target.value)}
+            className="flex-1 min-w-[140px]"
+          >
+            {FILTRO_TIPOS.map((t) => (
+              <option key={t.value} value={t.value}>
+                {t.label}
+              </option>
+            ))}
+          </SelectField>
+          <SelectField
+            label="Vista"
+            htmlFor="vista-presentacion"
+            value={vistaPresentacion}
+            onChange={(e) => setVistaPresentacion(e.target.value)}
+            className="flex-1 min-w-[200px] sm:min-w-[220px]"
+          >
+            {VISTAS_INSCRIPCIONES.map((v) => (
+              <option key={v.value} value={v.value}>
+                {v.label}
+              </option>
+            ))}
+          </SelectField>
           <div className="flex items-center gap-2 pb-2 sm:pb-2.5">
             <input
               id="solo-disponibles"
@@ -225,12 +183,14 @@ export default function Inscripciones() {
           </div>
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={aplicarFiltros}
               className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors"
             >
               Aplicar
             </button>
             <button
+              type="button"
               onClick={limpiarFiltros}
               className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors"
             >
@@ -238,63 +198,63 @@ export default function Inscripciones() {
             </button>
           </div>
         </div>
-      </div>
+      </PageHeader>
 
-      {/* Feedback flotante */}
-      {feedback && (
-        <div
-          className={`mb-4 px-4 py-3 rounded-lg border text-sm ${
-            feedback.type === 'success'
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-              : 'bg-rose-50 border-rose-200 text-rose-800'
-          }`}
-        >
-          {feedback.message}
-        </div>
-      )}
+      <AlertMessage message={error} />
 
-      {/* Errores de carga */}
-      {error && (
-        <div className="mb-4 px-4 py-3 rounded-lg border bg-rose-50 border-rose-200 text-rose-800 text-sm">
-          {error}
-        </div>
-      )}
-
-      {/* Listado */}
-      {loading ? (
-        <div className="flex flex-col items-center justify-center py-16 text-gray-500">
-          <span className="w-10 h-10 border-4 border-ucr-blue border-t-transparent rounded-full animate-spin mb-3" />
-          <p className="text-sm">Cargando eventos...</p>
-        </div>
-      ) : eventos.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center text-gray-500">
-          <svg className="w-14 h-14 mx-auto mb-3 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p className="text-base font-medium">No se encontraron eventos.</p>
-          <p className="text-sm mt-1">Prueba ajustando los filtros.</p>
-        </div>
+      {loadingInicial ? (
+        <LoadingState message="Cargando eventos..." />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-          {eventos.map((evento) => {
-            const inscripcion = inscripcionesPorEvento.get(evento.id)
-            const inscribiendo =
-              accion.eventoId === evento.id && accion.tipo === 'inscribir'
-            const cancelando =
-              accion.eventoId === evento.id && accion.tipo === 'cancelar'
-            return (
-              <EventoCard
-                key={evento.id}
-                evento={evento}
-                inscripcionId={inscripcion?.id ?? null}
-                inscribiendo={inscribiendo}
-                cancelando={cancelando}
-                onInscribirse={handleInscribirse}
-                onCancelar={handleCancelar}
-              />
-            )
-          })}
-        </div>
+        <>
+          {refrescandoEventos && <FetchingBanner />}
+
+          {eventos.length === 0 ? (
+            <EmptyState
+              icon="search"
+              title="No se encontraron eventos."
+              description="Prueba ajustando los filtros."
+            />
+          ) : vistaPresentacion === 'todos' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+              {eventosPlanoOrdenados.map((evento) => (
+                <EventoCardInscripcion key={evento.id} evento={evento} {...cardProps} />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-10">
+              {franjasOrdenadas.map((grupo) => {
+                const indiceErrorEnGrupo =
+                  feedback?.type === 'error'
+                    ? grupo.eventos.findIndex((e) => e.id === feedback.eventoId)
+                    : -1
+                const carouselKey =
+                  indiceErrorEnGrupo >= 0 ? `${grupo.key}-alerta-${feedback.eventoId}` : grupo.key
+                return (
+                  <section key={grupo.key} className="scroll-mt-4">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 pl-1 border-l-4 border-ucr-blue">
+                      <h2 className="text-base sm:text-lg font-bold text-ucr-blue-dark capitalize">
+                        {etiquetaFranjaHoraria(grupo)}
+                      </h2>
+                      {grupo.eventos.length > 1 && (
+                        <span className="text-[11px] sm:text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200">
+                          {grupo.eventos.length} eventos en paralelo
+                        </span>
+                      )}
+                    </div>
+                    <EventoSlotCarousel
+                      key={carouselKey}
+                      initialIndex={indiceErrorEnGrupo >= 0 ? indiceErrorEnGrupo : 0}
+                    >
+                      {grupo.eventos.map((evento) => (
+                        <EventoCardInscripcion key={evento.id} evento={evento} {...cardProps} />
+                      ))}
+                    </EventoSlotCarousel>
+                  </section>
+                )
+              })}
+            </div>
+          )}
+        </>
       )}
     </div>
   )

@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
+import LoadingState from './ui/LoadingState'
 
 export default function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -7,7 +8,7 @@ export default function ProtectedRoute({ children }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-ucr-blue-muted">
-        <div className="w-10 h-10 border-4 border-ucr-blue border-t-transparent rounded-full animate-spin" />
+        <LoadingState className="py-0" />
       </div>
     )
   }
