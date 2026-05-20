@@ -26,10 +26,10 @@ export default function Navbar() {
   return (
     <nav className="bg-ucr-blue shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Logo + título */}
           <div className="flex items-center gap-3 flex-shrink-0">
-            <img src={logoUcr} alt="UCR" className="h-10 w-auto" />
+            <img src={logoUcr} alt="UCR" className="h-25 w-auto" />
             <span className="text-white font-bold text-base leading-tight hidden sm:block">
               Simposio XIV
             </span>
