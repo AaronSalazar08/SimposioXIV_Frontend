@@ -28,3 +28,10 @@ export const FILTRO_DIAS = [
   { value: '2', label: 'Día 2' },
   { value: '3', label: 'Día 3' },
 ]
+
+/** Días del simposio para pestañas de inscripciones (fecha de referencia para etiqueta). */
+export const DIAS_SIMPOSIO = [
+  { value: '1', numeroDia: 1, fechaReferencia: '2026-06-09T12:00:00.000Z' },
+  { value: '2', numeroDia: 2, fechaReferencia: '2026-06-10T12:00:00.000Z' },
+  { value: '3', numeroDia: 3, fechaReferencia: '2026-06-11T12:00:00.000Z' },
+]

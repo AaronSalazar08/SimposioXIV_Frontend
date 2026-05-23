@@ -1,25 +1,23 @@
 import { useMemo, useState } from 'react'
 import EventoSlotCarousel from '../components/EventoSlotCarousel'
 import EventoCardInscripcion from '../components/inscripciones/EventoCardInscripcion'
+import InscripcionesDiaTabs from '../components/inscripciones/InscripcionesDiaTabs'
 import AlertMessage from '../components/ui/AlertMessage'
 import EmptyState from '../components/ui/EmptyState'
 import FetchingBanner from '../components/ui/FetchingBanner'
 import LoadingState from '../components/ui/LoadingState'
 import PageHeader from '../components/ui/PageHeader'
-import SelectField from '../components/ui/SelectField'
-import { FILTRO_DIAS, FILTRO_TIPOS } from '../constants/eventos'
-import { VISTAS_INSCRIPCIONES } from '../constants/inscripciones'
 import { useInscripcionMutations } from '../hooks/mutations/useInscripcionMutations'
 import { useEventos } from '../hooks/queries/useEventos'
 import { useMisInscripciones } from '../hooks/queries/useMisInscripciones'
 import { useTimedFeedback } from '../hooks/useTimedFeedback'
 import { getApiErrorMessage } from '../utils/apiErrors'
-import { buildEventosApiFilters } from '../utils/eventoFilters'
 import {
-  etiquetaFranjaHoraria,
-  groupEventosPorFranjaHoraria,
-  ordenarEventosPlano,
-} from '../utils/eventoGrouping'
+  buildEventosApiFilters,
+  conteosBadgeDiaTabs,
+  countPorDiaSimposio,
+} from '../utils/eventoFilters'
+import { etiquetaFranjaHoraria, groupEventosPorFranjaHoraria } from '../utils/eventoGrouping'
 import { buildInscripcionesPorEvento } from '../utils/inscripciones'
 import { pluralize } from '../utils/pluralize'
 
@@ -27,13 +25,11 @@ export default function Inscripciones() {
   const { feedback, showFeedback, clearFeedback } = useTimedFeedback(null, 6000)
   const [accion, setAccion] = useState({ eventoId: null, inscripcionId: null, tipo: null })
 
-  const [filtroDia, setFiltroDia] = useState('')
-  const [filtroTipo, setFiltroTipo] = useState('')
-  const [soloDisponibles, setSoloDisponibles] = useState(false)
-  const [vistaPresentacion, setVistaPresentacion] = useState('franjas')
-  const [appliedFilters, setAppliedFilters] = useState({})
+  const [filtroDia, setFiltroDia] = useState('1')
+  const [appliedFilters, setAppliedFilters] = useState({ dia: '1' })
 
   const eventosQuery = useEventos(appliedFilters)
+  const todosEventosQuery = useEventos({})
   const inscripcionesQuery = useMisInscripciones()
 
   const eventos = useMemo(() => eventosQuery.data ?? [], [eventosQuery.data])
@@ -59,23 +55,10 @@ export default function Inscripciones() {
     showFeedback,
   })
 
-  const aplicarFiltros = () => {
+  const handleSelectDia = (dia) => {
+    setFiltroDia(dia)
     clearFeedback()
-    setAppliedFilters(
-      buildEventosApiFilters({
-        dia: filtroDia,
-        tipo: filtroTipo,
-        soloDisponibles,
-      }),
-    )
-  }
-
-  const limpiarFiltros = () => {
-    setFiltroDia('')
-    setFiltroTipo('')
-    setSoloDisponibles(false)
-    clearFeedback()
-    setAppliedFilters({})
+    setAppliedFilters(buildEventosApiFilters({ dia }))
   }
 
   const handleInscribirse = (evento) => {
@@ -99,8 +82,20 @@ export default function Inscripciones() {
   }
 
   const totalInscrito = inscripcionesPorEvento.size
+
+  const conteosPorDia = useMemo(() => {
+    const inscripcionesPorDia = countPorDiaSimposio(
+      inscripciones,
+      (i) => i.evento?.horario?.numero_dia,
+    )
+    const eventosPorDia = countPorDiaSimposio(
+      todosEventosQuery.data ?? [],
+      (e) => e.horario?.numero_dia,
+    )
+    return conteosBadgeDiaTabs({ inscripcionesPorDia, eventosPorDia })
+  }, [inscripciones, todosEventosQuery.data])
+
   const franjasOrdenadas = useMemo(() => groupEventosPorFranjaHoraria(eventos), [eventos])
-  const eventosPlanoOrdenados = useMemo(() => ordenarEventosPlano(eventos), [eventos])
 
   const cardProps = {
     inscripcionesPorEvento,
@@ -120,85 +115,14 @@ export default function Inscripciones() {
             {pluralize(totalInscrito, 'evento inscrito', 'eventos inscritos')}
           </>
         }
-        description={
-          <>
-            Explora los eventos del Simposio XIV y reserva tu cupo. Los cupos se asignan por orden de
-            inscripción. La vista por defecto es la agenda por horario; si preferís ver todas las
-            tarjetas a la vez, elegí{' '}
-            <span className="font-medium text-gray-800">Todos los eventos</span> en Vista.
-          </>
-        }
-      >
-        <div className="flex flex-col sm:flex-row sm:items-end gap-3 sm:flex-wrap">
-          <SelectField
-            label="Día"
-            htmlFor="filtro-dia"
-            value={filtroDia}
-            onChange={(e) => setFiltroDia(e.target.value)}
-            className="flex-1 min-w-[140px]"
-          >
-            {FILTRO_DIAS.map((d) => (
-              <option key={d.value} value={d.value}>
-                {d.label}
-              </option>
-            ))}
-          </SelectField>
-          <SelectField
-            label="Tipo"
-            htmlFor="filtro-tipo"
-            value={filtroTipo}
-            onChange={(e) => setFiltroTipo(e.target.value)}
-            className="flex-1 min-w-[140px]"
-          >
-            {FILTRO_TIPOS.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.label}
-              </option>
-            ))}
-          </SelectField>
-          <SelectField
-            label="Vista"
-            htmlFor="vista-presentacion"
-            value={vistaPresentacion}
-            onChange={(e) => setVistaPresentacion(e.target.value)}
-            className="flex-1 min-w-[200px] sm:min-w-[220px]"
-          >
-            {VISTAS_INSCRIPCIONES.map((v) => (
-              <option key={v.value} value={v.value}>
-                {v.label}
-              </option>
-            ))}
-          </SelectField>
-          <div className="flex items-center gap-2 pb-2 sm:pb-2.5">
-            <input
-              id="solo-disponibles"
-              type="checkbox"
-              checked={soloDisponibles}
-              onChange={(e) => setSoloDisponibles(e.target.checked)}
-              className="w-4 h-4 rounded border-gray-300 text-ucr-blue focus:ring-ucr-blue"
-            />
-            <label htmlFor="solo-disponibles" className="text-sm text-gray-700">
-              Solo con cupos disponibles
-            </label>
-          </div>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={aplicarFiltros}
-              className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors"
-            >
-              Aplicar
-            </button>
-            <button
-              type="button"
-              onClick={limpiarFiltros}
-              className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Limpiar
-            </button>
-          </div>
-        </div>
-      </PageHeader>
+        description="Explorá los eventos del simposio organizados por día y hora. Los cupos se asignan por orden de inscripción."
+      />
+
+      <InscripcionesDiaTabs
+        diaActivo={filtroDia}
+        onSelectDia={handleSelectDia}
+        conteosPorDia={conteosPorDia}
+      />
 
       <AlertMessage message={error} />
 
@@ -212,14 +136,8 @@ export default function Inscripciones() {
             <EmptyState
               icon="search"
               title="No se encontraron eventos."
-              description="Prueba ajustando los filtros."
+              description="No hay eventos programados para este día."
             />
-          ) : vistaPresentacion === 'todos' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-              {eventosPlanoOrdenados.map((evento) => (
-                <EventoCardInscripcion key={evento.id} evento={evento} {...cardProps} />
-              ))}
-            </div>
           ) : (
             <div className="space-y-10">
               {franjasOrdenadas.map((grupo) => {
