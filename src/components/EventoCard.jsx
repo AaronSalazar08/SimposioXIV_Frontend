@@ -20,6 +20,7 @@ export default function EventoCard({
       rootRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
     }
   }, [mensajeAccion])
+
   const inscrito = !!inscripcionId || !!evento.usuario_inscrito
   const sinCupos = !evento.tiene_capacidad_disponible
   const tipo = evento.tipo
@@ -40,10 +41,8 @@ export default function EventoCard({
           <span className="text-[11px] text-gray-500 font-medium">
             Día {evento.horario.numero_dia}
           </span>
-          {evento.horario?.numero_dia && (
-            <span className="text-[11px] text-gray-400 font-medium">Día {evento.horario.numero_dia}</span>
-          )}
-        </div>
+        )}
+      </div>
 
       {/* Título y descripción */}
       <div className="px-5 pb-3 min-w-0">
@@ -55,14 +54,10 @@ export default function EventoCard({
         )}
       </div>
 
-        {/* Fila 3: descripción — siempre 2 líneas */}
-        <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 min-h-[2.5rem] mb-2">
-          {evento.descripcion ?? ''}
-        </p>
-
-        {/* Fila 3: áreas — altura fija, sin wrapping */}
-        <div className="h-5 flex items-center gap-1.5 overflow-hidden mb-4">
-          {evento.areas?.map((a) => (
+      {/* Áreas */}
+      {evento.areas?.length > 0 && (
+        <div className="px-5 pb-3 flex items-center gap-1.5 overflow-hidden">
+          {evento.areas.map((a) => (
             <span
               key={a.id}
               className="text-[10px] font-medium px-2 py-0.5 rounded-full text-white flex-shrink-0"
@@ -122,46 +117,12 @@ export default function EventoCard({
         </div>
       )}
 
-      {/* Footer con cupos y CTA — en ≤616px columna para que el botón no quede fuera de pantalla */}
+      {/* Footer con cupos y CTA */}
       <div className="px-5 py-3 border-t border-gray-100 flex flex-col gap-2 max-[616px]:items-stretch min-[617px]:flex-row min-[617px]:items-center min-[617px]:justify-between min-[617px]:gap-3 min-w-0">
         <div className="text-xs shrink-0 max-[616px]:text-center min-[617px]:text-left">
           <span className={`font-bold ${sinCupos ? 'text-rose-600' : 'text-emerald-600'}`}>
             {evento.cupos_disponibles}
           </span>
-
-          {inscrito ? (
-            <button
-              onClick={() => onCancelar?.(inscripcionId, evento)}
-              disabled={cancelando || inscripcionId === -1}
-              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-500 hover:bg-rose-600 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5 flex-shrink-0"
-            >
-              {cancelando ? (
-                <>
-                  <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Cancelando...
-                </>
-              ) : (
-                'Cancelar inscripción'
-              )}
-            </button>
-          ) : (
-            <button
-              onClick={() => onInscribirse?.(evento)}
-              disabled={inscribiendo || sinCupos}
-              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5 flex-shrink-0"
-            >
-              {inscribiendo ? (
-                <>
-                  <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Inscribiendo...
-                </>
-              ) : sinCupos ? (
-                'Sin cupos'
-              ) : (
-                'Inscribirse'
-              )}
-            </button>
-          )}
         </div>
 
         {inscrito ? (
