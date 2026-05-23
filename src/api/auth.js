@@ -1,4 +1,5 @@
 import apiClient from './client'
+export { normalizeAuthUser } from './authNormalize'
 
 export const login = async ({ identifier, password }) => {
   const { data } = await apiClient.post('/login', { identifier, password })

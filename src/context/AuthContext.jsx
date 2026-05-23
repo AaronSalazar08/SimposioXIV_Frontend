@@ -1,25 +1,42 @@
 import { createContext, useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { login as loginApi, logout as logoutApi, getMe } from '../api/auth'
+import {
+  login as loginApi,
+  logout as logoutApi,
+  getMe,
+  normalizeAuthUser,
+} from '../api/auth'
+import { useQueryClient } from '@tanstack/react-query'
+import { getAuthToken, removeAuthToken, setAuthToken } from '../utils/authStorage'
+import { registerUnauthorizedHandler } from '../utils/authSession'
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(() => !!localStorage.getItem('auth_token'))
+  const [loading, setLoading] = useState(() => !!getAuthToken())
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   useEffect(() => {
-    const token = localStorage.getItem('auth_token')
+    return registerUnauthorizedHandler(() => {
+      setUser(null)
+      queryClient.clear()
+      navigate('/login', { replace: true })
+    })
+  }, [navigate, queryClient])
+
+  useEffect(() => {
+    const token = getAuthToken()
     if (!token) return
 
     getMe()
       .then((data) => {
-        setUser(data?.data ?? data)
+        setUser(normalizeAuthUser(data))
       })
       .catch(() => {
-        localStorage.removeItem('auth_token')
+        removeAuthToken()
       })
       .finally(() => {
         setLoading(false)
@@ -35,10 +52,10 @@ export function AuthProvider({ children }) {
       throw new Error('No se recibió token de autenticación.')
     }
 
-    localStorage.setItem('auth_token', token)
+    setAuthToken(token)
 
     const me = await getMe()
-    setUser(me?.data ?? me)
+    setUser(normalizeAuthUser(me))
     navigate('/')
   }, [navigate])
 
@@ -48,7 +65,7 @@ export function AuthProvider({ children }) {
     } catch {
       // ignorar errores del servidor al desloguear
     }
-    localStorage.removeItem('auth_token')
+    removeAuthToken()
     setUser(null)
     navigate('/login')
   }, [navigate])
