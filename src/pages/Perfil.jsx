@@ -12,7 +12,7 @@ export default function Perfil() {
             {user?.name?.charAt(0)?.toUpperCase() ?? 'U'}
           </div>
           <div className="text-center sm:text-left">
-            <h1 className="text-white text-2xl font-bold">{user?.name ?? '—'}</h1>
+            <h1 className="text-white text-2xl font-bold">{user?.nombre ?? '—'}</h1>
             <p className="text-blue-200 text-sm mt-0.5">{user?.email ?? '—'}</p>
           </div>
         </div>
@@ -22,7 +22,7 @@ export default function Perfil() {
           <h2 className="text-ucr-blue-dark font-semibold text-base mb-4">Información de la cuenta</h2>
           <dl className="divide-y divide-gray-100">
             {[
-              { label: 'Nombre completo', value: user?.name },
+              { label: 'Nombre completo', value: user?.nombre },
               { label: 'Correo electrónico', value: user?.email },
             ].map(({ label, value }) => (
               <div key={label} className="py-3 flex flex-col sm:flex-row sm:gap-4">

@@ -40,8 +40,10 @@ export default function EventoCard({
           <span className="text-[11px] text-gray-500 font-medium">
             Día {evento.horario.numero_dia}
           </span>
-        )}
-      </div>
+          {evento.horario?.numero_dia && (
+            <span className="text-[11px] text-gray-400 font-medium">Día {evento.horario.numero_dia}</span>
+          )}
+        </div>
 
       {/* Título y descripción */}
       <div className="px-5 pb-3 min-w-0">
@@ -53,13 +55,17 @@ export default function EventoCard({
         )}
       </div>
 
-      {/* Áreas */}
-      {evento.areas?.length > 0 && (
-        <div className="px-5 pb-2 flex flex-wrap gap-1.5">
-          {evento.areas.map((a) => (
+        {/* Fila 3: descripción — siempre 2 líneas */}
+        <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 min-h-[2.5rem] mb-2">
+          {evento.descripcion ?? ''}
+        </p>
+
+        {/* Fila 3: áreas — altura fija, sin wrapping */}
+        <div className="h-5 flex items-center gap-1.5 overflow-hidden mb-4">
+          {evento.areas?.map((a) => (
             <span
               key={a.id}
-              className="text-[11px] font-medium px-2 py-0.5 rounded-full text-white"
+              className="text-[10px] font-medium px-2 py-0.5 rounded-full text-white flex-shrink-0"
               style={{ backgroundColor: a.color || '#64748B' }}
             >
               {a.nombre}
@@ -122,7 +128,40 @@ export default function EventoCard({
           <span className={`font-bold ${sinCupos ? 'text-rose-600' : 'text-emerald-600'}`}>
             {evento.cupos_disponibles}
           </span>
-          <span className="text-gray-500"> / {evento.capacidad} cupos</span>
+
+          {inscrito ? (
+            <button
+              onClick={() => onCancelar?.(inscripcionId, evento)}
+              disabled={cancelando || inscripcionId === -1}
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-500 hover:bg-rose-600 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5 flex-shrink-0"
+            >
+              {cancelando ? (
+                <>
+                  <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Cancelando...
+                </>
+              ) : (
+                'Cancelar inscripción'
+              )}
+            </button>
+          ) : (
+            <button
+              onClick={() => onInscribirse?.(evento)}
+              disabled={inscribiendo || sinCupos}
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5 flex-shrink-0"
+            >
+              {inscribiendo ? (
+                <>
+                  <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Inscribiendo...
+                </>
+              ) : sinCupos ? (
+                'Sin cupos'
+              ) : (
+                'Inscribirse'
+              )}
+            </button>
+          )}
         </div>
 
         {inscrito ? (
