@@ -16,6 +16,12 @@ export const deleteAdminUsuario = (id) =>
 export const generarPassword = () =>
   apiClient.get('/admin/passwords/generar').then((r) => r.data?.password ?? '')
 
+export const enviarCorreoUsuario = (id) =>
+  apiClient.post(`/admin/usuarios/${id}/enviar-correo`).then((r) => r.data)
+
+export const enviarCorreoTodos = () =>
+  apiClient.post('/admin/correos/todos').then((r) => r.data)
+
 // ── Eventos ──────────────────────────────────────────────────────────────────
 export const fetchAdminEventos = () =>
   apiClient.get('/admin/eventos').then((r) => r.data?.data ?? [])
