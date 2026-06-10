@@ -3,6 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createAdminUsuario,
   deleteAdminUsuario,
+  enviarCorreoTodos,
+  enviarCorreoUsuario,
   fetchAdminUsuarios,
   generarPassword,
   updateAdminUsuario,
@@ -10,6 +12,7 @@ import {
 import AdminModal from '../../components/admin/AdminModal'
 import AlertMessage from '../../components/ui/AlertMessage'
 import LoadingState from '../../components/ui/LoadingState'
+import Spinner from '../../components/ui/Spinner'
 import { INPUT_CLASS, SELECT_CLASS } from '../../constants/formStyles'
 import { queryKeys } from '../../constants/queryKeys'
 import { getApiErrorMessage } from '../../utils/apiErrors'
@@ -19,6 +22,31 @@ const EMPTY_FORM = { nombre: '', email: '', carnet: '', password: '', tipo_usuar
 const TIPO_BADGE = {
   admin: 'bg-ucr-blue text-white',
   participante: 'bg-gray-100 text-gray-600',
+}
+
+function EmailFeedbackBanner({ feedback, onClose }) {
+  if (!feedback) return null
+  const isSuccess = feedback.type === 'success'
+  return (
+    <div className={`mb-4 px-4 py-3 rounded-lg border text-sm flex items-start gap-3 ${
+      isSuccess
+        ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+        : 'bg-rose-50 border-rose-200 text-rose-800'
+    }`}>
+      <svg className="w-5 h-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        {isSuccess
+          ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        }
+      </svg>
+      <p className="flex-1 font-medium">{feedback.message}</p>
+      <button type="button" onClick={onClose} className="shrink-0 opacity-60 hover:opacity-100 transition-opacity">
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  )
 }
 
 export default function AdminUsuarios() {
@@ -34,6 +62,11 @@ export default function AdminUsuarios() {
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [createdPassword, setCreatedPassword] = useState(null)
   const [showPassword, setShowPassword] = useState(false)
+
+  // Email states
+  const [emailFeedback, setEmailFeedback] = useState(null)
+  const [enviandoCorreoId, setEnviandoCorreoId] = useState(null)
+  const [confirmEnviarTodos, setConfirmEnviarTodos] = useState(false)
 
   const openCrear = () => { setForm(EMPTY_FORM); setError(''); setModal({ open: true, usuario: null }) }
   const openEditar = (u) => {
@@ -69,6 +102,32 @@ export default function AdminUsuarios() {
     onError: (err) => setError(getApiErrorMessage(err, 'No se pudo eliminar el usuario.')),
   })
 
+  const enviarCorreoMutation = useMutation({
+    mutationFn: (id) => enviarCorreoUsuario(id),
+    onMutate: (id) => setEnviandoCorreoId(id),
+    onSuccess: (res) => {
+      setEmailFeedback({ type: 'success', message: res.message ?? 'Correo enviado correctamente.' })
+      invalidate()
+    },
+    onError: (err) => {
+      setEmailFeedback({ type: 'error', message: getApiErrorMessage(err, 'No se pudo enviar el correo.') })
+    },
+    onSettled: () => setEnviandoCorreoId(null),
+  })
+
+  const enviarTodosMutation = useMutation({
+    mutationFn: enviarCorreoTodos,
+    onSuccess: (res) => {
+      setEmailFeedback({ type: 'success', message: res.message ?? 'Correos enviados correctamente.' })
+      setConfirmEnviarTodos(false)
+      invalidate()
+    },
+    onError: (err) => {
+      setEmailFeedback({ type: 'error', message: getApiErrorMessage(err, 'No se pudieron enviar los correos.') })
+      setConfirmEnviarTodos(false)
+    },
+  })
+
   const handleGenerarPassword = async () => {
     try {
       const pwd = await generarPassword()
@@ -81,16 +140,32 @@ export default function AdminUsuarios() {
   const handleSubmit = (e) => { e.preventDefault(); setError(''); saveMutation.mutate(form) }
   const set = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }))
 
+  const participantesCount = usuarios.filter((u) => u.tipo_usuario !== 'admin').length
+
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="text-xl font-bold text-ucr-blue-dark">Usuarios</h1>
-        <button type="button" onClick={openCrear} className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors">
-          + Nuevo usuario
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => { setEmailFeedback(null); setConfirmEnviarTodos(true) }}
+            disabled={participantesCount === 0}
+            className="flex items-center gap-1.5 px-3 py-2 border border-ucr-blue text-ucr-blue hover:bg-ucr-blue-muted text-sm font-semibold rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Enviar a todos
+          </button>
+          <button type="button" onClick={openCrear} className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors">
+            + Nuevo usuario
+          </button>
+        </div>
       </div>
 
       <AlertMessage message={error} />
+      <EmailFeedbackBanner feedback={emailFeedback} onClose={() => setEmailFeedback(null)} />
 
       {/* Contraseña generada tras crear usuario */}
       {createdPassword && (
@@ -137,24 +212,46 @@ export default function AdminUsuarios() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {usuarios.map((u) => (
-                <tr key={u.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 font-medium text-gray-900">{u.nombre}</td>
-                  <td className="px-4 py-3 text-gray-600">{u.email}</td>
-                  <td className="px-4 py-3 text-gray-500">{u.carnet ?? '—'}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${TIPO_BADGE[u.tipo_usuario] ?? TIPO_BADGE.participante}`}>
-                      {u.tipo_usuario === 'admin' ? 'Admin' : 'Participante'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2 justify-end">
-                      <button type="button" onClick={() => openEditar(u)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
-                      <button type="button" onClick={() => setConfirmDelete(u)} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {usuarios.map((u) => {
+                const enviandoEste = enviandoCorreoId === u.id
+                return (
+                  <tr key={u.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-3 font-medium text-gray-900">{u.nombre}</td>
+                    <td className="px-4 py-3 text-gray-600">{u.email}</td>
+                    <td className="px-4 py-3 text-gray-500">{u.carnet ?? '—'}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${TIPO_BADGE[u.tipo_usuario] ?? TIPO_BADGE.participante}`}>
+                        {u.tipo_usuario === 'admin' ? 'Admin' : 'Participante'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2 justify-end">
+                        {u.tipo_usuario !== 'admin' && (
+                          <button
+                            type="button"
+                            onClick={() => { setEmailFeedback(null); enviarCorreoMutation.mutate(u.id) }}
+                            disabled={enviandoEste || enviarTodosMutation.isPending}
+                            className="flex items-center gap-1 text-emerald-700 hover:text-emerald-800 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-emerald-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {enviandoEste ? (
+                              <><Spinner size="sm" className="border-emerald-500" />Enviando...</>
+                            ) : (
+                              <>
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                Enviar correo
+                              </>
+                            )}
+                          </button>
+                        )}
+                        <button type="button" onClick={() => openEditar(u)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
+                        <button type="button" onClick={() => setConfirmDelete(u)} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
@@ -231,6 +328,7 @@ export default function AdminUsuarios() {
         </form>
       </AdminModal>
 
+      {/* Modal eliminar */}
       <AdminModal open={!!confirmDelete} title="Eliminar usuario" onClose={() => setConfirmDelete(null)}>
         <p className="text-gray-600 text-sm mb-5">
           ¿Eliminás al usuario <strong>{confirmDelete?.nombre}</strong> ({confirmDelete?.email})?
@@ -241,6 +339,46 @@ export default function AdminUsuarios() {
           <button type="button" onClick={() => deleteMutation.mutate(confirmDelete.id)} disabled={deleteMutation.isPending} className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-60">
             {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
           </button>
+        </div>
+      </AdminModal>
+
+      {/* Modal confirmar enviar a todos */}
+      <AdminModal
+        open={confirmEnviarTodos}
+        title="Enviar correo a todos los participantes"
+        onClose={() => !enviarTodosMutation.isPending && setConfirmEnviarTodos(false)}
+      >
+        <div className="space-y-4">
+          <p className="text-gray-600 text-sm leading-relaxed">
+            Se enviará un correo de bienvenida a{' '}
+            <strong className="text-ucr-blue-dark">{participantesCount} participante{participantesCount !== 1 ? 's' : ''}</strong>{' '}
+            con sus credenciales de acceso al Simposio.
+          </p>
+          <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800">
+            <strong>Importante:</strong> Se generará una nueva contraseña para cada usuario. Sus contraseñas actuales quedarán invalidadas.
+          </div>
+          <div className="flex gap-3 pt-1">
+            <button
+              type="button"
+              onClick={() => setConfirmEnviarTodos(false)}
+              disabled={enviarTodosMutation.isPending}
+              className="flex-1 py-2.5 border border-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={() => enviarTodosMutation.mutate()}
+              disabled={enviarTodosMutation.isPending}
+              className="flex-1 py-2.5 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+            >
+              {enviarTodosMutation.isPending ? (
+                <><Spinner size="sm" />Enviando correos...</>
+              ) : (
+                'Confirmar envío'
+              )}
+            </button>
+          </div>
         </div>
       </AdminModal>
     </div>

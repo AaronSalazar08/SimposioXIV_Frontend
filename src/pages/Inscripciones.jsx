@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import EventoSlotCarousel from '../components/EventoSlotCarousel'
+import ConfirmacionInscripcionModal from '../components/inscripciones/ConfirmacionInscripcionModal'
 import EventoCardInscripcion from '../components/inscripciones/EventoCardInscripcion'
 import InscripcionesDiaTabs from '../components/inscripciones/InscripcionesDiaTabs'
 import AlertMessage from '../components/ui/AlertMessage'
@@ -24,6 +25,7 @@ import { pluralize } from '../utils/pluralize'
 export default function Inscripciones() {
   const { feedback, showFeedback, clearFeedback } = useTimedFeedback(null, 6000)
   const [accion, setAccion] = useState({ eventoId: null, inscripcionId: null, tipo: null })
+  const [eventoParaConfirmar, setEventoParaConfirmar] = useState(null)
 
   const [filtroDia, setFiltroDia] = useState('1')
   const [appliedFilters, setAppliedFilters] = useState({ dia: '1' })
@@ -63,9 +65,18 @@ export default function Inscripciones() {
 
   const handleInscribirse = (evento) => {
     clearFeedback()
+    setEventoParaConfirmar(evento)
+  }
+
+  const handleConfirmarInscripcion = () => {
+    const evento = eventoParaConfirmar
+    if (!evento) return
     setAccion({ eventoId: evento.id, inscripcionId: null, tipo: 'inscribir' })
     inscribirMutation.mutate(evento, {
-      onSettled: () => setAccion({ eventoId: null, inscripcionId: null, tipo: null }),
+      onSettled: () => {
+        setAccion({ eventoId: null, inscripcionId: null, tipo: null })
+        setEventoParaConfirmar(null)
+      },
     })
   }
 
@@ -105,7 +116,19 @@ export default function Inscripciones() {
     onCancelar: handleCancelar,
   }
 
+  const inscribiendoEnModal =
+    !!eventoParaConfirmar &&
+    accion.tipo === 'inscribir' &&
+    accion.eventoId === eventoParaConfirmar?.id
+
   return (
+    <>
+    <ConfirmacionInscripcionModal
+      evento={eventoParaConfirmar}
+      inscribiendo={inscribiendoEnModal}
+      onConfirmar={handleConfirmarInscripcion}
+      onCancelar={() => setEventoParaConfirmar(null)}
+    />
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <PageHeader
         title="Inscripciones"
@@ -175,5 +198,6 @@ export default function Inscripciones() {
         </>
       )}
     </div>
+    </>
   )
 }
