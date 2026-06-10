@@ -55,8 +55,9 @@ export function AuthProvider({ children }) {
     setAuthToken(token)
 
     const me = await getMe()
-    setUser(normalizeAuthUser(me))
-    navigate('/')
+    const normalizedUser = normalizeAuthUser(me)
+    setUser(normalizedUser)
+    navigate(normalizedUser?.tipo_usuario === 'admin' ? '/admin' : '/')
   }, [navigate])
 
   const logout = useCallback(async () => {
@@ -67,8 +68,9 @@ export function AuthProvider({ children }) {
     }
     removeAuthToken()
     setUser(null)
+    queryClient.clear()
     navigate('/login')
-  }, [navigate])
+  }, [navigate, queryClient])
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout }}>
