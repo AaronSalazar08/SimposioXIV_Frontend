@@ -118,7 +118,8 @@ function MobileCarousel({ slides, initialIndex }) {
     <div className="relative w-full min-w-0">
       <div
         ref={viewportRef}
-        className="rounded-xl border border-gray-100 bg-gray-50/50 overflow-x-hidden overflow-y-visible touch-pan-y select-none"
+        className="rounded-2xl overflow-x-hidden overflow-y-visible touch-pan-y select-none"
+        style={{ background: 'rgba(0,93,164,0.03)', border: '1px solid rgba(0,93,164,0.08)' }}
         style={{ touchAction: 'pan-y' }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -148,11 +149,12 @@ function MobileCarousel({ slides, initialIndex }) {
         <button
           type="button"
           onClick={() => go(-1)}
-          className="p-2 rounded-lg border border-gray-200 bg-white text-ucr-blue-dark hover:bg-gray-50 shadow-sm transition-colors"
+          className="p-2 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
+          style={{ background: 'linear-gradient(135deg, #005DA4, #003A6E)', boxShadow: '0 2px 8px 0 rgba(0,93,164,0.25)', color: '#fff' }}
           aria-label="Evento anterior"
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         <div className="flex gap-1.5" role="tablist" aria-label="Seleccionar evento en este horario">
@@ -164,24 +166,28 @@ function MobileCarousel({ slides, initialIndex }) {
               aria-selected={i === activeIndex}
               aria-label={`Evento ${i + 1} de ${count}`}
               onClick={() => setIndex(i)}
-              className={`h-2 rounded-full transition-all ${
-                i === activeIndex ? 'w-6 bg-ucr-blue' : 'w-2 bg-gray-300 hover:bg-gray-400'
-              }`}
+              className="h-2 rounded-full transition-all duration-300"
+              style={
+                i === activeIndex
+                  ? { width: '1.5rem', background: 'linear-gradient(90deg, #21BBEF, #005DA4)' }
+                  : { width: '0.5rem', background: 'rgba(0,93,164,0.2)' }
+              }
             />
           ))}
         </div>
         <button
           type="button"
           onClick={() => go(1)}
-          className="p-2 rounded-lg border border-gray-200 bg-white text-ucr-blue-dark hover:bg-gray-50 shadow-sm transition-colors"
+          className="p-2 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
+          style={{ background: 'linear-gradient(135deg, #005DA4, #003A6E)', boxShadow: '0 2px 8px 0 rgba(0,93,164,0.25)', color: '#fff' }}
           aria-label="Siguiente evento"
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
           </svg>
         </button>
       </div>
-      <p className="text-center text-xs text-gray-500 mt-1">
+      <p className="text-center text-sm mt-1 font-mono-accent" style={{ color: 'rgba(0,93,164,0.5)' }}>
         {activeIndex + 1} / {count} en este horario · deslizá para cambiar
       </p>
     </div>
@@ -209,7 +215,7 @@ function DesktopWindowCarousel({ slides, initialIndex }) {
 
   return (
     <div className="relative w-full min-w-0">
-      <div className="rounded-xl border border-gray-100 bg-gray-50/50 overflow-hidden">
+      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(0,93,164,0.03)', border: '1px solid rgba(0,93,164,0.08)' }}>
         <div
           className="flex items-stretch transition-transform duration-300 ease-out"
           style={{
@@ -234,21 +240,23 @@ function DesktopWindowCarousel({ slides, initialIndex }) {
           type="button"
           onClick={() => go(-1)}
           disabled={activeIndex === 0}
-          className="p-2 rounded-lg border border-gray-200 bg-white text-ucr-blue-dark hover:bg-gray-50 shadow-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="p-2 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100"
+          style={{ background: 'linear-gradient(135deg, #005DA4, #003A6E)', boxShadow: '0 2px 8px 0 rgba(0,93,164,0.25)', color: '#fff' }}
           aria-label="Ver eventos anteriores"
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <p className="text-xs text-gray-500 tabular-nums min-w-[7rem] text-center">
+        <p className="text-sm tabular-nums min-w-[7rem] text-center font-mono-accent" style={{ color: 'rgba(0,93,164,0.5)' }}>
           Mostrando {rangeStart}–{rangeEnd} de {count}
         </p>
         <button
           type="button"
           onClick={() => go(1)}
           disabled={activeIndex >= maxIndex}
-          className="p-2 rounded-lg border border-gray-200 bg-white text-ucr-blue-dark hover:bg-gray-50 shadow-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="p-2 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100"
+          style={{ background: 'linear-gradient(135deg, #005DA4, #003A6E)', boxShadow: '0 2px 8px 0 rgba(0,93,164,0.25)', color: '#fff' }}
           aria-label="Ver más eventos"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>

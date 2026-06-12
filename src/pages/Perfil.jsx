@@ -2,48 +2,68 @@ import { useAuth } from '../context/useAuth'
 
 export default function Perfil() {
   const { user, logout } = useAuth()
+  const initial = user?.name?.charAt(0)?.toUpperCase() ?? 'U'
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        {/* Cabecera */}
-        <div className="bg-ucr-blue px-8 py-8 flex flex-col sm:flex-row items-center gap-5">
-          <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-white text-3xl font-bold shadow">
-            {user?.name?.charAt(0)?.toUpperCase() ?? 'U'}
-          </div>
-          <div className="text-center sm:text-left">
-            <h1 className="text-white text-2xl font-bold">{user?.name ?? '—'}</h1>
-            <p className="text-blue-200 text-sm mt-0.5">{user?.email ?? '—'}</p>
+    <div>
+      <section style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(145deg, #010810, #001020 40%, #001a38 70%, #002650)', padding: 'calc(clamp(36px,6vh,56px) + 96px) clamp(20px,4vw,56px) clamp(36px,5vh,52px)', marginTop: -96 }}>
+        <div className="aurora-a" style={{ position: 'absolute', top: '-40%', left: '-6%', width: '46vw', height: '46vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(33,187,239,0.22), transparent 64%)', filter: 'blur(24px)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)', backgroundSize: '60px 60px', WebkitMaskImage: 'radial-gradient(70% 90% at 30% 0%, #000, transparent)', maskImage: 'radial-gradient(70% 90% at 30% 0%, #000, transparent)', pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', maxWidth: 1180, margin: '0 auto' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 9, fontFamily: "'Space Mono', monospace", fontSize: 'clamp(13px,1.3vw,15px)', textTransform: 'uppercase', letterSpacing: '0.2em', color: '#7DDAF5' }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#21BBEF', flexShrink: 0 }} />
+            Estudiante · UCR
+          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 18, flexWrap: 'wrap' }}>
+            <div style={{ width: 72, height: 72, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 28, color: '#fff', letterSpacing: '-0.02em', background: 'linear-gradient(135deg, rgba(33,187,239,0.55), rgba(0,93,164,0.85))', boxShadow: '0 0 0 3px rgba(33,187,239,0.3), 0 0 0 6px rgba(33,187,239,0.08)' }}>
+              {initial}
+            </div>
+            <div>
+              <h1 style={{ margin: 0, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(1.6rem,3.5vw,2.8rem)', lineHeight: 1, letterSpacing: '-0.04em', color: '#fff' }}>
+                {user?.name ?? '—'}
+              </h1>
+              <p style={{ margin: '8px 0 0', fontFamily: "'Space Mono', monospace", fontSize: 'clamp(0.75rem,1vw,0.85rem)', color: 'rgba(255,255,255,0.45)', letterSpacing: '0.04em' }}>
+                {user?.email ?? '—'}
+              </p>
+            </div>
           </div>
         </div>
+        <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 2, background: 'linear-gradient(90deg, transparent, #21BBEF 40%, #005DA4 70%, transparent)' }} />
+      </section>
 
-        {/* Datos */}
-        <div className="px-8 py-6">
-          <h2 className="text-ucr-blue-dark font-semibold text-base mb-4">Información de la cuenta</h2>
-          <dl className="divide-y divide-gray-100">
-            {[
-              { label: 'Nombre completo', value: user?.name },
-              { label: 'Correo electrónico', value: user?.email },
-            ].map(({ label, value }) => (
-              <div key={label} className="py-3 flex flex-col sm:flex-row sm:gap-4">
-                <dt className="text-sm font-medium text-gray-500 sm:w-40 flex-shrink-0">{label}</dt>
-                <dd className="text-sm text-gray-900 mt-0.5 sm:mt-0">{value ?? '—'}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-
-        {/* Acciones */}
-        <div className="px-8 pb-8">
-          <button
-            onClick={logout}
-            className="flex items-center gap-2 px-5 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium transition-colors border border-red-200"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            Cerrar sesión
-          </button>
+      <div style={{ background: '#F8FAFD', padding: 'clamp(32px,5vh,52px) clamp(20px,4vw,56px) clamp(64px,10vh,100px)' }}>
+        <div style={{ maxWidth: 560, margin: '0 auto' }}>
+          <div style={{ background: '#fff', borderRadius: 16, border: '1px solid rgba(0,93,164,0.1)', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+            <div style={{ padding: '20px 28px', borderBottom: '1px solid rgba(0,93,164,0.07)' }}>
+              <p style={{ margin: '0 0 16px', fontFamily: "'Space Mono', monospace", fontSize: 14, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(0,93,164,0.5)', fontWeight: 700 }}>
+                Información de la cuenta
+              </p>
+              <dl style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                {[
+                  { label: 'Nombre completo', value: user?.name },
+                  { label: 'Correo electrónico', value: user?.email },
+                ].map(({ label, value }, i, arr) => (
+                  <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '14px 0', borderBottom: i < arr.length - 1 ? '1px solid rgba(0,93,164,0.06)' : 'none' }}>
+                    <dt style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(0,93,164,0.5)', fontFamily: "'Space Mono', monospace" }}>{label}</dt>
+                    <dd style={{ fontSize: 15, color: '#111827', fontWeight: 500, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>{value ?? '—'}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+            <div style={{ padding: '16px 28px' }}>
+              <button
+                onClick={logout}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', fontSize: 15, fontWeight: 600, borderRadius: 10, border: '1px solid rgba(244,63,94,0.3)', background: 'transparent', color: '#be123c', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", transition: 'background 150ms' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#FEF2F2'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              >
+                <svg style={{ width: 15, height: 15 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

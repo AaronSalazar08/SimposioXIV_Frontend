@@ -79,35 +79,64 @@ function SidebarContent({ onClose }) {
   }
 
   const linkClass = ({ isActive }) =>
-    `flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+    `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
       isActive
-        ? 'bg-white/20 text-white'
-        : 'text-blue-100 hover:bg-white/10 hover:text-white'
+        ? 'text-white'
+        : 'text-blue-100/75 hover:text-white hover:bg-white/10'
     }`
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-5 py-5 border-b border-white/10">
-        <p className="text-xs font-semibold text-blue-300 uppercase tracking-wider mb-0.5">
+      {/* Top accent stripe */}
+      <div className="h-[2px] w-full shrink-0" style={{ background: 'linear-gradient(90deg, transparent, #21BBEF 50%, transparent)' }} />
+
+      {/* Brand header */}
+      <div className="px-5 py-4 shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] mb-1 font-mono-accent" style={{ color: 'rgba(33,187,239,0.8)' }}>
           Panel Admin
         </p>
-        <p className="text-white text-sm font-medium truncate">{user?.name ?? user?.email}</p>
+        <p className="text-white text-[13px] font-semibold truncate font-display" style={{ letterSpacing: '-0.01em' }}>
+          {user?.name ?? user?.email}
+        </p>
+        <p className="text-[11px] truncate mt-0.5 font-mono-accent" style={{ color: 'rgba(147,197,253,0.65)' }}>
+          {user?.email}
+        </p>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+      {/* Nav */}
+      <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] px-3.5 pb-1.5 pt-0.5 font-mono-accent" style={{ color: 'rgba(255,255,255,0.28)' }}>
+          Gestión
+        </p>
         {NAV_ITEMS.map(({ to, label, icon, end }) => (
-          <NavLink key={to} to={to} end={end} className={linkClass} onClick={onClose}>
+          <NavLink
+            key={to}
+            to={to}
+            end={end}
+            className={linkClass}
+            style={({ isActive }) =>
+              isActive
+                ? {
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08))',
+                    boxShadow: '0 1px 4px 0 rgba(0,0,0,0.12)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                  }
+                : {}
+            }
+            onClick={onClose}
+          >
             {icon}
             {label}
           </NavLink>
         ))}
       </nav>
 
-      <div className="px-3 py-4 border-t border-white/10 space-y-1">
+      {/* Footer actions */}
+      <div className="px-3 py-3 shrink-0 space-y-0.5" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
         <NavLink
           to="/"
           onClick={onClose}
-          className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-blue-100 hover:bg-white/10 hover:text-white transition-colors"
+          className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-blue-100/75 hover:text-white hover:bg-white/10"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -117,7 +146,8 @@ function SidebarContent({ onClose }) {
         <button
           type="button"
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-rose-300 hover:bg-white/10 hover:text-rose-200 transition-colors"
+          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/10"
+          style={{ color: 'rgba(253,164,175,0.8)' }}
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -132,26 +162,31 @@ function SidebarContent({ onClose }) {
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
+  const sidebarStyle = {
+    background: 'linear-gradient(180deg, #002F58 0%, #001E3D 100%)',
+    borderRight: '1px solid rgba(255,255,255,0.06)',
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen flex" style={{ background: '#F0F4F8' }}>
       {/* Overlay móvil */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-20 lg:hidden"
+          className="fixed inset-0 z-20 lg:hidden"
+          style={{ background: 'rgba(0,15,35,0.55)', backdropFilter: 'blur(4px)' }}
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar escritorio */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-60 xl:w-64 bg-ucr-blue fixed inset-y-0 left-0 z-30">
+      <aside className="hidden lg:flex lg:flex-col lg:w-60 xl:w-64 fixed inset-y-0 left-0 z-30" style={sidebarStyle}>
         <SidebarContent onClose={undefined} />
       </aside>
 
       {/* Sidebar móvil (drawer) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 w-64 bg-ucr-blue flex flex-col transform transition-transform duration-200 lg:hidden ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed inset-y-0 left-0 z-30 w-64 flex flex-col transform transition-transform duration-250 lg:hidden`}
+        style={{ ...sidebarStyle, transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)', transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)' }}
       >
         <SidebarContent onClose={() => setSidebarOpen(false)} />
       </aside>
@@ -159,18 +194,25 @@ export default function AdminLayout() {
       {/* Contenido principal */}
       <div className="flex-1 flex flex-col lg:ml-60 xl:ml-64">
         {/* Header móvil */}
-        <header className="lg:hidden bg-ucr-blue px-4 py-3 flex items-center gap-3 shadow sticky top-0 z-10">
+        <header
+          className="lg:hidden px-4 py-3 flex items-center gap-3 sticky top-0 z-10"
+          style={{
+            background: 'linear-gradient(135deg, #002F58, #001E3D)',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
+            boxShadow: '0 4px 12px -2px rgba(0,0,0,0.2)',
+          }}
+        >
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
-            className="text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+            className="text-white p-1.5 rounded-xl transition-colors hover:bg-white/10"
             aria-label="Abrir menú"
           >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <span className="text-white font-semibold text-sm">Panel Admin</span>
+          <span className="text-white font-semibold text-sm font-display" style={{ letterSpacing: '-0.01em' }}>Panel Admin</span>
         </header>
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8">

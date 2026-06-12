@@ -1,12 +1,17 @@
 import { NavLink } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../context/useAuth'
 import logoUcr from '../assets/logo_ucr.png'
 
-const navItems = [
+const EASE_OUT = 'cubic-bezier(0.16, 1, 0.3, 1)'
+
+const publicNavItems = [
   { to: '/', label: 'Inicio', exact: true },
-  { to: '/informacion', label: 'Información' },
+]
+
+const authNavItems = [
   { to: '/tematicas', label: 'Temáticas' },
+  { to: '/agenda', label: 'Agenda' },
   { to: '/inscripciones', label: 'Inscripciones' },
   { to: '/cronograma', label: 'Cronograma' },
 ]
@@ -15,47 +20,58 @@ export default function Navbar() {
   const { user, logout } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
-  const linkClass = ({ isActive }) =>
-    `px-3 py-2 rounded text-sm font-medium transition-colors ${
-      isActive
-        ? 'bg-white/20 text-white'
-        : 'text-blue-100 hover:bg-white/10 hover:text-white'
-    }`
+  useEffect(() => {
+    let raf = 0
+    const on = () => {
+      if (raf) return
+      raf = requestAnimationFrame(() => { raf = 0; setScrolled(window.scrollY > 40) })
+    }
+    window.addEventListener('scroll', on, { passive: true })
+    on()
+    return () => window.removeEventListener('scroll', on)
+  }, [])
 
-  const mobileInscripcionClass = ({ isActive }) =>
-    `inline-flex items-center justify-center px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-full text-[11px] sm:text-xs font-semibold whitespace-nowrap border transition-colors ${
-      isActive
-        ? 'bg-white text-ucr-blue border-white'
-        : 'text-white border-white/80 bg-white/10 hover:bg-white/20'
-    }`
+  const navItems = user ? [...publicNavItems, ...authNavItems] : publicNavItems
+  const userInitial = user?.name?.charAt(0)?.toUpperCase() ?? 'U'
 
   const closeMobileMenu = () => setMenuOpen(false)
   const closeProfileMenu = () => setProfileOpen(false)
-  const userInitial = user?.name?.charAt(0)?.toUpperCase() ?? 'U'
 
-  const toggleProfileMenu = () => {
-    setProfileOpen((open) => !open)
-    setMenuOpen(false)
-  }
+  const toggleProfileMenu = () => { setProfileOpen(o => !o); setMenuOpen(false) }
+  const toggleMobileMenu  = () => { setMenuOpen(o => !o); setProfileOpen(false) }
 
-  const toggleMobileMenu = () => {
-    setMenuOpen((open) => !open)
-    setProfileOpen(false)
-  }
-
+  /* ── Profile dropdown ── */
   const profileDropdown = profileOpen && (
     <div
-      className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden z-50"
       role="menu"
+      style={{
+        position: 'absolute', right: 0, top: 'calc(100% + 10px)', width: 230,
+        background: '#fff', borderRadius: 14,
+        boxShadow: '0 12px 40px -4px rgba(0,0,0,0.18), 0 4px 16px -2px rgba(0,0,0,0.10)',
+        border: '1px solid rgba(0,0,0,0.06)', overflow: 'hidden',
+        animation: 'slide-down 0.28s cubic-bezier(0.16,1,0.3,1) both',
+        zIndex: 200,
+      }}
     >
+      <div style={{ padding: '14px 18px', background: 'linear-gradient(135deg, #EBF3FA 0%, #F5F9FE 100%)', borderBottom: '1px solid rgba(0,93,164,0.1)' }}>
+        <p style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#005DA4', fontFamily: 'var(--font-display)', letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {user?.name ?? 'Usuario'}
+        </p>
+        <p style={{ margin: '3px 0 0', fontSize: 15, color: '#6B7280', fontFamily: 'var(--font-mono-stack)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {user?.email ?? ''}
+        </p>
+      </div>
       <NavLink
         to="/perfil"
         onClick={closeProfileMenu}
         role="menuitem"
-        className="flex items-center gap-2 px-4 py-3 text-sm text-gray-700 hover:bg-ucr-blue-muted hover:text-ucr-blue transition-colors"
+        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '13px 18px', fontSize: 16, color: '#374151', textDecoration: 'none', transition: `background ${EASE_OUT} 150ms` }}
+        onMouseEnter={e => e.currentTarget.style.background = '#EBF3FA'}
+        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
       >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </svg>
         Mi perfil
@@ -63,13 +79,12 @@ export default function Navbar() {
       <button
         type="button"
         role="menuitem"
-        onClick={() => {
-          closeProfileMenu()
-          logout()
-        }}
-        className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-gray-100"
+        onClick={() => { closeProfileMenu(); logout() }}
+        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '13px 18px', width: '100%', border: 'none', background: 'transparent', fontSize: 16, color: '#DC2626', cursor: 'pointer', borderTop: '1px solid rgba(0,0,0,0.06)', transition: `background 150ms` }}
+        onMouseEnter={e => e.currentTarget.style.background = '#FEF2F2'}
+        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
       >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
         </svg>
         Cerrar sesión
@@ -78,115 +93,243 @@ export default function Navbar() {
   )
 
   return (
-    <nav className="bg-ucr-blue shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-2 min-h-[4.5rem] py-1.5 md:min-h-[4.5rem] md:py-2 lg:min-h-[5rem]">
-          {/* Logo UCR */}
+    <nav
+      aria-label="Navegación principal"
+      style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 120,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
+        padding: '22px clamp(24px, 4vw, 60px)',
+        background: scrolled ? 'rgba(5,7,14,0.72)' : 'transparent',
+        backdropFilter: scrolled ? 'blur(28px) saturate(160%)' : 'none',
+        WebkitBackdropFilter: scrolled ? 'blur(28px) saturate(160%)' : 'none',
+        borderBottom: scrolled ? '1px solid rgba(255,255,255,0.08)' : '1px solid transparent',
+        transition: `background 250ms ${EASE_OUT}, border-color 250ms ${EASE_OUT}`,
+      }}
+    >
+
+      {/* Logo */}
+      <NavLink
+        to="/"
+        onClick={() => { closeMobileMenu(); closeProfileMenu() }}
+        style={{ display: 'flex', alignItems: 'center', gap: 18, textDecoration: 'none', flexShrink: 0 }}
+      >
+        <img
+          src={logoUcr}
+          alt="Universidad de Costa Rica"
+          style={{ height: 58, width: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.95 }}
+        />
+        <div style={{ borderLeft: '1px solid rgba(255,255,255,0.2)', paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 5 }}>
+          <span style={{ fontFamily: 'var(--font-mono-stack)', fontSize: 16, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#21BBEF', lineHeight: 1 }}>
+            Simposio · CIE
+          </span>
+          <span style={{ fontFamily: 'var(--font-mono-stack)', fontSize: 15, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', lineHeight: 1 }}>
+            XIV Edición · Guanacaste
+          </span>
+        </div>
+      </NavLink>
+
+      {/* Desktop nav links */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1, justifyContent: 'center' }} className="nav-links-desktop">
+        {navItems.map(({ to, label, exact }) => (
           <NavLink
-            to="/"
-            onClick={() => {
-              closeMobileMenu()
-              closeProfileMenu()
-            }}
-            className="flex items-center min-w-0 flex-shrink max-w-[46%] sm:max-w-[54%] md:max-w-none"
+            key={to}
+            to={to}
+            end={exact}
+            onClick={() => { closeMobileMenu(); closeProfileMenu() }}
+            style={({ isActive }) => ({
+              display: 'inline-flex', alignItems: 'center',
+              padding: '11px 20px',
+              fontFamily: 'var(--font-body)', fontSize: 17, fontWeight: 500,
+              whiteSpace: 'nowrap',
+              borderRadius: 9999, textDecoration: 'none',
+              color: isActive ? '#fff' : 'rgba(255,255,255,0.5)',
+              background: isActive ? 'rgba(255,255,255,0.07)' : 'transparent',
+              transition: `color 150ms, background 150ms`,
+            })}
+            onMouseEnter={e => { if (e.currentTarget.getAttribute('aria-current') !== 'page') { e.currentTarget.style.color = '#fff' } }}
+            onMouseLeave={e => { if (e.currentTarget.getAttribute('aria-current') !== 'page') { e.currentTarget.style.color = 'rgba(255,255,255,0.5)' } }}
           >
-            <img
-              src={logoUcr}
-              alt="Universidad de Costa Rica"
-              className="block h-[3.75rem] w-auto min-w-[10rem] max-w-full object-contain object-left sm:h-12 md:h-12 lg:h-14 md:min-w-[9rem] lg:min-w-[10rem]"
-            />
+            {label}
           </NavLink>
+        ))}
+      </div>
 
-          {/* Links escritorio */}
-          <div className="hidden md:flex items-center gap-1 flex-1 justify-center">
-            {navItems.map(({ to, label, exact }) => (
-              <NavLink key={to} to={to} end={exact} className={linkClass}>
-                {label}
-              </NavLink>
-            ))}
-          </div>
-
-          {/* Inscribirse (móvil) + perfil + menú hamburguesa */}
-          <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 flex-shrink-0">
+      {/* Right actions */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+        {user ? (
+          <>
+            {/* Inscripciones — mobile quick link */}
             <NavLink
               to="/inscripciones"
-              onClick={() => {
-                closeMobileMenu()
-                closeProfileMenu()
-              }}
-              className={({ isActive }) =>
-                `md:hidden ${mobileInscripcionClass({ isActive })}`
-              }
-              title="Realizar inscripción a eventos"
+              onClick={() => { closeMobileMenu(); closeProfileMenu() }}
+              style={({ isActive }) => ({
+                display: 'none',
+                alignItems: 'center', justifyContent: 'center',
+                padding: '7px 16px', borderRadius: 9999,
+                fontFamily: 'var(--font-mono-stack)', fontSize: 15, fontWeight: 600,
+                letterSpacing: '0.04em', textTransform: 'uppercase', whiteSpace: 'nowrap',
+                textDecoration: 'none',
+                background: isActive ? '#fff' : 'rgba(255,255,255,0.1)',
+                color: isActive ? '#002F58' : '#fff',
+                border: '1px solid rgba(255,255,255,0.3)',
+              })}
+              className="nav-mobile-ins"
             >
-              Inscribirse
+              Inscripciones
             </NavLink>
 
-            <div className="relative">
+            {/* Profile button */}
+            <div style={{ position: 'relative' }}>
               <button
                 type="button"
                 onClick={toggleProfileMenu}
-                className="flex items-center gap-2 text-blue-100 hover:text-white transition-colors p-0.5 rounded-full md:rounded md:px-3 md:py-2 hover:bg-white/10 ring-1 ring-white/50 md:ring-0"
                 aria-label="Menú de perfil"
                 aria-expanded={profileOpen}
                 aria-haspopup="menu"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 9,
+                  padding: '9px 14px 9px 9px',
+                  background: profileOpen ? 'rgba(255,255,255,0.12)' : 'transparent',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 9999, cursor: 'pointer',
+                  transition: `background 150ms, border-color 150ms`,
+                  color: '#fff',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)' }}
+                onMouseLeave={e => { if (!profileOpen) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)' } }}
               >
-                <div className="w-9 h-9 md:w-8 md:h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                {/* Avatar */}
+                <div style={{
+                  width: 40, height: 40, borderRadius: '50%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: 'linear-gradient(135deg, rgba(33,187,239,0.55), rgba(0,93,164,0.85))',
+                  boxShadow: profileOpen ? '0 0 0 2px #21BBEF' : '0 0 0 1.5px rgba(255,255,255,0.25)',
+                  fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15, color: '#fff',
+                  flexShrink: 0, transition: 'box-shadow 150ms',
+                }}>
                   {userInitial}
                 </div>
-                <span className="hidden md:inline text-sm font-medium max-w-[8rem] truncate">
-                  {user?.name ?? 'Perfil'}
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 500, maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                  className="nav-username">
+                  {user.name}
                 </span>
-                <svg className="hidden md:block w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                <svg
+                  style={{ width: 15, height: 15, flexShrink: 0, transition: `transform 200ms ${EASE_OUT}`, transform: profileOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden
+                  className="nav-chevron"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
               {profileDropdown}
             </div>
+          </>
+        ) : (
+          /* Unauthenticated — botón de acceso */
+          <NavLink
+            to="/login"
+            onClick={() => { closeMobileMenu(); closeProfileMenu() }}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '12px 28px', borderRadius: 9999,
+              fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 600,
+              letterSpacing: '-0.01em', textDecoration: 'none', whiteSpace: 'nowrap',
+              background: '#21BBEF', color: '#02070E',
+              boxShadow: '0 0 24px rgba(33,187,239,0.3)',
+              transition: `background 150ms, box-shadow 150ms`,
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#44C9F3'; e.currentTarget.style.boxShadow = '0 0 32px rgba(33,187,239,0.45)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = '#21BBEF'; e.currentTarget.style.boxShadow = '0 0 24px rgba(33,187,239,0.3)' }}
+          >
+            Iniciar sesión
+            <span style={{ fontFamily: 'var(--font-mono-stack)', fontSize: 16 }}>→</span>
+          </NavLink>
+        )}
 
-            <button
-              type="button"
-              onClick={toggleMobileMenu}
-              className="p-2 text-white rounded-lg hover:bg-white/10 md:hidden"
-              aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
-              aria-expanded={menuOpen}
-            >
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                {menuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
-          </div>
-        </div>
+        {/* Hamburger — mobile */}
+        <button
+          type="button"
+          onClick={toggleMobileMenu}
+          aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+          aria-expanded={menuOpen}
+          style={{
+            display: 'none',
+            width: 52, height: 52, borderRadius: 9999,
+            border: '1px solid rgba(255,255,255,0.18)',
+            background: 'rgba(255,255,255,0.05)',
+            color: '#fff', cursor: 'pointer',
+            alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            transition: 'background 150ms',
+          }}
+          className="nav-burger"
+        >
+          <span style={{ position: 'relative', display: 'inline-block', width: 20, height: 14 }}>
+            <span style={{ position: 'absolute', left: 0, right: 0, top: menuOpen ? 6 : 0, height: 2, background: '#fff', borderRadius: 2, transform: menuOpen ? 'rotate(45deg)' : 'none', transition: `all 250ms ${EASE_OUT}` }} />
+            <span style={{ position: 'absolute', left: 0, right: 0, top: 6, height: 2, background: '#fff', borderRadius: 2, opacity: menuOpen ? 0 : 1, transition: 'opacity 200ms' }} />
+            <span style={{ position: 'absolute', left: 0, right: 0, top: menuOpen ? 6 : 12, height: 2, background: '#fff', borderRadius: 2, transform: menuOpen ? 'rotate(-45deg)' : 'none', transition: `all 250ms ${EASE_OUT}` }} />
+          </span>
+        </button>
       </div>
 
-      {/* Menú móvil */}
+      {/* Mobile dropdown */}
       {menuOpen && (
-        <div className="md:hidden border-t border-blue-700 bg-ucr-blue-dark">
-          <div className="px-4 py-3 space-y-1">
-            {navItems.map(({ to, label, exact }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={exact}
-                onClick={closeMobileMenu}
-                className={({ isActive }) =>
-                  `block px-3 py-2 rounded text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-white/20 text-white'
-                      : 'text-blue-100 hover:bg-white/10 hover:text-white'
-                  }`
-                }
-              >
-                {label}
-              </NavLink>
-            ))}
-          </div>
+        <div
+          style={{
+            position: 'absolute', top: '100%', left: 0, right: 0,
+            background: 'rgba(5,7,14,0.96)',
+            backdropFilter: 'blur(28px) saturate(160%)',
+            WebkitBackdropFilter: 'blur(28px) saturate(160%)',
+            borderBottom: '1px solid rgba(255,255,255,0.08)',
+            padding: '8px clamp(20px,3.4vw,48px) 18px',
+            display: 'flex', flexDirection: 'column', gap: 2,
+            animation: `slide-down 0.28s ${EASE_OUT} both`,
+            zIndex: 110,
+          }}
+        >
+          {navItems.map(({ to, label, exact }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={exact}
+              onClick={closeMobileMenu}
+              style={({ isActive }) => ({
+                display: 'flex', alignItems: 'center',
+                padding: '14px 14px',
+                fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 500, letterSpacing: '-0.01em',
+                borderRadius: 10, textDecoration: 'none',
+                color: isActive ? '#fff' : 'rgba(255,255,255,0.7)',
+                background: isActive ? 'rgba(255,255,255,0.1)' : 'transparent',
+                borderBottom: '1px solid rgba(255,255,255,0.06)',
+              })}
+            >
+              {label}
+            </NavLink>
+          ))}
+          {!user && (
+            <NavLink
+              to="/login"
+              onClick={closeMobileMenu}
+              style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                marginTop: 10, padding: '14px 14px', borderRadius: 10,
+                fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 600, letterSpacing: '-0.01em',
+                background: '#21BBEF', color: '#02070E', textDecoration: 'none',
+              }}
+            >
+              Iniciar sesión →
+            </NavLink>
+          )}
         </div>
       )}
+
+      <style>{`
+        @media (max-width: 767px) {
+          .nav-links-desktop { display: none !important; }
+          .nav-burger { display: inline-flex !important; }
+          .nav-mobile-ins { display: inline-flex !important; }
+          .nav-username, .nav-chevron { display: none !important; }
+        }
+      `}</style>
     </nav>
   )
 }

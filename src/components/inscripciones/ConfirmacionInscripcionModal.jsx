@@ -3,6 +3,13 @@ import { TIPO_LABELS, TIPO_COLORS, TIPO_COLOR_DEFAULT } from '../../constants/ev
 import { formatFecha, formatHora } from '../../utils/date'
 import Spinner from '../ui/Spinner'
 
+const TIPO_ACCENT = {
+  apertura: '#10B981',
+  clausura: '#EF4444',
+  taller: '#F59E0B',
+  charla: '#3B82F6',
+}
+
 export default function ConfirmacionInscripcionModal({ evento, inscribiendo, onConfirmar, onCancelar }) {
   const open = !!evento
 
@@ -18,44 +25,53 @@ export default function ConfirmacionInscripcionModal({ evento, inscribiendo, onC
   const tipo = evento.tipo
   const tipoLabel = TIPO_LABELS[tipo] ?? tipo
   const tipoColor = TIPO_COLORS[tipo] ?? TIPO_COLOR_DEFAULT
+  const tipoAccent = TIPO_ACCENT[tipo] ?? '#64748B'
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in"
       onClick={(e) => e.target === e.currentTarget && onCancelar()}
+      style={{ background: 'rgba(0,15,35,0.55)', backdropFilter: 'blur(4px)' }}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl w-full max-w-md"
+        className="bg-white w-full max-w-md animate-scale-in overflow-hidden"
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-title"
+        style={{
+          borderRadius: 20,
+          boxShadow: '0 24px 64px -12px rgba(0,0,0,0.35), 0 8px 24px -4px rgba(0,0,0,0.15)',
+        }}
       >
+        {/* Top accent stripe */}
+        <div className="h-[3px] w-full" style={{ background: `linear-gradient(90deg, ${tipoAccent} 0%, rgba(0,93,164,0.5) 100%)` }} />
+
         {/* Header */}
-        <div className="px-6 pt-6 pb-4 border-b border-gray-100">
+        <div className="px-6 pt-5 pb-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <span className={`inline-block text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full border mb-2 ${tipoColor}`}>
+              <span className={`inline-block text-sm font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full border mb-2.5 ${tipoColor}`}>
                 {tipoLabel}
               </span>
-              <h2 id="confirm-title" className="text-base font-bold text-ucr-blue-dark leading-snug">
+              <h2 id="confirm-title" className="text-[15px] font-bold text-ucr-blue-dark leading-snug font-display" style={{ letterSpacing: '-0.01em' }}>
                 {evento.titulo}
               </h2>
             </div>
             <button
               type="button"
               onClick={onCancelar}
-              className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100 flex-shrink-0 mt-0.5"
+              className="text-gray-400 hover:text-gray-700 transition-colors p-1.5 rounded-xl hover:bg-gray-100 flex-shrink-0 mt-0.5"
               aria-label="Cerrar"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg className="w-4.5 h-4.5 w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
         </div>
 
-        {/* Detalles del evento */}
-        <div className="px-6 py-4 space-y-2.5 text-sm text-gray-700">
+        {/* Event details */}
+        <div className="px-6 py-4 space-y-2.5 text-[13.5px] text-gray-600">
           {evento.horario && (
             <div className="flex items-start gap-2.5">
               <svg className="w-4 h-4 text-ucr-blue flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -84,26 +100,34 @@ export default function ConfirmacionInscripcionModal({ evento, inscribiendo, onC
             </div>
           )}
 
-          <p className="text-xs text-gray-500 pt-1">
-            Cupos disponibles:{' '}
-            <span className="font-semibold text-emerald-600">{evento.cupos_disponibles}</span>
-          </p>
+          {/* Cupos badge */}
+          <div
+            className="inline-flex items-center gap-2 mt-1 px-3 py-1.5 rounded-xl text-sm font-semibold font-mono-accent"
+            style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.25)', color: '#065f46' }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-none" />
+            {evento.cupos_disponibles} cupos disponibles
+          </div>
         </div>
 
-        {/* Pregunta de confirmación */}
+        {/* Confirmation question */}
         <div className="px-6 pb-2">
-          <p className="text-sm font-semibold text-ucr-blue-dark">
+          <p className="text-base font-semibold text-ucr-blue-dark font-display">
             ¿Confirmar tu inscripción a este evento?
           </p>
         </div>
 
-        {/* Botones */}
-        <div className="px-6 py-4 flex flex-col-reverse sm:flex-row gap-2.5 sm:justify-end border-t border-gray-100 mt-2">
+        {/* Actions */}
+        <div
+          className="px-6 py-4 flex flex-col-reverse sm:flex-row gap-2.5 sm:justify-end mt-2"
+          style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}
+        >
           <button
             type="button"
             onClick={onCancelar}
             disabled={inscribiendo}
-            className="px-4 py-2 text-sm font-semibold rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            className="px-5 py-2.5 text-sm font-semibold rounded-xl border transition-all duration-200 hover:bg-gray-50 active:scale-[0.97] disabled:opacity-50"
+            style={{ borderColor: 'rgba(0,0,0,0.12)', color: '#374151' }}
           >
             Cancelar
           </button>
@@ -111,13 +135,11 @@ export default function ConfirmacionInscripcionModal({ evento, inscribiendo, onC
             type="button"
             onClick={onConfirmar}
             disabled={inscribiendo}
-            className="px-4 py-2 text-sm font-semibold rounded-lg bg-ucr-blue text-white hover:bg-ucr-blue-dark disabled:opacity-60 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+            className="px-5 py-2.5 text-sm font-semibold rounded-xl text-white transition-all duration-200 active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            style={{ background: 'linear-gradient(135deg, #005DA4, #003A6E)', boxShadow: '0 4px 12px 0 rgba(0,93,164,0.25)' }}
           >
             {inscribiendo ? (
-              <>
-                <Spinner size="sm" />
-                Inscribiendo...
-              </>
+              <><Spinner size="sm" />Inscribiendo...</>
             ) : (
               'Confirmar inscripción'
             )}

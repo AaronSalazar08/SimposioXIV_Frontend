@@ -11,7 +11,7 @@ export default function SelectField({
 }) {
   return (
     <div className={className}>
-      <label htmlFor={htmlFor} className="block text-xs font-medium text-gray-700 mb-1">
+      <label htmlFor={htmlFor} className="block text-sm font-medium text-gray-700 mb-1">
         {label}
       </label>
       <select
