@@ -1,189 +1,189 @@
 import { useEffect, useRef } from 'react'
-import { TIPO_LABELS, TIPO_COLORS, TIPO_COLOR_DEFAULT } from '../constants/eventos'
-import { formatFecha, formatHora } from '../utils/date'
+import { TIPO_LABELS } from '../constants/eventos'
 import Spinner from './ui/Spinner'
 
-const TIPO_ACCENT = {
-  apertura: '#10B981',
-  clausura: '#EF4444',
-  taller: '#F59E0B',
-  charla: '#3B82F6',
-}
+const TIPO_ACCENT = { apertura: '#10B981', clausura: '#EF4444', taller: '#F59E0B', charla: '#21BBEF' }
+const TIPO_BG     = { apertura: '#ECFDF5', clausura: '#FEF2F2', taller: '#FFFBEB', charla: '#EFF8FF' }
+const TIPO_FG     = { apertura: '#065F46', clausura: '#991B1B', taller: '#92400E', charla: '#0C4A6E' }
 
 export default function EventoCard({
-  evento,
-  onInscribirse,
-  onCancelar,
-  inscribiendo = false,
-  cancelando = false,
-  inscripcionId = null,
-  mensajeAccion = null,
+  evento, onInscribirse, onCancelar,
+  inscribiendo = false, cancelando = false,
+  inscripcionId = null, mensajeAccion = null,
 }) {
   const rootRef = useRef(null)
-
   useEffect(() => {
-    if (mensajeAccion?.type === 'error' && rootRef.current) {
+    if (mensajeAccion?.type === 'error' && rootRef.current)
       rootRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
-    }
   }, [mensajeAccion])
 
-  const inscrito = !!inscripcionId || !!evento.usuario_inscrito
-  const sinCupos = !evento.tiene_capacidad_disponible
-  const tipo = evento.tipo
+  const inscrito  = !!inscripcionId || !!evento.usuario_inscrito
+  const sinCupos  = !evento.tiene_capacidad_disponible
+  const tipo      = evento.tipo
   const tipoLabel = TIPO_LABELS[tipo] ?? tipo
-  const tipoColor = TIPO_COLORS[tipo] ?? TIPO_COLOR_DEFAULT
-  const tipoAccent = TIPO_ACCENT[tipo] ?? '#64748B'
+  const accent    = TIPO_ACCENT[tipo] ?? '#64748B'
+  const tipoBg    = TIPO_BG[tipo]    ?? 'rgba(100,116,139,0.1)'
+  const tipoFg    = TIPO_FG[tipo]    ?? '#334155'
+
+  const ponenteNombre = evento.ponente
+    ? (evento.ponente.nombre_completo || `${evento.ponente.nombre} ${evento.ponente.apellidos}`)
+    : null
 
   return (
     <div
       ref={rootRef}
-      className="bg-white flex flex-col min-w-0 min-h-0 transition-all duration-200 hover:-translate-y-0.5"
       style={{
-        borderRadius: 16,
-        border: '1px solid rgba(0,0,0,0.07)',
-        boxShadow: '0 1px 4px 0 rgba(0,0,0,0.06)',
+        background: inscrito ? '#F0F9FF' : '#fff',
+        border: `1px solid ${inscrito ? 'rgba(33,187,239,0.3)' : 'rgba(0,0,0,0.08)'}`,
+        borderRadius: 14,
         overflow: 'hidden',
+        boxShadow: inscrito ? '0 1px 6px rgba(33,187,239,0.12)' : '0 1px 3px rgba(0,0,0,0.05)',
+        transition: 'all 200ms',
       }}
     >
-      {/* Top accent stripe */}
-      <div className="h-[3px] w-full flex-none" style={{ background: `linear-gradient(90deg, ${tipoAccent}, transparent)` }} />
-
-      {/* Header: tipo + día */}
-      <div className="px-4 pt-3.5 pb-2.5 flex items-center justify-between gap-2">
-        <span className={`text-sm font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full border ${tipoColor}`}>
-          {tipoLabel}
-        </span>
-        {evento.horario?.numero_dia && (
-          <span
-            className="text-sm font-bold uppercase tracking-wide px-2 py-0.5 rounded-full font-mono-accent"
-            style={{ background: 'rgba(0,93,164,0.07)', color: '#004A87' }}
-          >
-            Día {evento.horario.numero_dia}
-          </span>
-        )}
-      </div>
-
-      {/* Título y descripción */}
-      <div className="px-4 pb-2.5 min-w-0">
-        <h3 className="text-[15px] font-bold text-ucr-blue-dark leading-snug break-words font-display" style={{ letterSpacing: '-0.01em' }}>
-          {evento.titulo}
-        </h3>
-        {evento.descripcion && (
-          <p className="text-[15px] text-gray-500 mt-1.5 line-clamp-3 leading-relaxed">{evento.descripcion}</p>
-        )}
-      </div>
-
-      {/* Áreas */}
-      {evento.areas?.length > 0 && (
-        <div className="px-4 pb-2.5 flex items-center gap-1.5 flex-wrap">
-          {evento.areas.map((a) => (
-            <span
-              key={a.id}
-              className="text-sm font-semibold px-2.5 py-0.5 rounded-full text-white flex-shrink-0"
-              style={{ backgroundColor: a.color || '#64748B' }}
-            >
-              {a.nombre}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '20px 22px' }}>
+        {/* Main content */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {/* Meta row: tipo + areas + aula */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', marginBottom: 10 }}>
+            <span style={{
+              fontFamily: "'Space Mono', monospace",
+              fontSize: 13, fontWeight: 700,
+              textTransform: 'uppercase', letterSpacing: '0.07em',
+              padding: '4px 10px', borderRadius: 9999,
+              background: tipoBg, color: tipoFg,
+              border: `1px solid ${accent}33`,
+            }}>
+              {tipoLabel}
             </span>
-          ))}
-        </div>
-      )}
-
-      {/* Metadata */}
-      <div
-        className="px-4 py-3 mt-auto space-y-1.5 text-[15px]"
-        style={{ background: 'rgba(0,93,164,0.03)', borderTop: '1px solid rgba(0,0,0,0.06)' }}
-      >
-        {evento.horario && (
-          <div className="flex items-start gap-2 text-gray-600 min-w-0">
-            <svg className="w-3.5 h-3.5 text-ucr-blue flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span className="capitalize break-words min-w-0">
-              {formatFecha(evento.horario.hora_inicio)} · {formatHora(evento.horario.hora_inicio)}–{formatHora(evento.horario.hora_fin)}
-            </span>
+            {evento.areas?.map(a => (
+              <span key={a.id} style={{
+                fontSize: 13, fontWeight: 700,
+                textTransform: 'uppercase', letterSpacing: '0.06em',
+                padding: '4px 10px', borderRadius: 9999,
+                background: a.color || '#64748B', color: '#fff',
+              }}>
+                {a.nombre}
+              </span>
+            ))}
+            {evento.horario?.aula && (
+              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, color: '#6B7280' }}>
+                {evento.horario.aula.edificio} · {evento.horario.aula.numero}
+              </span>
+            )}
           </div>
-        )}
-        {evento.horario?.aula && (
-          <div className="flex items-start gap-2 text-gray-600 min-w-0">
-            <svg className="w-3.5 h-3.5 text-ucr-blue flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span className="break-words min-w-0">
-              Aula {evento.horario.aula.numero} · {evento.horario.aula.edificio}
-            </span>
-          </div>
-        )}
-        {evento.ponente && (
-          <div className="flex items-start gap-2 text-gray-600 min-w-0">
-            <svg className="w-3.5 h-3.5 text-ucr-blue flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span className="break-words min-w-0">
-              {evento.ponente.nombre_completo || `${evento.ponente.nombre} ${evento.ponente.apellidos}`}
-            </span>
-          </div>
-        )}
-      </div>
 
-      {/* Feedback message */}
-      {mensajeAccion && (
-        <div
-          role="alert"
-          className={`mx-4 mb-0 mt-0 px-4 py-2.5 text-[15px] font-medium leading-snug break-words ${
-            mensajeAccion.type === 'success'
-              ? 'bg-emerald-50 border-y border-emerald-200 text-emerald-900'
-              : 'bg-rose-50 border-y border-rose-200 text-rose-900'
-          }`}
-        >
-          {mensajeAccion.message}
-        </div>
-      )}
+          {/* Title */}
+          <h3 style={{
+            margin: 0,
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 700,
+            fontSize: 'clamp(1.15rem,1.8vw,1.35rem)',
+            lineHeight: 1.25, letterSpacing: '-0.01em', color: '#111827',
+          }}>
+            {evento.titulo}
+          </h3>
 
-      {/* Footer: cupos + CTA */}
-      <div
-        className="px-4 py-3 flex flex-col gap-2 max-[616px]:items-stretch min-[617px]:flex-row min-[617px]:items-center min-[617px]:justify-between min-[617px]:gap-3 min-w-0"
-        style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}
-      >
-        <div className="text-sm font-semibold shrink-0 max-[616px]:text-center">
-          <span className={sinCupos ? 'text-rose-600' : 'text-emerald-600'}>
-            {evento.cupos_disponibles} cupos
-          </span>
+          {/* Ponente */}
+          {ponenteNombre && (
+            <p style={{ margin: '7px 0 0', fontSize: 16, color: '#6B7280', fontFamily: "'Space Grotesk', sans-serif" }}>
+              {ponenteNombre}
+            </p>
+          )}
+
+          {/* Description */}
+          {evento.descripcion && (
+            <p style={{
+              margin: '6px 0 0', fontSize: 15, color: '#9CA3AF', lineHeight: 1.55,
+              display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+            }}>
+              {evento.descripcion}
+            </p>
+          )}
+
+          {/* Cupos + día */}
+          <div style={{ marginTop: 11, display: 'flex', alignItems: 'center', gap: 9 }}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: sinCupos ? '#DC2626' : '#059669' }}>
+              {evento.cupos_disponibles} cupos
+            </span>
+            {evento.horario?.numero_dia && (
+              <span style={{
+                fontFamily: "'Space Mono', monospace", fontSize: 13,
+                color: '#005DA4', background: 'rgba(0,93,164,0.07)',
+                padding: '3px 9px', borderRadius: 9999,
+              }}>
+                Día {evento.horario.numero_dia}
+              </span>
+            )}
+          </div>
         </div>
 
+        {/* Action button */}
         {inscrito ? (
           <button
+            type="button"
             onClick={() => onCancelar?.(inscripcionId, evento)}
             disabled={cancelando}
-            className="px-3.5 py-2 text-sm font-semibold rounded-xl border transition-all duration-200 flex items-center justify-center gap-1.5 max-[616px]:w-full min-[617px]:py-1.5 min-[617px]:w-auto hover:bg-rose-50 active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed"
-            style={{ borderColor: 'rgba(239,68,68,0.4)', color: '#dc2626' }}
+            title="Cancelar inscripción"
+            style={{
+              width: 50, height: 50, borderRadius: '50%', flexShrink: 0,
+              background: '#21BBEF', border: 'none',
+              color: '#fff', fontSize: 22,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: cancelando ? 'not-allowed' : 'pointer',
+              opacity: cancelando ? 0.6 : 1,
+              boxShadow: '0 2px 8px rgba(33,187,239,0.35)',
+              transition: 'background 150ms',
+            }}
+            onMouseEnter={ev => { if (!cancelando) ev.currentTarget.style.background = '#DC2626' }}
+            onMouseLeave={ev => { if (!cancelando) ev.currentTarget.style.background = '#21BBEF' }}
           >
-            {cancelando ? (
-              <><Spinner size="sm" className="border-rose-400" />Cancelando...</>
-            ) : (
-              'Cancelar inscripción'
-            )}
+            {cancelando ? <Spinner size="sm" /> : '✓'}
           </button>
         ) : (
           <button
-            onClick={() => onInscribirse?.(evento)}
+            type="button"
+            onClick={() => { if (!sinCupos && !inscribiendo) onInscribirse?.(evento) }}
             disabled={inscribiendo || sinCupos}
-            className="px-3.5 py-2 text-sm font-semibold rounded-xl text-white transition-all duration-200 flex items-center justify-center gap-1.5 max-[616px]:w-full min-[617px]:py-1.5 min-[617px]:w-auto active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed"
+            title={sinCupos ? 'Sin cupos disponibles' : 'Inscribirse'}
             style={{
-              background: sinCupos ? '#94a3b8' : 'linear-gradient(135deg, #005DA4, #004A87)',
-              boxShadow: sinCupos ? 'none' : '0 2px 8px 0 rgba(0,93,164,0.25)',
+              width: 50, height: 50, borderRadius: '50%', flexShrink: 0,
+              background: 'transparent',
+              border: `1.5px solid ${sinCupos ? '#E5E7EB' : 'rgba(0,0,0,0.2)'}`,
+              color: sinCupos ? '#D1D5DB' : '#374151',
+              fontSize: 28, fontWeight: 300,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: (inscribiendo || sinCupos) ? 'not-allowed' : 'pointer',
+              opacity: inscribiendo ? 0.6 : 1,
+              transition: 'all 150ms',
+            }}
+            onMouseEnter={ev => {
+              if (!sinCupos && !inscribiendo) {
+                ev.currentTarget.style.borderColor = '#21BBEF'
+                ev.currentTarget.style.color = '#21BBEF'
+              }
+            }}
+            onMouseLeave={ev => {
+              ev.currentTarget.style.borderColor = sinCupos ? '#E5E7EB' : 'rgba(0,0,0,0.2)'
+              ev.currentTarget.style.color = sinCupos ? '#D1D5DB' : '#374151'
             }}
           >
-            {inscribiendo ? (
-              <><Spinner size="sm" />Inscribiendo...</>
-            ) : sinCupos ? (
-              'Sin cupos'
-            ) : (
-              'Inscribirse'
-            )}
+            {inscribiendo ? <Spinner size="sm" /> : '+'}
           </button>
         )}
       </div>
+
+      {/* Feedback */}
+      {mensajeAccion && (
+        <div role="alert" style={{
+          padding: '12px 22px', fontSize: 16, fontWeight: 500, lineHeight: 1.4,
+          borderTop: `1px solid ${mensajeAccion.type === 'success' ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
+          background: mensajeAccion.type === 'success' ? '#ECFDF5' : '#FEF2F2',
+          color: mensajeAccion.type === 'success' ? '#065F46' : '#991B1B',
+        }}>
+          {mensajeAccion.message}
+        </div>
+      )}
     </div>
   )
 }

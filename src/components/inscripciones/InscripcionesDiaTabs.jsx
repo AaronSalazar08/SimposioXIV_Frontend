@@ -1,5 +1,6 @@
 import { DIAS_SIMPOSIO } from '../../constants/eventos'
-import { formatFechaDiaTab } from '../../utils/date'
+
+const DAY_DATES = { '1': '05 Ago', '2': '06 Ago', '3': '07 Ago' }
 
 function badgeLabel(count) {
   if (!count || count <= 0) return null
@@ -9,12 +10,12 @@ function badgeLabel(count) {
 export default function InscripcionesDiaTabs({ diaActivo, onSelectDia, conteosPorDia = {} }) {
   return (
     <div
-      className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-6"
+      style={{ display: 'inline-flex', background: 'rgba(0,0,0,0.07)', borderRadius: 9999, padding: 5, gap: 3 }}
       role="tablist"
       aria-label="Filtrar eventos por día"
     >
       {DIAS_SIMPOSIO.map((dia) => {
-        const activo = diaActivo === dia.value
+        const on = diaActivo === dia.value
         const badge = badgeLabel(conteosPorDia[dia.value])
 
         return (
@@ -22,57 +23,27 @@ export default function InscripcionesDiaTabs({ diaActivo, onSelectDia, conteosPo
             key={dia.value}
             type="button"
             role="tab"
-            aria-selected={activo}
+            aria-selected={on}
             onClick={() => onSelectDia(dia.value)}
-            className="rounded-2xl px-4 py-3.5 text-center transition-all duration-200 relative overflow-hidden"
-            style={
-              activo
-                ? {
-                    background: 'linear-gradient(135deg, #005DA4, #003A6E)',
-                    border: '1px solid transparent',
-                    boxShadow: '0 4px 12px 0 rgba(0,93,164,0.28)',
-                    transform: 'translateY(-1px)',
-                  }
-                : {
-                    background: '#fff',
-                    border: '1px solid rgba(0,93,164,0.12)',
-                    boxShadow: '0 1px 3px 0 rgba(0,0,0,0.05)',
-                  }
-            }
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 9,
+              height: 50, padding: '0 22px', border: 'none', borderRadius: 9999,
+              background: on ? '#111827' : 'transparent',
+              boxShadow: on ? '0 1px 6px rgba(0,0,0,0.2)' : 'none',
+              color: on ? '#fff' : '#6B7280',
+              fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 19,
+              cursor: 'pointer', transition: 'all 150ms', whiteSpace: 'nowrap',
+            }}
           >
-            {activo && (
-              <div
-                className="absolute top-0 right-0 w-24 h-24 rounded-full pointer-events-none"
-                style={{ background: 'radial-gradient(circle, rgba(33,187,239,0.18), transparent 65%)', transform: 'translate(30%, -30%)' }}
-              />
-            )}
-            <span
-              className={`block text-sm capitalize mb-1 leading-tight font-mono-accent tracking-wide ${
-                activo ? 'text-blue-200/80' : 'text-gray-400'
-              }`}
-            >
-              {formatFechaDiaTab(dia.fechaReferencia)}
+            Día {dia.numeroDia}
+            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 15, opacity: on ? 0.6 : 0.7 }}>
+              · {DAY_DATES[dia.value]}
             </span>
-            <span className="flex items-center justify-center gap-1.5">
-              <span
-                className={`text-lg font-bold font-display ${activo ? 'text-white' : 'text-ucr-blue-dark'}`}
-                style={{ letterSpacing: '-0.02em' }}
-              >
-                Día {dia.numeroDia}
+            {badge && (
+              <span style={{ fontSize: 14, fontFamily: "'Space Mono', monospace", background: on ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)', color: on ? '#fff' : '#6B7280', borderRadius: 9999, padding: '2px 9px' }}>
+                {badge}
               </span>
-              {badge && (
-                <span
-                  className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full text-sm font-bold font-mono-accent"
-                  style={
-                    activo
-                      ? { background: 'rgba(255,255,255,0.2)', color: '#fff' }
-                      : { background: 'rgba(0,93,164,0.1)', color: '#004A87' }
-                  }
-                >
-                  {badge}
-                </span>
-              )}
-            </span>
+            )}
           </button>
         )
       })}

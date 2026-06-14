@@ -22,7 +22,7 @@ function AgendaHeader({ totalEventos }) {
       <div style={{ position: 'relative', maxWidth: 1180, margin: '0 auto' }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 9, fontFamily: "'Space Mono', monospace", fontSize: 'clamp(13px,1.3vw,15px)', textTransform: 'uppercase', letterSpacing: '0.2em', color: '#7DDAF5' }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#21BBEF', flexShrink: 0 }} />
-          Programa · 3 Días
+          Programa · 05–07 Agosto 2026
         </span>
         <h1 style={{ margin: '14px 0 0', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(1.9rem,4.5vw,3.5rem)', lineHeight: 0.97, letterSpacing: '-0.04em', color: '#fff' }}>
           Todo lo que podrás encontrar<br /><span className="ed" style={{ color: '#21BBEF' }}>va a pasar.</span>
@@ -39,22 +39,35 @@ function AgendaHeader({ totalEventos }) {
 
 // ─── Day switcher tabs ────────────────────────────────────────────
 const DAY_LABELS = { '': 'Todos', '1': 'Día 1', '2': 'Día 2', '3': 'Día 3' }
-const DAY_DATES  = { '': '',      '1': '12 Oct', '2': '13 Oct', '3': '14 Oct' }
+const DAY_DATES  = { '': '',      '1': '05 Ago', '2': '06 Ago', '3': '07 Ago' }
 
 function DayTabs({ active, onChange, countPerDay }) {
   const tabs = [{ value: '' }, ...DIAS_SIMPOSIO.map(d => ({ value: d.value }))]
   return (
-    <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+    <div style={{ display: 'inline-flex', background: 'rgba(0,0,0,0.07)', borderRadius: 9999, padding: 5, gap: 3 }}>
       {tabs.map(({ value }) => {
         const on = active === value
         const count = value ? countPerDay[value] ?? 0 : null
         return (
-          <button key={value} type="button" onClick={() => onChange(value)}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 7, height: 36, padding: '0 16px', border: `1px solid ${on ? '#05070E' : 'rgba(0,0,0,0.12)'}`, background: on ? '#05070E' : '#fff', color: on ? '#fff' : '#374151', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 15, borderRadius: 9999, cursor: 'pointer', transition: 'all 150ms', whiteSpace: 'nowrap' }}>
+          <button key={value} type="button" onClick={() => onChange(value)} style={{
+            display: 'inline-flex', alignItems: 'center', gap: 9,
+            height: 50, padding: '0 22px', border: 'none', borderRadius: 9999,
+            background: on ? '#111827' : 'transparent',
+            boxShadow: on ? '0 1px 6px rgba(0,0,0,0.2)' : 'none',
+            color: on ? '#fff' : '#6B7280',
+            fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 19,
+            cursor: 'pointer', transition: 'all 150ms', whiteSpace: 'nowrap',
+          }}>
             {DAY_LABELS[value]}
-            {DAY_DATES[value] && <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 13, opacity: on ? 0.6 : 0.5 }}>· {DAY_DATES[value]}</span>}
+            {DAY_DATES[value] && (
+              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 15, opacity: on ? 0.6 : 0.7 }}>
+                · {DAY_DATES[value]}
+              </span>
+            )}
             {count !== null && (
-              <span style={{ fontSize: 13, fontFamily: "'Space Mono', monospace", background: on ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.07)', color: on ? '#fff' : '#6B7280', borderRadius: 9999, padding: '1px 6px', marginLeft: 1 }}>{count}</span>
+              <span style={{ fontSize: 14, fontFamily: "'Space Mono', monospace", background: on ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)', color: on ? '#fff' : '#6B7280', borderRadius: 9999, padding: '2px 9px' }}>
+                {count}
+              </span>
             )}
           </button>
         )
@@ -67,7 +80,7 @@ function DayTabs({ active, onChange, countPerDay }) {
 function AreaChip({ label, color, selected, onClick }) {
   return (
     <button type="button" onClick={onClick}
-      style={{ display: 'inline-flex', alignItems: 'center', gap: 7, height: 32, padding: '0 14px', cursor: 'pointer', border: `1px solid ${selected ? color : 'rgba(0,0,0,0.1)'}`, background: selected ? color : '#fff', color: selected ? '#fff' : '#374151', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 500, fontSize: 15, borderRadius: 9999, transition: 'all 150ms', flexShrink: 0, boxShadow: selected ? `0 0 0 3px ${color}33` : 'none' }}>
+      style={{ display: 'inline-flex', alignItems: 'center', gap: 8, height: 38, padding: '0 16px', cursor: 'pointer', border: `1px solid ${selected ? color : 'rgba(0,0,0,0.1)'}`, background: selected ? color : '#fff', color: selected ? '#fff' : '#374151', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 500, fontSize: 16, borderRadius: 9999, transition: 'all 150ms', flexShrink: 0, boxShadow: selected ? `0 0 0 3px ${color}33` : 'none' }}>
       {!selected && <span style={{ width: 7, height: 7, borderRadius: '50%', background: color, flexShrink: 0 }} />}
       {label}
     </button>
@@ -75,119 +88,108 @@ function AreaChip({ label, color, selected, onClick }) {
 }
 
 // ─── Rich event card (read-only) ──────────────────────────────────
-function EventoCard({ evento }) {
-  const tipo = evento.tipo
+function AgendaEventoCard({ evento }) {
+  const tipo      = evento.tipo
   const tipoLabel = TIPO_LABELS[tipo] ?? tipo
-  const dot   = TIPO_DOT[tipo]  ?? '#64748B'
-  const tipoBg = TIPO_BG[tipo]  ?? 'rgba(100,116,139,0.1)'
-  const tipoFg = TIPO_FG[tipo]  ?? '#334155'
-
-  const horaInicio = formatHora(evento.horario?.hora_inicio)
-  const horaFin    = formatHora(evento.horario?.hora_fin)
-  const durMin = evento.horario?.hora_inicio && evento.horario?.hora_fin
-    ? Math.round((new Date(evento.horario.hora_fin) - new Date(evento.horario.hora_inicio)) / 60000)
-    : null
+  const dot       = TIPO_DOT[tipo]  ?? '#64748B'
+  const tipoBg    = TIPO_BG[tipo]   ?? 'rgba(100,116,139,0.1)'
+  const tipoFg    = TIPO_FG[tipo]   ?? '#334155'
+  const sinCupos  = !evento.tiene_capacidad_disponible
 
   const ponenteNombre = evento.ponente
     ? (evento.ponente.nombre_completo || `${evento.ponente.nombre} ${evento.ponente.apellidos}`)
     : null
 
   return (
-    <div style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.07)', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', transition: 'box-shadow 200ms, transform 200ms' }}
-      onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.09)'; e.currentTarget.style.transform = 'translateY(-1px)' }}
-      onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.05)'; e.currentTarget.style.transform = 'none' }}>
+    <div style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', transition: 'box-shadow 200ms, transform 200ms' }}
+      onMouseEnter={ev => { ev.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.09)'; ev.currentTarget.style.transform = 'translateY(-1px)' }}
+      onMouseLeave={ev => { ev.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)'; ev.currentTarget.style.transform = 'none' }}>
 
-      {/* Accent bar */}
-      <div style={{ height: 3, background: `linear-gradient(90deg, ${dot}, transparent)` }} />
-
-      <div style={{ padding: '16px 18px 18px' }}>
-        {/* Tipo + areas */}
+      <div style={{ padding: '18px 22px 20px' }}>
+        {/* Meta row: tipo + areas + aula */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', marginBottom: 10 }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', padding: '3px 9px', borderRadius: 9999, background: tipoBg, color: tipoFg }}>
-            <span style={{ width: 5, height: 5, borderRadius: '50%', background: dot, flexShrink: 0 }} />
+          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', padding: '4px 10px', borderRadius: 9999, background: tipoBg, color: tipoFg, border: `1px solid ${dot}33` }}>
             {tipoLabel}
           </span>
           {evento.areas?.map(a => (
-            <span key={a.id} style={{ fontSize: 14, fontWeight: 600, padding: '3px 9px', borderRadius: 9999, background: a.color || '#64748B', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{a.nombre}</span>
+            <span key={a.id} style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '4px 10px', borderRadius: 9999, background: a.color || '#64748B', color: '#fff' }}>
+              {a.nombre}
+            </span>
           ))}
+          {evento.horario?.aula && (
+            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, color: '#6B7280' }}>
+              {evento.horario.aula.edificio} · {evento.horario.aula.numero}
+            </span>
+          )}
         </div>
 
         {/* Title */}
-        <h4 style={{ margin: 0, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(0.95rem,1.3vw,1.1rem)', lineHeight: 1.25, letterSpacing: '-0.015em', color: '#111827' }}>
+        <h4 style={{ margin: 0, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 'clamp(1.1rem,1.7vw,1.3rem)', lineHeight: 1.25, letterSpacing: '-0.015em', color: '#111827' }}>
           {evento.titulo}
         </h4>
 
+        {/* Ponente */}
+        {ponenteNombre && (
+          <p style={{ margin: '7px 0 0', fontSize: 16, color: '#6B7280', fontFamily: "'Space Grotesk', sans-serif" }}>
+            {ponenteNombre}
+          </p>
+        )}
+
         {/* Description */}
         {evento.descripcion && (
-          <p style={{ margin: '8px 0 0', fontSize: 15, lineHeight: 1.55, color: '#6B7280', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          <p style={{ margin: '7px 0 0', fontSize: 15, lineHeight: 1.55, color: '#9CA3AF', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
             {evento.descripcion}
           </p>
         )}
 
-        {/* Metadata row */}
-        <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid rgba(0,0,0,0.06)', display: 'flex', flexWrap: 'wrap', gap: '8px 20px' }}>
-          {ponenteNombre && (
-            <MetaItem icon={
-              <svg style={{ width: 12, height: 12 }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-            }>{ponenteNombre}</MetaItem>
-          )}
-          {evento.horario?.aula && (
-            <MetaItem icon={
-              <svg style={{ width: 12, height: 12 }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-            }>Aula {evento.horario.aula.numero} · {evento.horario.aula.edificio}</MetaItem>
-          )}
-          {durMin && (
-            <MetaItem icon={
-              <svg style={{ width: 12, height: 12 }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            }>{durMin} min</MetaItem>
-          )}
-          {evento.cupos_disponibles != null && (
-            <MetaItem icon={
-              <svg style={{ width: 12, height: 12 }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-            } color={evento.tiene_capacidad_disponible ? '#059669' : '#DC2626'}>
+        {/* Cupos */}
+        {evento.cupos_disponibles != null && (
+          <div style={{ marginTop: 11 }}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: sinCupos ? '#DC2626' : '#059669' }}>
               {evento.cupos_disponibles} cupos
-            </MetaItem>
-          )}
-        </div>
+            </span>
+          </div>
+        )}
       </div>
     </div>
   )
 }
 
-function MetaItem({ icon, children, color = '#6B7280' }) {
-  return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 14, color, fontFamily: "'Space Grotesk', sans-serif" }}>
-      <span style={{ color: '#005DA4', flexShrink: 0 }}>{icon}</span>
-      {children}
-    </span>
-  )
-}
-
 // ─── Franja horaria section ───────────────────────────────────────
 function FranjaSection({ grupo }) {
-  const hora     = grupo.hora_inicio ? formatHora(grupo.hora_inicio) : '—'
-  const horaFin  = grupo.hora_fin    ? formatHora(grupo.hora_fin)    : null
-  const durMin   = grupo.hora_inicio && grupo.hora_fin
+  const hora   = grupo.hora_inicio ? formatHora(grupo.hora_inicio) : '—'
+  const durMin = grupo.hora_inicio && grupo.hora_fin
     ? Math.round((new Date(grupo.hora_fin) - new Date(grupo.hora_inicio)) / 60000) : null
 
   return (
-    <div>
-      {/* Franja header */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 14 }}>
-        <span style={{ fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 15, color: '#111827', letterSpacing: '-0.02em' }}>{hora}{horaFin && <span style={{ fontWeight: 400, color: '#9CA3AF' }}> – {horaFin}</span>}</span>
-        {durMin && <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{durMin} min</span>}
-        {grupo.eventos.length > 1 && (
-          <span style={{ fontSize: 14, fontFamily: "'Space Mono', monospace", color: '#F59E0B', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 9999, padding: '2px 8px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-            {grupo.eventos.length} paralelos
-          </span>
-        )}
-        <span style={{ flex: 1, height: 1, background: 'rgba(0,0,0,0.07)', marginLeft: 4 }} />
-      </div>
-
-      {/* Cards grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 380px), 1fr))', gap: 12 }}>
-        {grupo.eventos.map(e => <EventoCard key={e.id} evento={e} />)}
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {grupo.eventos.map((e, idx) => (
+        <div key={e.id} style={{ display: 'flex', alignItems: 'flex-start' }}>
+          {/* Time column — only shown for first event in this slot */}
+          <div style={{ width: 100, flexShrink: 0, paddingTop: 18, paddingRight: 14, textAlign: 'right' }}>
+            {idx === 0 && (
+              <>
+                <div style={{ fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 19, color: '#111827', letterSpacing: '-0.02em' }}>
+                  {hora}
+                </div>
+                {durMin && (
+                  <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, color: '#9CA3AF', marginTop: 3 }}>
+                    {durMin} min
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+          {/* Dot */}
+          <div style={{ flexShrink: 0, paddingTop: 24, width: 22, display: 'flex', justifyContent: 'center' }}>
+            <div style={{ width: 11, height: 11, borderRadius: '50%', background: '#D1D5DB' }} />
+          </div>
+          {/* Card */}
+          <div style={{ flex: 1, marginLeft: 12, minWidth: 0 }}>
+            <AgendaEventoCard evento={e} />
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
@@ -249,10 +251,10 @@ export default function Agenda() {
         <div style={{ maxWidth: 1180, margin: '0 auto' }}>
 
           {/* ── Sticky toolbar ── */}
-          <div style={{ position: 'sticky', top: 96, zIndex: 50, background: '#F8FAFD', padding: '14px 0', borderBottom: '1px solid rgba(0,0,0,0.08)', marginBottom: 0 }}>
+          <div style={{ position: 'sticky', top: 145, zIndex: 50, background: '#F8FAFD', padding: '14px 0', borderBottom: '1px solid rgba(0,0,0,0.08)', marginBottom: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
               <DayTabs active={filtroDia} onChange={handleDia} countPerDay={countPerDay} />
-              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, color: '#9CA3AF', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
+              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 16, color: '#9CA3AF', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
                 {eventosFiltrados.length} evento{eventosFiltrados.length !== 1 ? 's' : ''}
               </span>
             </div>

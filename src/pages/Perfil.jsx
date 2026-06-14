@@ -19,10 +19,10 @@ export default function Perfil() {
               {initial}
             </div>
             <div>
-              <h1 style={{ margin: 0, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(1.6rem,3.5vw,2.8rem)', lineHeight: 1, letterSpacing: '-0.04em', color: '#fff' }}>
+              <h1 style={{ margin: 0, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(1.9rem,4.5vw,3.5rem)', lineHeight: 0.97, letterSpacing: '-0.04em', color: '#fff' }}>
                 {user?.name ?? '—'}
               </h1>
-              <p style={{ margin: '8px 0 0', fontFamily: "'Space Mono', monospace", fontSize: 'clamp(0.75rem,1vw,0.85rem)', color: 'rgba(255,255,255,0.45)', letterSpacing: '0.04em' }}>
+              <p style={{ margin: '8px 0 0', fontFamily: "'Space Mono', monospace", fontSize: 'clamp(0.85rem,1.1vw,0.95rem)', color: 'rgba(255,255,255,0.45)', letterSpacing: '0.04em' }}>
                 {user?.email ?? '—'}
               </p>
             </div>
@@ -45,7 +45,7 @@ export default function Perfil() {
                 ].map(({ label, value }, i, arr) => (
                   <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '14px 0', borderBottom: i < arr.length - 1 ? '1px solid rgba(0,93,164,0.06)' : 'none' }}>
                     <dt style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(0,93,164,0.5)', fontFamily: "'Space Mono', monospace" }}>{label}</dt>
-                    <dd style={{ fontSize: 15, color: '#111827', fontWeight: 500, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>{value ?? '—'}</dd>
+                    <dd style={{ fontSize: 16, color: '#111827', fontWeight: 500, margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>{value ?? '—'}</dd>
                   </div>
                 ))}
               </dl>

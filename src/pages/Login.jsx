@@ -79,8 +79,7 @@ export default function Login() {
               <img
                 src={logoUcr}
                 alt="Logo Universidad de Costa Rica"
-                className="h-16 w-auto object-contain"
-                style={{ filter: 'brightness(0) invert(1)' }}
+                className="h-40 w-auto object-contain"
               />
               <div className="text-center">
                 <div

@@ -26,8 +26,8 @@ export default function Tematicas() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <p style={{ fontSize: 15, fontWeight: 600, color: '#374151', margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>Temáticas disponibles próximamente.</p>
-          <p style={{ fontSize: 15, color: 'rgba(0,93,164,0.45)', margin: '8px 0 0' }}>Esta sección se conectará a la API cuando esté disponible.</p>
+          <p style={{ fontSize: 'clamp(0.95rem,1.2vw,1.05rem)', fontWeight: 600, color: '#374151', margin: 0, fontFamily: "'Space Grotesk', sans-serif" }}>Temáticas disponibles próximamente.</p>
+          <p style={{ fontSize: 'clamp(0.9rem,1.2vw,1.05rem)', color: 'rgba(0,93,164,0.45)', margin: '8px 0 0' }}>Esta sección se conectará a la API cuando esté disponible.</p>
         </div>
       </div>
     </div>

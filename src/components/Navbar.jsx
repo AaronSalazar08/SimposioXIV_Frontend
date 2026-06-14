@@ -33,7 +33,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', on)
   }, [])
 
-  const navItems = user ? [...publicNavItems, ...authNavItems] : publicNavItems
+  const navItems = user ? [...publicNavItems, ...authNavItems] : []
   const userInitial = user?.name?.charAt(0)?.toUpperCase() ?? 'U'
 
   const closeMobileMenu = () => setMenuOpen(false)
@@ -100,8 +100,8 @@ export default function Navbar() {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
         padding: '22px clamp(24px, 4vw, 60px)',
         background: scrolled ? 'rgba(5,7,14,0.72)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(28px) saturate(160%)' : 'none',
-        WebkitBackdropFilter: scrolled ? 'blur(28px) saturate(160%)' : 'none',
+        backdropFilter: scrolled ? 'blur(25px) saturate(160%)' : 'none',
+        WebkitBackdropFilter: scrolled ? 'blur(25px) saturate(160%)' : 'none',
         borderBottom: scrolled ? '1px solid rgba(255,255,255,0.08)' : '1px solid transparent',
         transition: `background 250ms ${EASE_OUT}, border-color 250ms ${EASE_OUT}`,
       }}
@@ -116,7 +116,7 @@ export default function Navbar() {
         <img
           src={logoUcr}
           alt="Universidad de Costa Rica"
-          style={{ height: 58, width: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.95 }}
+          style={{ height: 100, width: 'auto', objectFit: 'contain', opacity: 0.95 }}
         />
         <div style={{ borderLeft: '1px solid rgba(255,255,255,0.2)', paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 5 }}>
           <span style={{ fontFamily: 'var(--font-mono-stack)', fontSize: 16, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#21BBEF', lineHeight: 1 }}>

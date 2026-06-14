@@ -17,7 +17,8 @@ import {
   conteosBadgeDiaTabs,
   countPorDiaSimposio,
 } from '../utils/eventoFilters'
-import { etiquetaFranjaHoraria, groupEventosPorFranjaHoraria } from '../utils/eventoGrouping'
+import { groupEventosPorFranjaHoraria } from '../utils/eventoGrouping'
+import { formatHora } from '../utils/date'
 import { buildInscripcionesPorEvento } from '../utils/inscripciones'
 import { pluralize } from '../utils/pluralize'
 
@@ -182,7 +183,7 @@ export default function Inscripciones() {
                   description="No hay eventos programados para este día."
                 />
               ) : (
-                <div className="space-y-10">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   {franjasOrdenadas.map((grupo) => {
                     const indiceErrorEnGrupo =
                       feedback?.type === 'error'
@@ -190,26 +191,46 @@ export default function Inscripciones() {
                         : -1
                     const carouselKey =
                       indiceErrorEnGrupo >= 0 ? `${grupo.key}-alerta-${feedback.eventoId}` : grupo.key
+                    const horaInicio = grupo.hora_inicio ? formatHora(grupo.hora_inicio) : '—'
+                    const durMin = grupo.hora_inicio && grupo.hora_fin
+                      ? Math.round((new Date(grupo.hora_fin) - new Date(grupo.hora_inicio)) / 60000)
+                      : null
+                    const anyInscrito = grupo.eventos.some(e => inscripcionesPorEvento.has(e.id))
                     return (
-                      <section key={grupo.key} className="scroll-mt-4">
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 pl-1 border-l-4 border-ucr-blue">
-                          <h2 className="text-base sm:text-lg font-bold text-ucr-blue-dark capitalize">
-                            {etiquetaFranjaHoraria(grupo)}
-                          </h2>
-                          {grupo.eventos.length > 1 && (
-                            <span className="text-sm font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200">
-                              {grupo.eventos.length} eventos en paralelo
-                            </span>
+                      <section key={grupo.key} style={{ display: 'flex', alignItems: 'flex-start' }}>
+                        {/* Time column */}
+                        <div style={{ width: 100, flexShrink: 0, paddingTop: 18, paddingRight: 14, textAlign: 'right' }}>
+                          <div style={{ fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 19, color: '#111827', letterSpacing: '-0.02em' }}>
+                            {horaInicio}
+                          </div>
+                          {durMin && (
+                            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, color: '#9CA3AF', marginTop: 3 }}>
+                              {durMin} min
+                            </div>
                           )}
                         </div>
-                        <EventoSlotCarousel
-                          key={carouselKey}
-                          initialIndex={indiceErrorEnGrupo >= 0 ? indiceErrorEnGrupo : 0}
-                        >
-                          {grupo.eventos.map((evento) => (
-                            <EventoCardInscripcion key={evento.id} evento={evento} {...cardProps} />
-                          ))}
-                        </EventoSlotCarousel>
+                        {/* Dot */}
+                        <div style={{ flexShrink: 0, paddingTop: 24, width: 22, display: 'flex', justifyContent: 'center' }}>
+                          <div style={{ width: 11, height: 11, borderRadius: '50%', background: anyInscrito ? '#21BBEF' : '#D1D5DB' }} />
+                        </div>
+                        {/* Carousel */}
+                        <div style={{ flex: 1, marginLeft: 14, minWidth: 0 }}>
+                          {grupo.eventos.length > 1 && (
+                            <div style={{ marginBottom: 10 }}>
+                              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#92400E', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 9999, padding: '4px 12px' }}>
+                                {grupo.eventos.length} en paralelo
+                              </span>
+                            </div>
+                          )}
+                          <EventoSlotCarousel
+                            key={carouselKey}
+                            initialIndex={indiceErrorEnGrupo >= 0 ? indiceErrorEnGrupo : 0}
+                          >
+                            {grupo.eventos.map((evento) => (
+                              <EventoCardInscripcion key={evento.id} evento={evento} {...cardProps} />
+                            ))}
+                          </EventoSlotCarousel>
+                        </div>
                       </section>
                     )
                   })}

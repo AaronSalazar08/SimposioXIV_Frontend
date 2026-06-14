@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 import heroImg from '../assets/hero.jpeg' // reemplazar con foto aérea de la sede
+import logoCIE from '../assets/logo_CIE.png'
+import logoSimposio from '../assets/logo_Simposio.png'
 
 // ─── Motion preference ────────────────────────────────────────────
 const REDUCE = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -116,9 +118,9 @@ const TRACKS = [
 ]
 
 const DAYS = [
-  { n: '01', day: 'Martes 12 Oct', theme: 'Fundamentos', bg: '#05070E', fg: '#fff', dot: '#21BBEF', kw: ['Keynote inaugural', 'Arquitectura cloud', 'Cultura de datos'], lead: 'Abrimos con las grandes ideas: hacia dónde va el software empresarial en la región.' },
-  { n: '02', day: 'Miércoles 13 Oct', theme: 'Inteligencia', bg: '#004A87', fg: '#fff', dot: '#21BBEF', kw: ['IA aplicada', 'Automatización', 'Producto & negocio'], lead: 'El día de la inteligencia artificial y los datos: de la teoría a los procesos reales.' },
-  { n: '03', day: 'Jueves 14 Oct', theme: 'Comunidad', bg: '#21BBEF', fg: '#05070E', dot: '#002F58', kw: ['Feria de proyectos', 'Panel academia-industria', 'Cierre'], lead: 'Cerramos con la comunidad: proyectos estudiantiles, networking y futuro profesional.' },
+  { n: '01', day: 'Miércoles 05 Ago', theme: 'Llegada', bg: '#05070E', fg: '#fff', dot: '#21BBEF', kw: ['Check-in · Hotel Las Espuelas', 'Traslado a la UCR', 'Cena + Actividad Deportiva'], lead: 'El día de la llegada: nos instalamos en el Hotel Las Espuelas, nos trasladamos al campus y arrancamos juntos con cena y deporte.' },
+  { n: '02', day: 'Jueves 06 Ago', theme: 'Inteligencia', bg: '#004A87', fg: '#fff', dot: '#21BBEF', kw: ['IA aplicada', 'Automatización', 'Producto & negocio'], lead: 'El día de la inteligencia artificial y los datos: de la teoría a los procesos reales.' },
+  { n: '03', day: 'Viernes 07 Ago', theme: 'Comunidad', bg: '#21BBEF', fg: '#05070E', dot: '#002F58', kw: ['Feria de proyectos', 'Panel academia-industria', 'Cierre'], lead: 'Cerramos con la comunidad: proyectos estudiantiles, networking y futuro profesional.' },
 ]
 
 const NUMS = [
@@ -128,7 +130,7 @@ const NUMS = [
   ['03', 'Días', 'inmersión total en Guanacaste'],
 ]
 
-const MARQUEE_WORDS = ['INTELIGENCIA ARTIFICIAL', 'CLOUD', 'DATOS', 'CIBERSEGURIDAD', 'PRODUCTO', 'ACADEMIA × INDUSTRIA', 'GUANACASTE 2026']
+const MARQUEE_WORDS = ['INTELIGENCIA ARTIFICIAL', 'CLOUD', 'DATOS', 'CIBERSEGURIDAD', 'PRODUCTO', 'GUANACASTE 2026']
 
 // ─── Shared style fragments ───────────────────────────────────────
 const GLASS_CARD = {
@@ -158,7 +160,7 @@ function Hero({ user }) {
   return (
     <section style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden', background: 'linear-gradient(145deg, #010810 0%, #001020 35%, #001a38 65%, #002650 100%)', display: 'flex', flexDirection: 'column' }}>
       {/* Aurora blobs */}
-      <div className="aurora-a" style={{ position: 'absolute', top: '-18%', left: '-8%', width: '62vw', height: '62vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(33,187,239,0.28), transparent 62%)', filter: 'blur(26px)', transform: `translateY(${t * 0.12}px)`, pointerEvents: 'none' }} />
+      <div className="aurora-a" style={{ position: 'absolute', top: '-40%', left: '-25%', width: '62vw', height: '62vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(33,187,239,0.28), transparent 62%)', filter: 'blur(26px)', transform: `translateY(${t * 0.12}px)`, pointerEvents: 'none' }} />
       <div className="aurora-b" style={{ position: 'absolute', bottom: '-26%', right: '-12%', width: '58vw', height: '58vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,74,135,0.55), transparent 64%)', filter: 'blur(30px)', transform: `translateY(${t * -0.08}px)`, pointerEvents: 'none' }} />
 
       {/* Masked grid */}
@@ -168,8 +170,9 @@ function Hero({ user }) {
       <div aria-hidden="true" style={{ position: 'absolute', left: '50%', top: '50%', transform: `translate(-50%,calc(-50% + ${t * -0.1}px))`, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 'min(30vw,26rem)', lineHeight: 0.8, color: 'rgba(255,255,255,0.025)', letterSpacing: '-0.05em', whiteSpace: 'nowrap', pointerEvents: 'none' }}>SIMPOSIO</div>
 
       <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', maxWidth: 1560, width: '100%', margin: '0 auto', padding: '80px clamp(20px,4vw,56px) 0' }}>
+
         {/* Kicker */}
-        <Fade style={{ marginBottom: 'clamp(20px,3vh,38px)' }}>
+        <Fade delay={0.08} style={{ marginBottom: 'clamp(20px,3vh,38px)' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 11, fontFamily: "'Space Mono', monospace", fontSize: 'clamp(14px,1.3vw,16px)', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7DDAF5' }}>
             <span style={{ width: 30, height: 1, background: '#21BBEF' }} />
             XIV Edición · Informática Empresarial
@@ -185,16 +188,9 @@ function Hero({ user }) {
           ]} />
         </h1>
 
-        {/* Subheading */}
-        <Fade delay={0.5} style={{ marginTop: 'clamp(26px,4vh,44px)', maxWidth: '44ch' }}>
-          <p style={{ margin: 0, fontSize: 'clamp(1rem,1.5vw,1.35rem)', lineHeight: 1.55, color: 'rgba(255,255,255,0.65)' }}>
-            Tres días donde la academia y la industria se encuentran para repensar el software empresarial, los datos y la inteligencia artificial.
-          </p>
-        </Fade>
-
         {user && (
           <Fade delay={0.55} style={{ marginTop: 14 }}>
-            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 15, color: 'rgba(33,187,239,0.8)', letterSpacing: '0.04em' }}>
+            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 25, color: 'rgba(33,187,239,0.8)', letterSpacing: '0.04em' }}>
               Bienvenido de nuevo, <strong style={{ color: '#fff' }}>{user.name}</strong>
             </span>
           </Fade>
@@ -211,30 +207,12 @@ function Hero({ user }) {
             <Link to="/cronograma" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, height: 58, padding: '0 30px', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(0.95rem,1.2vw,1.1rem)', borderRadius: 9999, background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.25)', textDecoration: 'none', transition: `all 200ms ${EASE_OUT}` }}
               onMouseEnter={e => e.currentTarget.style.background='rgba(255,255,255,0.07)'}
               onMouseLeave={e => e.currentTarget.style.background='transparent'}>
-              Ver programa
+              Ver Agenda
             </Link>
           </div>
         </Fade>
 
-        {/* Floating info cards */}
-        <Fade delay={0.4} style={{ position: 'absolute', right: 'clamp(20px,4vw,56px)', top: 'clamp(80px,14vh,140px)', display: 'flex', flexDirection: 'column', gap: 14, width: 'clamp(220px,20vw,272px)', zIndex: 3 }}
-          className="hero-cards">
-          <div className="floaty" style={{ ...GLASS_CARD, transform: `translateY(${t * 0.06}px)` }}>
-            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>Fechas</span>
-            <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(1.4rem,2vw,1.9rem)', letterSpacing: '-0.02em', color: '#fff', marginTop: 4 }}>12—14 OCT</span>
-            <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)' }}>2026 · Martes a Jueves</span>
-          </div>
-          <div className="floaty-slow" style={{ ...GLASS_CARD, transform: `translateY(${t * -0.05}px)` }}>
-            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>Sede</span>
-            <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(1.4rem,2vw,1.9rem)', letterSpacing: '-0.02em', color: '#fff', marginTop: 4 }}>Liberia, GTE</span>
-            <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)' }}>Sede de Guanacaste · UCR</span>
-          </div>
-          <div className="floaty" style={{ ...GLASS_CARD, transform: `translateY(${t * 0.09}px)`, animationDelay: '1.2s' }}>
-            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>Acceso</span>
-            <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(1.4rem,2vw,1.9rem)', letterSpacing: '-0.02em', color: '#21BBEF', marginTop: 4 }}>Gratuito</span>
-            <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)' }}>Comunidad estudiantil UCR</span>
-          </div>
-        </Fade>
+
       </div>
 
       {/* Bottom bar */}
@@ -445,7 +423,7 @@ function Venue() {
               La Sede de Guanacaste de la UCR — entre el calor del Pacífico y una comunidad universitaria que crece. Un campus pensado para encontrarse, crear y celebrar la tecnología hecha en Costa Rica.
             </p>
             <div style={{ marginTop: 26, display: 'flex', gap: 28, flexWrap: 'wrap' }}>
-              {[['A 3.5 h', 'de San José'], ['Aeropuerto', 'LIR · 25 min'], ['Octubre', 'Verano seco']].map(([k, v]) => (
+              {[['A 3.5 h', 'de San José'], ['Aeropuerto', 'LIR · 25 min'], ['Agosto', 'Verano seco']].map(([k, v]) => (
                 <div key={k}>
                   <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(1.2rem,1.8vw,1.6rem)', color: '#fff', letterSpacing: '-0.02em' }}>{k}</div>
                   <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 15, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>{v}</div>
@@ -475,46 +453,42 @@ function Marquee() {
   )
 }
 
-// ─── CTA FINALE ───────────────────────────────────────────────────
-function CTAFinale() {
+// ─── ORGANIZAN ────────────────────────────────────────────────────
+function Organizers() {
   return (
-    <section style={{ position: 'relative', overflow: 'hidden', background: '#21BBEF', minHeight: '90vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(70px,12vh,140px) clamp(20px,4vw,56px)' }}>
-      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.08) 1px,transparent 1px)', backgroundSize: '54px 54px', opacity: 0.5 }} />
-      <div aria-hidden="true" className="spin-slow" style={{ position: 'absolute', right: '-10vw', top: '-10vw', width: '40vw', height: '40vw', borderRadius: '50%', border: '1px solid rgba(5,7,14,0.12)', pointerEvents: 'none' }} />
-      <div aria-hidden="true" style={{ position: 'absolute', left: '-1vw', bottom: '-6vh', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 'min(40vw,34rem)', lineHeight: 0.8, color: 'rgba(5,7,14,0.06)', letterSpacing: '-0.05em', pointerEvents: 'none' }}>26</div>
-      <div style={{ position: 'relative', maxWidth: 1560, margin: '0 auto', width: '100%' }}>
-        <div style={{ marginBottom: 'clamp(24px,4vh,44px)' }}><ChapterTag n="06" label="Te esperamos" color="rgba(5,7,14,0.6)" /></div>
-        <h2 style={{ margin: 0, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(3rem,10vw,9.5rem)', lineHeight: 0.9, letterSpacing: '-0.05em', color: '#05070E' }}>
-          <Lines lines={['Reservá tu', <span key="b">lugar <span className="ed">ahora.</span></span>]} />
-        </h2>
-        <Fade delay={0.3} style={{ marginTop: 'clamp(34px,5vh,56px)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
-            <Link to="/inscripciones"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 10, height: 60, padding: '0 34px', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(1rem,1.3vw,1.15rem)', borderRadius: 9999, background: '#05070E', color: '#fff', border: 'none', textDecoration: 'none', transition: `all 200ms ${EASE_OUT}` }}
-              onMouseEnter={e => e.currentTarget.style.background='#002F58'}
-              onMouseLeave={e => e.currentTarget.style.background='#05070E'}>
-              Inicia sesión para inscribirte <span style={{ fontFamily: "'Space Mono', monospace" }}>→</span>
-            </Link>
-            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 'clamp(14px,1.4vw,17px)', letterSpacing: '0.06em', color: 'rgba(5,7,14,0.7)' }}>12—14 OCTUBRE 2026 · SEDE DE GUANACASTE, UCR</span>
+    <section style={{ background: '#fff', padding: 'clamp(72px,13vh,140px) clamp(20px,4vw,56px)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+      <div style={{ maxWidth: 1180, margin: '0 auto', textAlign: 'center' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 12, fontFamily: "'Space Mono', monospace", fontSize: 'clamp(14px,1.3vw,16px)', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#005DA4', marginBottom: 'clamp(40px,6vh,68px)' }}>
+          <span style={{ width: 26, height: 1, background: 'currentColor', opacity: 0.5 }} />
+          Organizado por
+          <span style={{ width: 26, height: 1, background: 'currentColor', opacity: 0.5 }} />
+        </span>
+        <Fade>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'clamp(40px,8vw,100px)', flexWrap: 'wrap' }}>
+            <img src={logoSimposio} alt="XIV Simposio de Informática Empresarial" style={{ width: 'clamp(260px,34vw,420px)', height: 'auto', objectFit: 'contain', display: 'block' }} />
+            <span className="org-divider" style={{ width: 1, height: 200, background: 'rgba(0,0,0,0.12)' }} />
+            <img src={logoCIE} alt="Carrera de Informática Empresarial · Sede de Guanacaste" style={{ width: 'clamp(300px,38vw,500px)', height: 'auto', objectFit: 'contain', display: 'block' }} />
           </div>
         </Fade>
       </div>
+      <style>{`@media (max-width: 720px){ .org-divider{ display:none !important; } }`}</style>
     </section>
   )
 }
 
+
 // ─── FOOTER ───────────────────────────────────────────────────────
 function HomeFooter() {
   return (
-    <footer style={{ position: 'relative', overflow: 'hidden', background: '#05070E', borderTop: '1px solid rgba(255,255,255,0.06)', padding: 'clamp(64px,9vh,100px) clamp(20px,4vw,56px) 40px' }}>
-      <div aria-hidden="true" style={{ position: 'absolute', left: '-2vw', bottom: '-12vh', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 'min(34vw,26rem)', lineHeight: 0.8, color: 'rgba(255,255,255,0.02)', letterSpacing: '-0.05em', pointerEvents: 'none' }}>UCR</div>
+    <footer style={{ position: 'relative', overflow: 'hidden', background: '#05070E', borderTop: '1px solid rgba(255,255,255,0.12)', padding: 'clamp(64px,9vh,100px) clamp(20px,4vw,56px) 40px' }}>
+      <div aria-hidden="true" style={{ position: 'absolute', left: '-2vw', bottom: '-12vh', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 'min(34vw,26rem)', lineHeight: 0.8, color: 'rgba(255,255,255,0.03)', letterSpacing: '-0.05em', pointerEvents: 'none' }}>UCR</div>
       <div style={{ position: 'relative', maxWidth: 1560, margin: '0 auto' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 48, justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div style={{ maxWidth: 420 }}>
             <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 'clamp(2rem,4vw,3.2rem)', letterSpacing: '-0.04em', color: '#fff', lineHeight: 0.95 }}>
               Nos vemos en<br /><span className="ed" style={{ color: '#21BBEF' }}>Guanacaste.</span>
             </div>
-            <p style={{ margin: '22px 0 0', fontSize: 16, lineHeight: 1.65, color: 'rgba(255,255,255,0.4)', maxWidth: 380 }}>
+            <p style={{ margin: '22px 0 0', fontSize: 17, lineHeight: 1.7, color: 'rgba(255,255,255,0.72)', maxWidth: 380 }}>
               XIV Simposio de Informática Empresarial · Carrera de Informática Empresarial, Sede de Guanacaste, Universidad de Costa Rica.
             </p>
           </div>
@@ -523,9 +497,9 @@ function HomeFooter() {
             <FooterCol title="Asistentes" links={[['Inscripciones', '/inscripciones'], ['Mi perfil', '/perfil']]} />
           </div>
         </div>
-        <div style={{ marginTop: 'clamp(48px,8vh,80px)', paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, alignItems: 'center', fontFamily: "'Space Mono', monospace", fontSize: 14, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-          <span>© 2026 Universidad de Costa Rica</span>
-          <span>Liberia, Guanacaste · 12–14 OCT 2026</span>
+        <div style={{ marginTop: 'clamp(48px,8vh,80px)', paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, alignItems: 'center', fontFamily: "'Space Mono', monospace", fontSize: 14, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <span>© 2026 Universidad de Costa Rica</span>
+            <span>Liberia, Guanacaste · 05–07 AGO 2026</span>
         </div>
       </div>
     </footer>
@@ -534,12 +508,12 @@ function HomeFooter() {
 
 function FooterCol({ title, links }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
-      <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 15, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#21BBEF', marginBottom: 4 }}>{title}</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 13 }}>
+      <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 15, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#21BBEF', marginBottom: 6 }}>{title}</span>
       {links.map(([l, to]) => (
-        <Link key={l} to={to} style={{ fontSize: 16, color: 'rgba(255,255,255,0.5)', textDecoration: 'none', transition: 'color 150ms' }}
+        <Link key={l} to={to} style={{ fontSize: 17, color: 'rgba(255,255,255,0.72)', textDecoration: 'none', transition: 'color 150ms' }}
           onMouseEnter={e => e.currentTarget.style.color = '#fff'}
-          onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.5)'}>{l}</Link>
+          onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.72)'}>{l}</Link>
       ))}
     </div>
   )
@@ -561,7 +535,7 @@ export default function Home() {
       <Numbers />
       <Venue />
       <Marquee />
-      <CTAFinale />
+      <Organizers />
       <HomeFooter />
     </div>
   )
