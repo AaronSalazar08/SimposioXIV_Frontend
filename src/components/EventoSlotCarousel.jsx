@@ -118,9 +118,8 @@ function MobileCarousel({ slides, initialIndex }) {
     <div className="relative w-full min-w-0">
       <div
         ref={viewportRef}
-        className="rounded-2xl overflow-x-hidden overflow-y-visible touch-pan-y select-none"
-        style={{ background: 'rgba(0,93,164,0.03)', border: '1px solid rgba(0,93,164,0.08)' }}
-        style={{ touchAction: 'pan-y' }}
+        className="rounded-2xl overflow-x-hidden overflow-y-visible select-none"
+        style={{ background: 'rgba(0,93,164,0.03)', border: '1px solid rgba(0,93,164,0.08)', touchAction: 'pan-y' }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerEnd}

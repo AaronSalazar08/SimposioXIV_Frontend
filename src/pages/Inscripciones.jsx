@@ -131,11 +131,14 @@ export default function Inscripciones() {
     />
     <div>
       {/* Cinematic header */}
-      <section style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(145deg, #010810, #001020 40%, #001a38 70%, #002650)', padding: 'calc(clamp(36px,6vh,56px) + 96px) clamp(20px,4vw,56px) clamp(32px,5vh,48px)', marginTop: -96 }}>
+      <section
+        className="pt-[120px] md:pt-[140px]"
+        style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(145deg, #010810, #001020 40%, #001a38 70%, #002650)', paddingLeft: 'clamp(20px,4vw,56px)', paddingRight: 'clamp(20px,4vw,56px)', paddingBottom: 'clamp(32px,5vh,48px)', marginTop: -96 }}
+      >
         <div className="aurora-a" style={{ position: 'absolute', top: '-40%', left: '-6%', width: '46vw', height: '46vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(33,187,239,0.22), transparent 64%)', filter: 'blur(24px)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)', backgroundSize: '60px 60px', WebkitMaskImage: 'radial-gradient(70% 90% at 30% 0%, #000, transparent)', maskImage: 'radial-gradient(70% 90% at 30% 0%, #000, transparent)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', maxWidth: 1180, margin: '0 auto' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 9, fontFamily: "'Space Mono', monospace", fontSize: 'clamp(13px,1.3vw,15px)', textTransform: 'uppercase', letterSpacing: '0.2em', color: '#7DDAF5' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 9, fontFamily: "var(--font-pixel)", fontSize: 'clamp(18px,1.3vw,20px)', textTransform: 'uppercase', letterSpacing: '0.2em', color: '#7DDAF5' }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#21BBEF', flexShrink: 0 }} />
             Inscripciones · XIV Edición
           </span>
@@ -144,7 +147,7 @@ export default function Inscripciones() {
               Reservá tu cupo.
             </h1>
             {totalInscrito > 0 && (
-              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 15, color: '#21BBEF', letterSpacing: '0.08em', textTransform: 'uppercase', paddingBottom: 4 }}>
+              <span style={{ fontFamily: "var(--font-pixel)", fontSize: 20, color: '#21BBEF', letterSpacing: '0.08em', textTransform: 'uppercase', paddingBottom: 4 }}>
                 {totalInscrito} {pluralize(totalInscrito, 'inscrito', 'inscritos')}
               </span>
             )}
@@ -159,7 +162,7 @@ export default function Inscripciones() {
       <div style={{ background: '#F8FAFD', minHeight: '60vh', padding: '0 clamp(20px,4vw,56px) clamp(64px,10vh,100px)' }}>
         <div style={{ maxWidth: 1180, margin: '0 auto' }}>
           {/* Sticky day tabs toolbar */}
-          <div style={{ position: 'sticky', top: 96, zIndex: 50, background: '#F8FAFD', padding: '14px 0', borderBottom: '1px solid rgba(0,0,0,0.08)', marginBottom: 0 }}>
+          <div className="top-[110px] sm:top-[134px]" style={{ position: 'sticky', zIndex: 40, background: '#F8FAFD', padding: '14px 0', borderBottom: '1px solid rgba(0,0,0,0.08)', marginBottom: 0 }}>
             <InscripcionesDiaTabs
               diaActivo={filtroDia}
               onSelectDia={handleSelectDia}
@@ -197,27 +200,27 @@ export default function Inscripciones() {
                       : null
                     const anyInscrito = grupo.eventos.some(e => inscripcionesPorEvento.has(e.id))
                     return (
-                      <section key={grupo.key} style={{ display: 'flex', alignItems: 'flex-start' }}>
-                        {/* Time column */}
-                        <div style={{ width: 100, flexShrink: 0, paddingTop: 18, paddingRight: 14, textAlign: 'right' }}>
-                          <div style={{ fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 19, color: '#111827', letterSpacing: '-0.02em' }}>
+                      <section key={grupo.key} className="flex flex-col sm:flex-row items-start">
+                        {/* Time info — horizontal row on mobile, vertical column on desktop */}
+                        <div className="flex sm:flex-col items-center sm:items-end gap-1.5 sm:gap-0 mb-2 sm:mb-0 sm:w-[100px] sm:shrink-0 sm:pt-[18px] sm:pr-[14px] sm:text-right">
+                          <div style={{ fontFamily: "var(--font-pixel)", fontWeight: 700, fontSize: 'clamp(17px,2vw,24px)', color: '#111827', letterSpacing: '-0.02em' }}>
                             {horaInicio}
                           </div>
                           {durMin && (
-                            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, color: '#9CA3AF', marginTop: 3 }}>
+                            <div style={{ fontFamily: "var(--font-pixel)", fontSize: 'clamp(13px,1.5vw,19px)', color: '#9CA3AF' }}>
                               {durMin} min
                             </div>
                           )}
                         </div>
-                        {/* Dot */}
-                        <div style={{ flexShrink: 0, paddingTop: 24, width: 22, display: 'flex', justifyContent: 'center' }}>
+                        {/* Dot — visible only on desktop */}
+                        <div className="hidden sm:flex shrink-0 pt-[24px] w-[22px] justify-center">
                           <div style={{ width: 11, height: 11, borderRadius: '50%', background: anyInscrito ? '#21BBEF' : '#D1D5DB' }} />
                         </div>
                         {/* Carousel */}
-                        <div style={{ flex: 1, marginLeft: 14, minWidth: 0 }}>
+                        <div className="flex-1 w-full sm:ml-[14px] min-w-0">
                           {grupo.eventos.length > 1 && (
                             <div style={{ marginBottom: 10 }}>
-                              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#92400E', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 9999, padding: '4px 12px' }}>
+                              <span style={{ fontFamily: "var(--font-pixel)", fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#92400E', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 9999, padding: '4px 12px' }}>
                                 {grupo.eventos.length} en paralelo
                               </span>
                             </div>

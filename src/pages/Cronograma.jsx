@@ -71,11 +71,14 @@ export default function Cronograma() {
   return (
     <div>
       {/* Cinematic header */}
-      <section style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(145deg, #010810, #001020 40%, #001a38 70%, #002650)', padding: 'calc(clamp(36px,6vh,56px) + 96px) clamp(20px,4vw,56px) clamp(32px,5vh,48px)', marginTop: -96 }}>
+      <section
+        className="pt-[120px] md:pt-[140px]"
+        style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(145deg, #010810, #001020 40%, #001a38 70%, #002650)', paddingLeft: 'clamp(20px,4vw,56px)', paddingRight: 'clamp(20px,4vw,56px)', paddingBottom: 'clamp(32px,5vh,48px)', marginTop: -96 }}
+      >
         <div className="aurora-a" style={{ position: 'absolute', top: '-40%', left: '-6%', width: '46vw', height: '46vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(33,187,239,0.22), transparent 64%)', filter: 'blur(24px)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)', backgroundSize: '60px 60px', WebkitMaskImage: 'radial-gradient(70% 90% at 30% 0%, #000, transparent)', maskImage: 'radial-gradient(70% 90% at 30% 0%, #000, transparent)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', maxWidth: 1180, margin: '0 auto' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 9, fontFamily: "'Space Mono', monospace", fontSize: 'clamp(13px,1.3vw,15px)', textTransform: 'uppercase', letterSpacing: '0.2em', color: '#7DDAF5' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 9, fontFamily: "var(--font-pixel)", fontSize: 'clamp(18px,1.3vw,20px)', textTransform: 'uppercase', letterSpacing: '0.2em', color: '#7DDAF5' }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#21BBEF', flexShrink: 0 }} />
             Mi Agenda · XIV Edición
           </span>
@@ -84,7 +87,7 @@ export default function Cronograma() {
               Tu plan del Simposio.
             </h1>
             {total > 0 && (
-              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 15, color: '#21BBEF', letterSpacing: '0.08em', textTransform: 'uppercase', paddingBottom: 4 }}>
+              <span style={{ fontFamily: "var(--font-pixel)", fontSize: 20, color: '#21BBEF', letterSpacing: '0.08em', textTransform: 'uppercase', paddingBottom: 4 }}>
                 {total} {pluralize(total, 'confirmado', 'confirmados')}
               </span>
             )}
@@ -96,75 +99,41 @@ export default function Cronograma() {
         <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 2, background: 'linear-gradient(90deg, transparent, #21BBEF 40%, #005DA4 70%, transparent)' }} />
       </section>
 
-      {/* ── Día 1: Cronograma general de llegada ─────────────────────── */}
-      <div style={{ background: '#F8FAFD', padding: 'clamp(32px,5vh,52px) clamp(20px,4vw,56px) 0' }}>
-        <div style={{ maxWidth: 1180, margin: '0 auto' }}>
-          <div style={{ borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(0,93,164,0.14)', boxShadow: '0 4px 24px rgba(0,93,164,0.08)' }}>
-            {/* Header */}
-            <div style={{ background: 'linear-gradient(135deg, #003A6E, #004A87, #005DA4)', padding: '22px 28px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '1rem', color: '#fff', flexShrink: 0 }}>01</div>
-                <div>
-                  <p style={{ margin: 0, fontFamily: "'Space Mono', monospace", fontSize: 13, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(33,187,239,0.9)' }}>Día 1 · General</p>
-                  <h2 style={{ margin: '3px 0 0', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 'clamp(1rem,2vw,1.2rem)', color: '#fff', letterSpacing: '-0.01em' }}>Miércoles 05 de Agosto</h2>
-                </div>
-              </div>
-              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 13, color: 'rgba(255,255,255,0.75)', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 9999, padding: '6px 14px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Aplica para todos</span>
-            </div>
-
-            {/* Filas */}
-            <div style={{ background: '#fff' }}>
-              {[
-                { hora: '15:00 – 17:30', actividad: 'Asignación de habitaciones a Estudiantes', lugar: 'Hotel Las Espuelas', icono: '🏨' },
-                { hora: null,            actividad: 'Traslado de estudiantes a la UCR',          lugar: null,               icono: '🚌' },
-                { hora: '17:30 – 18:30', actividad: 'Cena',                                       lugar: 'UCR · Salón Multiusos', icono: '🍽️' },
-                { hora: '19:00 – 21:00', actividad: 'Actividad Deportiva',                        lugar: 'Gimnasio UCR',     icono: '⚽' },
-              ].map(({ hora, actividad, lugar, icono }, idx, arr) => (
-                <div key={idx} style={{ display: 'grid', gridTemplateColumns: '160px 1fr auto', alignItems: 'center', gap: '12px 20px', padding: '18px 28px', borderBottom: idx < arr.length - 1 ? '1px solid rgba(0,0,0,0.06)' : 'none' }}>
-                  {/* Hora */}
-                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, fontWeight: 600, color: hora ? '#005DA4' : 'transparent', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>{hora ?? '–'}</span>
-                  {/* Actividad */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 20, flexShrink: 0 }}>{icono}</span>
-                    <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 500, fontSize: 'clamp(0.95rem,1.2vw,1.05rem)', color: '#111827' }}>{actividad}</span>
-                  </div>
-                  {/* Lugar */}
-                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 13, color: '#6B7280', textAlign: 'right', whiteSpace: 'nowrap' }}>{lugar ?? ''}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Aviso importante */}
-            <div style={{ background: 'linear-gradient(90deg, #FEF9EC, #FFFBF0)', borderTop: '1px solid rgba(245,158,11,0.25)', padding: '16px 28px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-              <span style={{ fontSize: 22, flexShrink: 0 }}>📌</span>
-              <p style={{ margin: 0, fontFamily: "'Space Grotesk', sans-serif", fontSize: 'clamp(0.9rem,1.2vw,1.05rem)', color: '#92400E', lineHeight: 1.55 }}>
-                <strong>Importante:</strong> El Check In Máximo es a las <strong>7:00 pm</strong> para estudiantes en el Hotel.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ background: '#F8FAFD', minHeight: '40vh', padding: 'clamp(32px,5vh,48px) clamp(20px,4vw,56px) clamp(64px,10vh,100px)' }}>
+      <div style={{ background: '#F8FAFD', minHeight: '40vh', padding: '0 clamp(20px,4vw,56px) clamp(64px,10vh,100px)' }}>
         <div style={{ maxWidth: 1180, margin: '0 auto' }}>
           {/* Toolbar */}
-          <div style={{ position: 'sticky', top: 96, zIndex: 50, background: '#F8FAFD', padding: '14px 0', borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
-            <div style={{ display: 'inline-flex', background: 'rgba(0,0,0,0.07)', borderRadius: 9999, padding: 5, gap: 3, opacity: grupos.length === 0 ? 0.4 : 1, pointerEvents: grupos.length === 0 ? 'none' : 'auto' }}>
+          <div className="top-[110px] sm:top-[110px]" style={{ position: 'sticky', zIndex: 50, background: '#F8FAFD', padding: '14px 0', borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
+            <div
+              className="flex sm:inline-flex w-full sm:w-auto rounded-full gap-[3px]"
+              role="tablist"
+              aria-label="Filtrar por día"
+              style={{ background: 'rgba(0,0,0,0.07)', padding: 5, opacity: grupos.length === 0 ? 0.4 : 1, pointerEvents: grupos.length === 0 ? 'none' : 'auto' }}
+            >
               {['', '1', '2', '3'].map((value) => {
                 const on = filtroDia === value
                 return (
-                  <button key={value || 'todos'} type="button" onClick={() => { setFiltroDia(value); clearFeedbackFila() }} style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 9,
-                    height: 50, padding: '0 22px', border: 'none', borderRadius: 9999,
-                    background: on ? '#111827' : 'transparent',
-                    boxShadow: on ? '0 1px 6px rgba(0,0,0,0.2)' : 'none',
-                    color: on ? '#fff' : '#6B7280',
-                    fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 19,
-                    cursor: 'pointer', transition: 'all 150ms', whiteSpace: 'nowrap',
-                  }}>
+                  <button
+                    key={value || 'todos'}
+                    type="button"
+                    role="tab"
+                    aria-selected={on}
+                    onClick={() => { setFiltroDia(value); clearFeedbackFila() }}
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center"
+                    style={{
+                      gap: 'clamp(5px,1vw,9px)',
+                      height: 'clamp(38px,5vh,50px)',
+                      padding: '0 clamp(10px,2.5vw,22px)',
+                      border: 'none', borderRadius: 9999,
+                      background: on ? '#111827' : 'transparent',
+                      boxShadow: on ? '0 1px 6px rgba(0,0,0,0.2)' : 'none',
+                      color: on ? '#fff' : '#6B7280',
+                      fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(14px,1.5vw,19px)',
+                      cursor: 'pointer', transition: 'all 150ms', whiteSpace: 'nowrap',
+                    }}
+                  >
                     {DAY_LABELS[value]}
                     {DAY_DATES[value] && (
-                      <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 15, opacity: on ? 0.6 : 0.7 }}>
+                      <span className="hidden sm:inline" style={{ fontFamily: "var(--font-pixel)", fontSize: 'clamp(14px,1.5vw,20px)', opacity: on ? 0.6 : 0.7 }}>
                         · {DAY_DATES[value]}
                       </span>
                     )}
@@ -257,29 +226,29 @@ export default function Cronograma() {
                     : null
 
                   return (
-                    <li key={i.id} style={{ display: 'flex', alignItems: 'flex-start', listStyle: 'none', margin: 0 }}>
-                      {/* Time column */}
-                      <div style={{ width: 100, flexShrink: 0, paddingTop: 18, paddingRight: 14, textAlign: 'right' }}>
-                        <div style={{ fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 19, color: '#111827', letterSpacing: '-0.02em' }}>
+                    <li key={i.id} className="flex flex-col sm:flex-row items-start" style={{ listStyle: 'none', margin: 0 }}>
+                      {/* Time info — row on mobile, column on desktop */}
+                      <div className="flex sm:flex-col items-center sm:items-end gap-1.5 sm:gap-0 mb-2 sm:mb-0 sm:w-[100px] sm:shrink-0 sm:pt-[18px] sm:pr-[14px] sm:text-right">
+                        <div style={{ fontFamily: "var(--font-pixel)", fontWeight: 700, fontSize: 'clamp(17px,2vw,24px)', color: '#111827', letterSpacing: '-0.02em' }}>
                           {formatHora(e.horario?.hora_inicio)}
                         </div>
                         {e.horario?.hora_fin && (
-                          <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, color: '#9CA3AF', marginTop: 3 }}>
+                          <div style={{ fontFamily: "var(--font-pixel)", fontSize: 'clamp(13px,1.5vw,19px)', color: '#9CA3AF' }}>
                             –{formatHora(e.horario.hora_fin)}
                           </div>
                         )}
                       </div>
-                      {/* Dot — always cyan (inscribed) */}
-                      <div style={{ flexShrink: 0, paddingTop: 24, width: 22, display: 'flex', justifyContent: 'center' }}>
+                      {/* Dot — visible only on desktop */}
+                      <div className="hidden sm:flex shrink-0 pt-[24px] w-[22px] justify-center">
                         <div style={{ width: 11, height: 11, borderRadius: '50%', background: '#21BBEF' }} />
                       </div>
                       {/* Card */}
-                      <div style={{ flex: 1, marginLeft: 14, minWidth: 0, background: '#F0F9FF', border: '1px solid rgba(33,187,239,0.25)', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 4px rgba(33,187,239,0.1)' }}>
+                      <div className="flex-1 w-full sm:ml-[14px] min-w-0" style={{ background: '#F0F9FF', border: '1px solid rgba(33,187,239,0.25)', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 4px rgba(33,187,239,0.1)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '20px 22px' }}>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             {/* Meta row */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', marginBottom: 10 }}>
-                              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', padding: '4px 10px', borderRadius: 9999, background: tipoBg, color: tipoFg, border: `1px solid ${accent}33` }}>
+                              <span style={{ fontFamily: "var(--font-pixel)", fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', padding: '4px 10px', borderRadius: 9999, background: tipoBg, color: tipoFg, border: `1px solid ${accent}33` }}>
                                 {tipoLabel}
                               </span>
                               {e.areas?.map((a) => (
@@ -288,7 +257,7 @@ export default function Cronograma() {
                                 </span>
                               ))}
                               {e.horario?.aula && (
-                                <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, color: '#6B7280' }}>
+                                <span style={{ fontFamily: "var(--font-pixel)", fontSize: 19, color: '#6B7280' }}>
                                   {e.horario.aula.edificio} · {e.horario.aula.numero}
                                 </span>
                               )}

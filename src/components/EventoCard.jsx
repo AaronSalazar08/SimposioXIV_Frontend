@@ -47,7 +47,7 @@ export default function EventoCard({
           {/* Meta row: tipo + areas + aula */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', marginBottom: 10 }}>
             <span style={{
-              fontFamily: "'Space Mono', monospace",
+              fontFamily: "var(--font-pixel)",
               fontSize: 13, fontWeight: 700,
               textTransform: 'uppercase', letterSpacing: '0.07em',
               padding: '4px 10px', borderRadius: 9999,
@@ -67,7 +67,7 @@ export default function EventoCard({
               </span>
             ))}
             {evento.horario?.aula && (
-              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 14, color: '#6B7280' }}>
+              <span style={{ fontFamily: "var(--font-pixel)", fontSize: 19, color: '#6B7280' }}>
                 {evento.horario.aula.edificio} · {evento.horario.aula.numero}
               </span>
             )}
@@ -108,7 +108,7 @@ export default function EventoCard({
             </span>
             {evento.horario?.numero_dia && (
               <span style={{
-                fontFamily: "'Space Mono', monospace", fontSize: 13,
+                fontFamily: "var(--font-pixel)", fontSize: 18,
                 color: '#005DA4', background: 'rgba(0,93,164,0.07)',
                 padding: '3px 9px', borderRadius: 9999,
               }}>

@@ -13,7 +13,6 @@ const authNavItems = [
   { to: '/tematicas', label: 'Temáticas' },
   { to: '/agenda', label: 'Agenda' },
   { to: '/inscripciones', label: 'Inscripciones' },
-  { to: '/cronograma', label: 'Cronograma' },
 ]
 
 export default function Navbar() {
@@ -47,44 +46,81 @@ export default function Navbar() {
     <div
       role="menu"
       style={{
-        position: 'absolute', right: 0, top: 'calc(100% + 10px)', width: 230,
-        background: '#fff', borderRadius: 14,
-        boxShadow: '0 12px 40px -4px rgba(0,0,0,0.18), 0 4px 16px -2px rgba(0,0,0,0.10)',
-        border: '1px solid rgba(0,0,0,0.06)', overflow: 'hidden',
+        position: 'absolute', right: 0, top: 'calc(100% + 10px)', width: 248,
+        background: 'rgba(5,7,14,0.96)',
+        backdropFilter: 'blur(28px) saturate(160%)',
+        WebkitBackdropFilter: 'blur(28px) saturate(160%)',
+        borderRadius: 16,
+        boxShadow: '0 20px 56px -8px rgba(0,0,0,0.55), 0 4px 16px -2px rgba(0,0,0,0.3)',
+        border: '1px solid rgba(255,255,255,0.09)', overflow: 'hidden',
         animation: 'slide-down 0.28s cubic-bezier(0.16,1,0.3,1) both',
         zIndex: 200,
       }}
     >
-      <div style={{ padding: '14px 18px', background: 'linear-gradient(135deg, #EBF3FA 0%, #F5F9FE 100%)', borderBottom: '1px solid rgba(0,93,164,0.1)' }}>
-        <p style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#005DA4', fontFamily: 'var(--font-display)', letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {user?.name ?? 'Usuario'}
-        </p>
-        <p style={{ margin: '3px 0 0', fontSize: 15, color: '#6B7280', fontFamily: 'var(--font-mono-stack)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {user?.email ?? ''}
-        </p>
+      {/* Header */}
+      <div style={{ padding: '16px 18px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+          <div style={{ width: 38, height: 38, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, rgba(33,187,239,0.55), rgba(0,93,164,0.85))', boxShadow: '0 0 0 1.5px rgba(33,187,239,0.35)', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15, color: '#fff' }}>
+            {userInitial}
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#fff', fontFamily: 'var(--font-display)', letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {user?.name ?? 'Usuario'}
+            </p>
+            <p style={{ margin: '2px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--font-mono-stack)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {user?.email ?? ''}
+            </p>
+          </div>
+        </div>
       </div>
+
+      {/* Mi perfil */}
       <NavLink
         to="/perfil"
         onClick={closeProfileMenu}
         role="menuitem"
-        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '13px 18px', fontSize: 16, color: '#374151', textDecoration: 'none', transition: `background ${EASE_OUT} 150ms` }}
-        onMouseEnter={e => e.currentTarget.style.background = '#EBF3FA'}
-        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '13px 18px', fontSize: 15, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', transition: 'background 150ms, color 150ms', fontFamily: 'var(--font-display)' }}
+        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#fff' }}
+        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)' }}
       >
-        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden style={{ opacity: 0.5 }}>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </svg>
         Mi perfil
       </NavLink>
+
+      {/* Mi Cronograma */}
+      <div style={{ padding: '5px 10px 8px' }}>
+        <NavLink
+          to="/micronograma"
+          onClick={closeProfileMenu}
+          role="menuitem"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '11px 12px', fontSize: 15, fontWeight: 600, color: '#21BBEF', textDecoration: 'none', borderRadius: 10, background: 'rgba(33,187,239,0.08)', border: '1px solid rgba(33,187,239,0.2)', transition: 'background 150ms, border-color 150ms', fontFamily: 'var(--font-display)' }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(33,187,239,0.15)'; e.currentTarget.style.borderColor = 'rgba(33,187,239,0.4)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(33,187,239,0.08)'; e.currentTarget.style.borderColor = 'rgba(33,187,239,0.2)' }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Mi Cronograma
+          </div>
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden style={{ opacity: 0.5, flexShrink: 0 }}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+          </svg>
+        </NavLink>
+      </div>
+
+      {/* Cerrar sesión */}
       <button
         type="button"
         role="menuitem"
         onClick={() => { closeProfileMenu(); logout() }}
-        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '13px 18px', width: '100%', border: 'none', background: 'transparent', fontSize: 16, color: '#DC2626', cursor: 'pointer', borderTop: '1px solid rgba(0,0,0,0.06)', transition: `background 150ms` }}
-        onMouseEnter={e => e.currentTarget.style.background = '#FEF2F2'}
+        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '13px 18px', width: '100%', border: 'none', borderTop: '1px solid rgba(255,255,255,0.07)', background: 'transparent', fontSize: 15, color: '#F87171', cursor: 'pointer', transition: 'background 150ms', fontFamily: 'var(--font-display)' }}
+        onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.1)'}
         onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
       >
-        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden style={{ opacity: 0.7 }}>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
         </svg>
         Cerrar sesión
@@ -98,7 +134,7 @@ export default function Navbar() {
       style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 120,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
-        padding: '22px clamp(24px, 4vw, 60px)',
+        padding: 'clamp(10px,2vh,22px) clamp(16px, 4vw, 60px)',
         background: scrolled ? 'rgba(5,7,14,0.72)' : 'transparent',
         backdropFilter: scrolled ? 'blur(25px) saturate(160%)' : 'none',
         WebkitBackdropFilter: scrolled ? 'blur(25px) saturate(160%)' : 'none',
@@ -111,14 +147,17 @@ export default function Navbar() {
       <NavLink
         to="/"
         onClick={() => { closeMobileMenu(); closeProfileMenu() }}
-        style={{ display: 'flex', alignItems: 'center', gap: 18, textDecoration: 'none', flexShrink: 0 }}
+        style={{ display: 'flex', width: '50%', alignItems: 'center', gap: 18, textDecoration: 'none', flexShrink: 0 }}
+        className="nav-logo-link"
       >
         <img
           src={logoUcr}
           alt="Universidad de Costa Rica"
-          style={{ height: 100, width: 'auto', objectFit: 'contain', opacity: 0.95 }}
+          style={{ objectFit: 'contain', opacity: 0.95 }}
+          className="nav-logo-img"
         />
-        <div style={{ borderLeft: '1px solid rgba(255,255,255,0.2)', paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 5 }}>
+        <div style={{ width: '100%', borderLeft: '1px solid rgba(255,255,255,0.2)', paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 5 }}
+          className="nav-logo-text">
           <span style={{ fontFamily: 'var(--font-mono-stack)', fontSize: 16, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#21BBEF', lineHeight: 1 }}>
             Simposio · CIE
           </span>
@@ -188,7 +227,7 @@ export default function Navbar() {
                 aria-haspopup="menu"
                 style={{
                   display: 'flex', alignItems: 'center', gap: 9,
-                  padding: '9px 14px 9px 9px',
+                  padding: '5px',
                   background: profileOpen ? 'rgba(255,255,255,0.12)' : 'transparent',
                   border: '1px solid rgba(255,255,255,0.15)',
                   borderRadius: 9999, cursor: 'pointer',
@@ -229,10 +268,11 @@ export default function Navbar() {
           <NavLink
             to="/login"
             onClick={() => { closeMobileMenu(); closeProfileMenu() }}
+            className="nav-login-btn"
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '12px 28px', borderRadius: 9999,
-              fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 600,
+              padding: '12px 18px', borderRadius: 9999,
+              fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 600,
               letterSpacing: '-0.01em', textDecoration: 'none', whiteSpace: 'nowrap',
               background: '#21BBEF', color: '#02070E',
               boxShadow: '0 0 24px rgba(33,187,239,0.3)',
@@ -242,7 +282,6 @@ export default function Navbar() {
             onMouseLeave={e => { e.currentTarget.style.background = '#21BBEF'; e.currentTarget.style.boxShadow = '0 0 24px rgba(33,187,239,0.3)' }}
           >
             Iniciar sesión
-            <span style={{ fontFamily: 'var(--font-mono-stack)', fontSize: 16 }}>→</span>
           </NavLink>
         )}
 
@@ -286,7 +325,7 @@ export default function Navbar() {
             zIndex: 110,
           }}
         >
-          {navItems.map(({ to, label, exact }) => (
+          {(user ? navItems : [{ to: '/agenda', label: 'Agenda' }]).map(({ to, label, exact }) => (
             <NavLink
               key={to}
               to={to}
@@ -305,29 +344,32 @@ export default function Navbar() {
               {label}
             </NavLink>
           ))}
-          {!user && (
-            <NavLink
-              to="/login"
-              onClick={closeMobileMenu}
-              style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                marginTop: 10, padding: '14px 14px', borderRadius: 10,
-                fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 600, letterSpacing: '-0.01em',
-                background: '#21BBEF', color: '#02070E', textDecoration: 'none',
-              }}
-            >
-              Iniciar sesión →
-            </NavLink>
-          )}
+
         </div>
       )}
 
       <style>{`
+        .nav-logo-img { height: 72px; width: auto; }
+
         @media (max-width: 767px) {
-          .nav-links-desktop { display: none !important; }
-          .nav-burger { display: inline-flex !important; }
-          .nav-mobile-ins { display: inline-flex !important; }
+          .nav-links-desktop  { display: none !important; }
+          .nav-burger         { display: inline-flex !important; }
+          .nav-mobile-ins     { display: none !important; }
           .nav-username, .nav-chevron { display: none !important; }
+
+          /* Logo compacto en mobile */
+          .nav-logo-img       { height: 52px !important; width: auto !important; }
+          .nav-logo-link      { width: auto !important; gap: 10px !important; }
+          .nav-logo-text      { padding-left: 10px !important; gap: 3px !important; }
+          .nav-logo-text span:first-child  { font-size: 13px !important; letter-spacing: 0.1em !important; }
+          .nav-logo-text span:last-child   { display: none !important; }
+
+          /* Botón login compacto para que quepa junto al hamburger */
+          .nav-login-btn      { padding: 9px 12px !important; font-size: 13px !important; }
+        }
+
+        @media (max-width: 400px) {
+          .nav-logo-text { display: none !important; }
         }
       `}</style>
     </nav>

@@ -49,7 +49,7 @@ export default function App() {
           <Route path="tematicas" element={<Tematicas />} />
           <Route path="inscripciones" element={<Inscripciones />} />
           <Route path="agenda" element={<Agenda />} />
-          <Route path="cronograma" element={<Cronograma />} />
+          <Route path="micronograma" element={<Cronograma />} />
           <Route path="perfil" element={<Perfil />} />
         </Route>
 

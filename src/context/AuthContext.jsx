@@ -69,7 +69,7 @@ export function AuthProvider({ children }) {
     removeAuthToken()
     setUser(null)
     queryClient.clear()
-    navigate('/login')
+    navigate('/')
   }, [navigate, queryClient])
 
   return (

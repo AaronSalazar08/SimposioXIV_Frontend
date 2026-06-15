@@ -10,7 +10,8 @@ function badgeLabel(count) {
 export default function InscripcionesDiaTabs({ diaActivo, onSelectDia, conteosPorDia = {} }) {
   return (
     <div
-      style={{ display: 'inline-flex', background: 'rgba(0,0,0,0.07)', borderRadius: 9999, padding: 5, gap: 3 }}
+      className="flex sm:inline-flex w-full sm:w-auto rounded-full gap-[3px]"
+      style={{ background: 'rgba(0,0,0,0.07)', padding: 5 }}
       role="tablist"
       aria-label="Filtrar eventos por día"
     >
@@ -25,22 +26,37 @@ export default function InscripcionesDiaTabs({ diaActivo, onSelectDia, conteosPo
             role="tab"
             aria-selected={on}
             onClick={() => onSelectDia(dia.value)}
+            className="flex-1 sm:flex-none inline-flex items-center justify-center"
             style={{
-              display: 'inline-flex', alignItems: 'center', gap: 9,
-              height: 50, padding: '0 22px', border: 'none', borderRadius: 9999,
+              gap: 'clamp(5px,1vw,9px)',
+              height: 'clamp(38px,5vh,50px)',
+              padding: '0 clamp(10px,2.5vw,22px)',
+              border: 'none',
+              borderRadius: 9999,
               background: on ? '#111827' : 'transparent',
               boxShadow: on ? '0 1px 6px rgba(0,0,0,0.2)' : 'none',
               color: on ? '#fff' : '#6B7280',
-              fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 19,
-              cursor: 'pointer', transition: 'all 150ms', whiteSpace: 'nowrap',
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 600,
+              fontSize: 'clamp(14px,1.5vw,19px)',
+              cursor: 'pointer',
+              transition: 'all 150ms',
+              whiteSpace: 'nowrap',
             }}
           >
             Día {dia.numeroDia}
-            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 15, opacity: on ? 0.6 : 0.7 }}>
+            <span className="hidden sm:inline" style={{ fontFamily: "var(--font-pixel)", fontSize: 'clamp(14px,1.5vw,20px)', opacity: on ? 0.6 : 0.7 }}>
               · {DAY_DATES[dia.value]}
             </span>
             {badge && (
-              <span style={{ fontSize: 14, fontFamily: "'Space Mono', monospace", background: on ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)', color: on ? '#fff' : '#6B7280', borderRadius: 9999, padding: '2px 9px' }}>
+              <span style={{
+                fontSize: 'clamp(12px,1.3vw,19px)',
+                fontFamily: "var(--font-pixel)",
+                background: on ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)',
+                color: on ? '#fff' : '#6B7280',
+                borderRadius: 9999,
+                padding: '2px 7px',
+              }}>
                 {badge}
               </span>
             )}

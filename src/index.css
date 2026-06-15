@@ -12,7 +12,8 @@
   /* Typography */
   --font-display: "Space Grotesk", "TruenoRG", "Nunito", system-ui, sans-serif;
   --font-body: "TruenoRG", "Nunito", system-ui, sans-serif;
-  --font-mono-stack: "Space Mono", ui-monospace, monospace;
+  --font-pixel: "Pixelify Sans", system-ui, sans-serif;
+  --font-mono-stack: "Pixelify Sans", system-ui, sans-serif;
   --font-trueno: "TruenoRG", "Nunito", system-ui, sans-serif;
 }
 
