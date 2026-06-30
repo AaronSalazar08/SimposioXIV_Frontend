@@ -15,3 +15,18 @@ export const getMe = async () => {
   const { data } = await apiClient.get('/me')
   return data
 }
+
+export const enviarOtpPassword = async () => {
+  const { data } = await apiClient.post('/password/otp')
+  return data
+}
+
+export const verificarOtpPassword = async ({ codigo }) => {
+  const { data } = await apiClient.post('/password/otp/verificar', { codigo })
+  return data
+}
+
+export const cambiarPassword = async ({ password, password_confirmation }) => {
+  const { data } = await apiClient.put('/password/cambiar', { password, password_confirmation })
+  return data
+}

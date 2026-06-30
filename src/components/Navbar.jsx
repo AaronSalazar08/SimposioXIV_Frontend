@@ -15,7 +15,7 @@ const authNavItems = [
   { to: '/inscripciones', label: 'Inscripciones' },
 ]
 
-export default function Navbar() {
+export default function Navbar({ bannerOffset = 0 }) {
   const { user, logout } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
@@ -132,7 +132,7 @@ export default function Navbar() {
     <nav
       aria-label="Navegación principal"
       style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 120,
+        position: 'fixed', top: bannerOffset, left: 0, right: 0, zIndex: 120,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
         padding: 'clamp(10px,2vh,22px) clamp(16px, 4vw, 60px)',
         background: scrolled ? 'rgba(5,7,14,0.72)' : 'transparent',

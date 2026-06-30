@@ -1,8 +1,11 @@
+import { useState } from 'react'
 import { useAuth } from '../context/useAuth'
+import CambiarPasswordModal from '../components/perfil/CambiarPasswordModal'
 
 export default function Perfil() {
   const { user, logout } = useAuth()
   const initial = user?.name?.charAt(0)?.toUpperCase() ?? 'U'
+  const [cambiarPassOpen, setCambiarPassOpen] = useState(false)
 
   return (
     <div>
@@ -37,6 +40,7 @@ export default function Perfil() {
       <div style={{ background: '#F8FAFD', padding: 'clamp(32px,5vh,52px) clamp(20px,4vw,56px) clamp(64px,10vh,100px)' }}>
         <div style={{ maxWidth: 560, margin: '0 auto' }}>
           <div style={{ background: '#fff', borderRadius: 16, border: '1px solid rgba(0,93,164,0.1)', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+            {/* Información de la cuenta */}
             <div style={{ padding: '20px 28px', borderBottom: '1px solid rgba(0,93,164,0.07)' }}>
               <p style={{ margin: '0 0 16px', fontFamily: "var(--font-pixel)", fontSize: 19, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(0,93,164,0.5)', fontWeight: 700 }}>
                 Información de la cuenta
@@ -53,12 +57,32 @@ export default function Perfil() {
                 ))}
               </dl>
             </div>
+
+            {/* Seguridad */}
+            <div style={{ padding: '18px 28px', borderBottom: '1px solid rgba(0,93,164,0.07)' }}>
+              <p style={{ margin: '0 0 14px', fontFamily: "var(--font-pixel)", fontSize: 19, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(0,93,164,0.5)', fontWeight: 700 }}>
+                Seguridad
+              </p>
+              <button
+                onClick={() => setCambiarPassOpen(true)}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', fontSize: 15, fontWeight: 600, borderRadius: 10, border: '1px solid rgba(0,93,164,0.25)', background: 'transparent', color: '#005DA4', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", transition: 'background 150ms, border-color 150ms' }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#EFF6FF'; e.currentTarget.style.borderColor = 'rgba(0,93,164,0.45)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(0,93,164,0.25)' }}
+              >
+                <svg style={{ width: 15, height: 15 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                Cambiar contraseña
+              </button>
+            </div>
+
+            {/* Cerrar sesión */}
             <div style={{ padding: '16px 28px' }}>
               <button
                 onClick={logout}
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', fontSize: 15, fontWeight: 600, borderRadius: 10, border: '1px solid rgba(244,63,94,0.3)', background: 'transparent', color: '#be123c', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", transition: 'background 150ms' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#FEF2F2'}
-                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#FEF2F2'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               >
                 <svg style={{ width: 15, height: 15 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -69,6 +93,13 @@ export default function Perfil() {
           </div>
         </div>
       </div>
+
+      {cambiarPassOpen && (
+        <CambiarPasswordModal
+          user={user}
+          onClose={() => setCambiarPassOpen(false)}
+        />
+      )}
     </div>
   )
 }

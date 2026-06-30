@@ -12,8 +12,8 @@
   /* Typography */
   --font-display: "Space Grotesk", "TruenoRG", "Nunito", system-ui, sans-serif;
   --font-body: "TruenoRG", "Nunito", system-ui, sans-serif;
-  --font-pixel: "Pixelify Sans", system-ui, sans-serif;
-  --font-mono-stack: "Pixelify Sans", system-ui, sans-serif;
+  --font-pixel: "Google Sans", "DM Sans", system-ui, sans-serif;
+  --font-mono-stack: "Google Sans", "DM Sans", system-ui, sans-serif;
   --font-trueno: "TruenoRG", "Nunito", system-ui, sans-serif;
 }
 
