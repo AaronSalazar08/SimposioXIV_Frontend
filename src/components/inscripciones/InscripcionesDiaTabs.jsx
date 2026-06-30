@@ -1,5 +1,6 @@
 import { DIAS_SIMPOSIO } from '../../constants/eventos'
-import { formatFechaDiaTab } from '../../utils/date'
+
+const DAY_DATES = { '1': '05 Ago', '2': '06 Ago', '3': '07 Ago' }
 
 function badgeLabel(count) {
   if (!count || count <= 0) return null
@@ -9,12 +10,13 @@ function badgeLabel(count) {
 export default function InscripcionesDiaTabs({ diaActivo, onSelectDia, conteosPorDia = {} }) {
   return (
     <div
-      className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-6"
+      className="flex sm:inline-flex w-full sm:w-auto rounded-full gap-[3px]"
+      style={{ background: 'rgba(0,0,0,0.07)', padding: 5 }}
       role="tablist"
       aria-label="Filtrar eventos por día"
     >
       {DIAS_SIMPOSIO.map((dia) => {
-        const activo = diaActivo === dia.value
+        const on = diaActivo === dia.value
         const badge = badgeLabel(conteosPorDia[dia.value])
 
         return (
@@ -22,37 +24,42 @@ export default function InscripcionesDiaTabs({ diaActivo, onSelectDia, conteosPo
             key={dia.value}
             type="button"
             role="tab"
-            aria-selected={activo}
+            aria-selected={on}
             onClick={() => onSelectDia(dia.value)}
-            className={`rounded-xl px-3 py-2.5 text-center transition-all border ${
-              activo
-                ? 'bg-ucr-blue border-ucr-blue text-white shadow-sm'
-                : 'bg-white border-gray-200 text-gray-500 hover:border-ucr-blue hover:text-ucr-blue'
-            }`}
+            className="flex-1 sm:flex-none inline-flex items-center justify-center"
+            style={{
+              gap: 'clamp(5px,1vw,9px)',
+              height: 'clamp(38px,5vh,50px)',
+              padding: '0 clamp(10px,2.5vw,22px)',
+              border: 'none',
+              borderRadius: 9999,
+              background: on ? '#111827' : 'transparent',
+              boxShadow: on ? '0 1px 6px rgba(0,0,0,0.2)' : 'none',
+              color: on ? '#fff' : '#6B7280',
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 600,
+              fontSize: 'clamp(14px,1.5vw,19px)',
+              cursor: 'pointer',
+              transition: 'all 150ms',
+              whiteSpace: 'nowrap',
+            }}
           >
-            <span
-              className={`block text-[11px] sm:text-xs capitalize mb-0.5 leading-tight ${
-                activo ? 'text-blue-100' : 'text-gray-400'
-              }`}
-            >
-              {formatFechaDiaTab(dia.fechaReferencia)}
+            Día {dia.numeroDia}
+            <span className="hidden sm:inline" style={{ fontFamily: "var(--font-pixel)", fontSize: 'clamp(14px,1.5vw,20px)', opacity: on ? 0.6 : 0.7 }}>
+              · {DAY_DATES[dia.value]}
             </span>
-            <span className="flex items-center justify-center gap-1.5">
-              <span className={`text-base sm:text-lg font-bold ${activo ? 'text-white' : 'text-gray-700'}`}>
-                Día {dia.numeroDia}
+            {badge && (
+              <span style={{
+                fontSize: 'clamp(12px,1.3vw,19px)',
+                fontFamily: "var(--font-pixel)",
+                background: on ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)',
+                color: on ? '#fff' : '#6B7280',
+                borderRadius: 9999,
+                padding: '2px 7px',
+              }}>
+                {badge}
               </span>
-              {badge && (
-                <span
-                  className={`inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full text-[10px] font-bold ${
-                    activo
-                      ? 'bg-white text-ucr-blue'
-                      : 'bg-gray-100 text-gray-600'
-                  }`}
-                >
-                  {badge}
-                </span>
-              )}
-            </span>
+            )}
           </button>
         )
       })}

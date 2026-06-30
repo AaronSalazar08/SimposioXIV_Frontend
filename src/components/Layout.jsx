@@ -18,7 +18,7 @@ function AdminPreviewBanner() {
       <button
         type="button"
         onClick={() => navigate('/admin')}
-        className="shrink-0 flex items-center gap-1.5 bg-amber-900 text-amber-50 text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-amber-800 transition-colors"
+        className="shrink-0 flex items-center gap-1.5 bg-amber-900 text-amber-50 text-sm font-semibold px-3 py-1.5 rounded-lg hover:bg-amber-800 transition-colors"
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -29,7 +29,7 @@ function AdminPreviewBanner() {
   )
 }
 
-export default function Layout() {
+export default function Layout({ noTopPad = false }) {
   const { user } = useAuth()
   const isAdmin = user?.tipo_usuario === 'admin'
 
@@ -37,7 +37,9 @@ export default function Layout() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {isAdmin && <AdminPreviewBanner />}
       <Navbar />
-      <main className="flex-1">
+      {/* noTopPad=true en Home: el hero llena el viewport y el nav fixed flota encima transparente.
+          En el resto de páginas el offset empuja el contenido por debajo del nav. */}
+      <main className="flex-1" style={{ paddingTop: noTopPad ? 0 : 96 }}>
         <Outlet />
       </main>
     </div>
