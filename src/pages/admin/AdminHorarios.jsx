@@ -16,6 +16,7 @@ import { getApiErrorMessage } from '../../utils/apiErrors'
 
 const EMPTY_FORM = { aula_id: '', numero_dia: '1', hora_inicio: '', hora_fin: '' }
 const DIAS = [{ value: '1', label: 'Día 1' }, { value: '2', label: 'Día 2' }, { value: '3', label: 'Día 3' }]
+const FILTRO_DIAS = [{ value: '', label: 'Todos los días' }, ...DIAS]
 
 function formatHora(dt) {
   if (!dt) return '—'
@@ -32,6 +33,8 @@ export default function AdminHorarios() {
   const [form, setForm] = useState(EMPTY_FORM)
   const [error, setError] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(null)
+  const [filtroDia, setFiltroDia] = useState('')
+  const horariosFiltrados = filtroDia ? horarios.filter((h) => String(h.numero_dia) === filtroDia) : horarios
 
   const openCrear = () => { setForm(EMPTY_FORM); setError(''); setModal({ open: true, horario: null }) }
   const openEditar = (h) => {
@@ -57,17 +60,22 @@ export default function AdminHorarios() {
   const handleSubmit = (e) => {
     e.preventDefault()
     setError('')
-    saveMutation.mutate({ ...form, aula_id: Number(form.aula_id), numero_dia: Number(form.numero_dia) })
+    saveMutation.mutate({ ...form, aula_id: form.aula_id ? Number(form.aula_id) : null, numero_dia: Number(form.numero_dia) })
   }
   const set = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }))
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="text-xl font-bold text-ucr-blue-dark">Horarios</h1>
-        <button type="button" onClick={openCrear} className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors">
-          + Nuevo horario
-        </button>
+        <div className="flex items-center gap-2">
+          <select className={`${SELECT_CLASS} w-auto`} value={filtroDia} onChange={(e) => setFiltroDia(e.target.value)}>
+            {FILTRO_DIAS.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
+          </select>
+          <button type="button" onClick={openCrear} className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
+            + Nuevo horario
+          </button>
+        </div>
       </div>
 
       <AlertMessage message={error} />
@@ -76,6 +84,8 @@ export default function AdminHorarios() {
         <LoadingState message="Cargando horarios..." />
       ) : horarios.length === 0 ? (
         <p className="text-gray-500 text-sm">No hay horarios registrados.</p>
+      ) : horariosFiltrados.length === 0 ? (
+        <p className="text-gray-500 text-sm">No hay horarios para el día seleccionado.</p>
       ) : (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <table className="w-full text-sm">
@@ -87,7 +97,7 @@ export default function AdminHorarios() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {horarios.map((h) => (
+              {horariosFiltrados.map((h) => (
                 <tr key={h.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3 font-medium text-gray-900">Día {h.numero_dia}</td>
                   <td className="px-4 py-3 text-gray-600">{formatHora(h.hora_inicio)}</td>
@@ -110,9 +120,11 @@ export default function AdminHorarios() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <AlertMessage message={error} />
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Aula</label>
-            <select className={SELECT_CLASS} value={form.aula_id} onChange={set('aula_id')} required>
-              <option value="">Seleccioná un aula...</option>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Aula <span className="text-gray-400 font-normal">(opcional)</span>
+            </label>
+            <select className={SELECT_CLASS} value={form.aula_id} onChange={set('aula_id')}>
+              <option value="">Sin aula (actividad general: traslados, comidas, plenarias...)</option>
               {aulas.map((a) => <option key={a.id} value={a.id}>{a.numero} — {a.edificio}</option>)}
             </select>
           </div>

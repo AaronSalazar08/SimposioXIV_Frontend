@@ -13,7 +13,6 @@ import Layout from './components/Layout'
 import AdminLayout from './components/admin/AdminLayout'
 import Login from './pages/Login'
 import Home from './pages/Home'
-import Tematicas from './pages/Tematicas'
 import Inscripciones from './pages/Inscripciones'
 import Agenda from './pages/Agenda'
 import Cronograma from './pages/Cronograma'
@@ -21,6 +20,7 @@ import Perfil from './pages/Perfil'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminUsuarios from './pages/admin/AdminUsuarios'
 import AdminEventos from './pages/admin/AdminEventos'
+import AdminEventoInscritos from './pages/admin/AdminEventoInscritos'
 import AdminHorarios from './pages/admin/AdminHorarios'
 import AdminAulas from './pages/admin/AdminAulas'
 import AdminPonentes from './pages/admin/AdminPonentes'
@@ -46,7 +46,6 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="tematicas" element={<Tematicas />} />
           <Route path="inscripciones" element={<Inscripciones />} />
           <Route path="agenda" element={<Agenda />} />
           <Route path="micronograma" element={<Cronograma />} />
@@ -65,6 +64,7 @@ export default function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="usuarios" element={<AdminUsuarios />} />
           <Route path="eventos" element={<AdminEventos />} />
+          <Route path="eventos/:eventoId/inscritos" element={<AdminEventoInscritos />} />
           <Route path="horarios" element={<AdminHorarios />} />
           <Route path="aulas" element={<AdminAulas />} />
           <Route path="ponentes" element={<AdminPonentes />} />

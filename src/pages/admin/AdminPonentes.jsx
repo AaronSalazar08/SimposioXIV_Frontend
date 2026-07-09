@@ -7,11 +7,13 @@ import {
   updateAdminPonente,
 } from '../../api/admin'
 import AdminModal from '../../components/admin/AdminModal'
+import SearchInput from '../../components/admin/SearchInput'
 import AlertMessage from '../../components/ui/AlertMessage'
 import LoadingState from '../../components/ui/LoadingState'
 import { INPUT_CLASS } from '../../constants/formStyles'
 import { queryKeys } from '../../constants/queryKeys'
 import { getApiErrorMessage } from '../../utils/apiErrors'
+import { matchesQuery } from '../../utils/text'
 
 const EMPTY_FORM = { nombre: '', apellidos: '', educacion: '', grado_academico: '', descripcion: '' }
 
@@ -26,6 +28,8 @@ export default function AdminPonentes() {
   const [form, setForm] = useState(EMPTY_FORM)
   const [error, setError] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(null)
+  const [search, setSearch] = useState('')
+  const ponentesFiltrados = ponentes.filter((p) => matchesQuery(search, p.nombre, p.apellidos, p.grado_academico, p.educacion))
 
   const openCrear = () => { setForm(EMPTY_FORM); setError(''); setModal({ open: true, ponente: null }) }
   const openEditar = (p) => {
@@ -53,11 +57,14 @@ export default function AdminPonentes() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="text-xl font-bold text-ucr-blue-dark">Ponentes</h1>
-        <button type="button" onClick={openCrear} className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors">
-          + Nuevo ponente
-        </button>
+        <div className="flex items-center gap-2">
+          <SearchInput value={search} onChange={setSearch} placeholder="Buscar ponente..." />
+          <button type="button" onClick={openCrear} className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
+            + Nuevo ponente
+          </button>
+        </div>
       </div>
 
       <AlertMessage message={error} />
@@ -66,6 +73,8 @@ export default function AdminPonentes() {
         <LoadingState message="Cargando ponentes..." />
       ) : ponentes.length === 0 ? (
         <p className="text-gray-500 text-sm">No hay ponentes registrados.</p>
+      ) : ponentesFiltrados.length === 0 ? (
+        <p className="text-gray-500 text-sm">No se encontraron ponentes para "{search}".</p>
       ) : (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <table className="w-full text-sm">
@@ -77,7 +86,7 @@ export default function AdminPonentes() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {ponentes.map((p) => (
+              {ponentesFiltrados.map((p) => (
                 <tr key={p.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3 font-medium text-gray-900">{p.nombre} {p.apellidos}</td>
                   <td className="px-4 py-3 text-gray-600">{p.grado_academico ?? '—'}</td>

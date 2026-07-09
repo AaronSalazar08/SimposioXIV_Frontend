@@ -10,12 +10,14 @@ import {
   updateAdminUsuario,
 } from '../../api/admin'
 import AdminModal from '../../components/admin/AdminModal'
+import SearchInput from '../../components/admin/SearchInput'
 import AlertMessage from '../../components/ui/AlertMessage'
 import LoadingState from '../../components/ui/LoadingState'
 import Spinner from '../../components/ui/Spinner'
 import { INPUT_CLASS, SELECT_CLASS } from '../../constants/formStyles'
 import { queryKeys } from '../../constants/queryKeys'
 import { getApiErrorMessage } from '../../utils/apiErrors'
+import { matchesQuery } from '../../utils/text'
 
 const EMPTY_FORM = { nombre: '', email: '', carnet: '', password: '', tipo_usuario: 'participante' }
 
@@ -67,6 +69,8 @@ export default function AdminUsuarios() {
   const [emailFeedback, setEmailFeedback] = useState(null)
   const [enviandoCorreoId, setEnviandoCorreoId] = useState(null)
   const [confirmEnviarTodos, setConfirmEnviarTodos] = useState(false)
+  const [search, setSearch] = useState('')
+  const usuariosFiltrados = usuarios.filter((u) => matchesQuery(search, u.nombre, u.email, u.carnet))
 
   const openCrear = () => { setForm(EMPTY_FORM); setError(''); setModal({ open: true, usuario: null }) }
   const openEditar = (u) => {
@@ -146,7 +150,8 @@ export default function AdminUsuarios() {
     <div>
       <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="text-xl font-bold text-ucr-blue-dark">Usuarios</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <SearchInput value={search} onChange={setSearch} placeholder="Buscar usuario..." />
           <button
             type="button"
             onClick={() => { setEmailFeedback(null); setConfirmEnviarTodos(true) }}
@@ -201,6 +206,8 @@ export default function AdminUsuarios() {
         <LoadingState message="Cargando usuarios..." />
       ) : usuarios.length === 0 ? (
         <p className="text-gray-500 text-sm">No hay usuarios registrados.</p>
+      ) : usuariosFiltrados.length === 0 ? (
+        <p className="text-gray-500 text-sm">No se encontraron usuarios para "{search}".</p>
       ) : (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <table className="w-full text-sm">
@@ -212,7 +219,7 @@ export default function AdminUsuarios() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {usuarios.map((u) => {
+              {usuariosFiltrados.map((u) => {
                 const enviandoEste = enviandoCorreoId === u.id
                 return (
                   <tr key={u.id} className="hover:bg-gray-50 transition-colors">

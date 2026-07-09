@@ -7,11 +7,13 @@ import {
   updateAdminArea,
 } from '../../api/admin'
 import AdminModal from '../../components/admin/AdminModal'
+import SearchInput from '../../components/admin/SearchInput'
 import AlertMessage from '../../components/ui/AlertMessage'
 import LoadingState from '../../components/ui/LoadingState'
 import { INPUT_CLASS } from '../../constants/formStyles'
 import { queryKeys } from '../../constants/queryKeys'
 import { getApiErrorMessage } from '../../utils/apiErrors'
+import { matchesQuery } from '../../utils/text'
 
 const EMPTY_FORM = { nombre: '', descripcion: '', color: '#3b82f6' }
 
@@ -26,6 +28,8 @@ export default function AdminAreas() {
   const [form, setForm] = useState(EMPTY_FORM)
   const [error, setError] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(null)
+  const [search, setSearch] = useState('')
+  const areasFiltradas = areas.filter((a) => matchesQuery(search, a.nombre, a.descripcion))
 
   const openCrear = () => { setForm(EMPTY_FORM); setError(''); setModal({ open: true, area: null }) }
   const openEditar = (area) => {
@@ -53,11 +57,14 @@ export default function AdminAreas() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="text-xl font-bold text-ucr-blue-dark">Áreas temáticas</h1>
-        <button type="button" onClick={openCrear} className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors">
-          + Nueva área
-        </button>
+        <div className="flex items-center gap-2">
+          <SearchInput value={search} onChange={setSearch} placeholder="Buscar área..." />
+          <button type="button" onClick={openCrear} className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
+            + Nueva área
+          </button>
+        </div>
       </div>
 
       <AlertMessage message={error} />
@@ -66,6 +73,8 @@ export default function AdminAreas() {
         <LoadingState message="Cargando áreas..." />
       ) : areas.length === 0 ? (
         <p className="text-gray-500 text-sm">No hay áreas registradas.</p>
+      ) : areasFiltradas.length === 0 ? (
+        <p className="text-gray-500 text-sm">No se encontraron áreas para "{search}".</p>
       ) : (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <table className="w-full text-sm">
@@ -77,7 +86,7 @@ export default function AdminAreas() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {areas.map((area) => (
+              {areasFiltradas.map((area) => (
                 <tr key={area.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3">
                     <span className="inline-block w-5 h-5 rounded-full border border-gray-200" style={{ backgroundColor: area.color ?? '#6b7280' }} />

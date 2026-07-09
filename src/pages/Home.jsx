@@ -109,18 +109,18 @@ function Fade({ children, delay = 0, y = 20, style, className }) {
 
 // ─── Data ─────────────────────────────────────────────────────────
 const TRACKS = [
-  { n: '01', name: 'Inteligencia & Datos',    blurb: 'Modelos de lenguaje, analítica y decisiones basadas en evidencia.', color: '#21BBEF' },
-  { n: '02', name: 'Cloud & Plataformas',     blurb: 'Arquitecturas serverless, escalamiento y nube para la región.',     color: '#3B82F6' },
-  { n: '03', name: 'Producto & Negocio',      blurb: 'De la tecnología al impacto: estrategia, producto y operación.',     color: '#F59E0B' },
-  { n: '04', name: 'Seguridad',               blurb: 'Ciberseguridad, privacidad y resiliencia de la infraestructura.',   color: '#EF4444' },
-  { n: '05', name: 'Academia & Investigación',blurb: 'Lo que se investiga hoy en las aulas y laboratorios de la UCR.',    color: '#10B981' },
-  { n: '06', name: 'Comunidad & Carrera',     blurb: 'Networking, empleabilidad y la próxima generación de talento.',     color: '#8B5CF6' },
+  { n: '01', name: 'OPT – Área de Tendencias de Gestión de la Informática en las Organizaciones', blurb: 'Estrategia, gobierno de TI y administración de proyectos y servicios tecnológicos.', color: '#21BBEF' },
+  { n: '02', name: 'OPT – Área de Tendencias de Desarrollo de Software',                          blurb: 'Ingeniería, arquitecturas modernas y buenas prácticas para construir software de calidad.', color: '#3B82F6' },
+  { n: '03', name: 'OPT – Área de Tendencia de Ingeniería de Datos',                               blurb: 'Modelado, procesamiento y aprovechamiento de datos para la toma de decisiones.', color: '#F59E0B' },
+  { n: '04', name: 'OPT – Área de Tendencias de Arquitectura e Infraestructura de Sistemas Computacionales', blurb: 'Redes, cómputo en la nube y sistemas distribuidos: la base que sostiene todo lo demás.', color: '#EF4444' },
+  { n: '05', name: 'Conocimientos Básicos para la Informática',                                    blurb: 'Los fundamentos matemáticos, lógicos y técnicos que sostienen toda la carrera.', color: '#10B981' },
+  { n: '06', name: 'Humanística',                                                                  blurb: 'Comunicación, ética y cultura: las habilidades humanas que dan sentido a la tecnología.', color: '#8B5CF6' },
 ]
 
 const DAYS = [
   { n: '01', day: 'Miércoles 05 Ago', theme: 'Llegada', bg: '#05070E', fg: '#fff', dot: '#21BBEF', kw: ['Check-in · Hotel Las Espuelas', 'Traslado a la UCR', 'Cena + Actividad Deportiva'], lead: 'El día de la llegada: nos instalamos en el Hotel Las Espuelas, nos trasladamos al campus y arrancamos juntos con cena y deporte.' },
-  { n: '02', day: 'Jueves 06 Ago', theme: 'Inteligencia', bg: '#004A87', fg: '#fff', dot: '#21BBEF', kw: ['IA aplicada', 'Automatización', 'Producto & negocio'], lead: 'El día de la inteligencia artificial y los datos: de la teoría a los procesos reales.' },
-  { n: '03', day: 'Viernes 07 Ago', theme: 'Comunidad', bg: '#21BBEF', fg: '#05070E', dot: '#002F58', kw: ['Feria de proyectos', 'Panel academia-industria', 'Cierre'], lead: 'Cerramos con la comunidad: proyectos estudiantiles, networking y futuro profesional.' },
+  { n: '02', day: 'Jueves 06 Ago', theme: 'Talleres', bg: '#004A87', fg: '#fff', dot: '#21BBEF', kw: ['IA aplicada', 'Ciberseguridad & firma digital', 'Datos, software & transformación digital'], lead: 'El día de los talleres: experiencias prácticas en inteligencia artificial, ciberseguridad y transformación digital.' },
+  { n: '03', day: 'Viernes 07 Ago', theme: 'Cierre', bg: '#21BBEF', fg: '#05070E', dot: '#002F58', kw: ['Datos & infraestructura', 'Actualización de reacreditación', 'Clausura & reconocimientos'], lead: 'El día de cierre: talleres de datos e infraestructura, la actualización del proceso de reacreditación y la ceremonia de clausura y reconocimientos.' },
 ]
 
 const NUMS = [
@@ -276,14 +276,14 @@ function Tracks() {
       <div style={{ maxWidth: 1560, margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 24, marginBottom: 'clamp(40px,7vh,72px)' }}>
           <div>
-            <div style={{ marginBottom: 22 }}><ChapterTag n="02" label="Ejes temáticos" color="#005DA4" /></div>
+            <div style={{ marginBottom: 22 }}><ChapterTag n="02" label="Tendencias del plan de estudios" color="#005DA4" /></div>
             <h2 style={{ margin: 0, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(2.2rem,6vw,4.8rem)', lineHeight: 0.96, letterSpacing: '-0.04em', color: '#05070E' }}>
-              <Lines lines={['Seis frentes', <span key="b">para pensar el <span style={{ color: '#005DA4' }}>futuro.</span></span>]} />
+              <Lines lines={['Seis tendencias', <span key="b">para pensar el <span style={{ color: '#005DA4' }}>futuro.</span></span>]} />
             </h2>
           </div>
           <Fade delay={0.2} style={{ maxWidth: '34ch' }}>
             <p style={{ margin: 0, fontSize: 'clamp(1rem,1.4vw,1.2rem)', lineHeight: 1.55, color: '#6B7280' }}>
-              El programa se organiza en seis ejes que recorren toda la cadena del software empresarial — de la infraestructura al impacto humano.
+              El nuevo plan de estudios de Informática Empresarial se organiza en seis tendencias que recorren toda la cadena del software empresarial — de la infraestructura al impacto humano.
             </p>
           </Fade>
         </div>
@@ -293,17 +293,15 @@ function Tracks() {
             const on = hover === i
             return (
               <Fade key={tk.n} delay={i * 0.05}>
-                <Link to="/tematicas" style={{ textDecoration: 'none' }}>
-                  <div onMouseEnter={() => setHover(i)}
-                    style={{ display: 'grid', gridTemplateColumns: 'auto minmax(0,1fr) auto', alignItems: 'center', gap: 'clamp(16px,3vw,44px)', padding: 'clamp(20px,3.2vh,34px) clamp(8px,1.5vw,20px)', borderBottom: '1px solid rgba(0,0,0,0.08)', cursor: 'pointer', background: on ? '#fff' : 'transparent', boxShadow: on ? '0 4px 24px rgba(0,0,0,0.07)' : 'none', borderRadius: on ? 12 : 0, transform: on ? 'translateX(6px)' : 'none', transition: `all 0.4s ${EASE_OUT}` }}>
-                    <span style={{ fontFamily: "var(--font-pixel)", fontSize: 'clamp(19px,1.3vw,22px)', color: on ? tk.color : 'rgba(0,0,0,0.25)', width: 30, transition: 'color 0.3s' }}>{tk.n}</span>
-                    <div style={{ minWidth: 0 }}>
-                      <h3 style={{ margin: 0, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(1.4rem,3.4vw,2.6rem)', lineHeight: 1.02, letterSpacing: '-0.03em', color: '#05070E' }}>{tk.name}</h3>
-                      <p style={{ margin: '8px 0 0', fontSize: 'clamp(0.9rem,1.1vw,1rem)', color: '#6B7280', maxHeight: on ? 60 : 0, opacity: on ? 1 : 0, overflow: 'hidden', transition: `all 0.45s ${EASE_OUT}` }}>{tk.blurb}</p>
-                    </div>
-                    <span style={{ width: 12, height: 12, borderRadius: '50%', background: tk.color, flexShrink: 0, boxShadow: on ? `0 0 0 6px ${tk.color}22` : 'none', transition: 'box-shadow 0.3s' }} />
+                <div onMouseEnter={() => setHover(i)}
+                  style={{ display: 'grid', gridTemplateColumns: 'auto minmax(0,1fr) auto', alignItems: 'center', gap: 'clamp(16px,3vw,44px)', padding: 'clamp(20px,3.2vh,34px) clamp(8px,1.5vw,20px)', borderBottom: '1px solid rgba(0,0,0,0.08)', background: on ? '#fff' : 'transparent', boxShadow: on ? '0 4px 24px rgba(0,0,0,0.07)' : 'none', borderRadius: on ? 12 : 0, transform: on ? 'translateX(6px)' : 'none', transition: `all 0.4s ${EASE_OUT}` }}>
+                  <span style={{ fontFamily: "var(--font-pixel)", fontSize: 'clamp(19px,1.3vw,22px)', color: on ? tk.color : 'rgba(0,0,0,0.25)', width: 30, transition: 'color 0.3s' }}>{tk.n}</span>
+                  <div style={{ minWidth: 0 }}>
+                    <h3 style={{ margin: 0, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(1.4rem,3.4vw,2.6rem)', lineHeight: 1.02, letterSpacing: '-0.03em', color: '#05070E' }}>{tk.name}</h3>
+                    <p style={{ margin: '8px 0 0', fontSize: 'clamp(0.9rem,1.1vw,1rem)', color: '#6B7280', maxHeight: on ? 60 : 0, opacity: on ? 1 : 0, overflow: 'hidden', transition: `all 0.45s ${EASE_OUT}` }}>{tk.blurb}</p>
                   </div>
-                </Link>
+                  <span style={{ width: 12, height: 12, borderRadius: '50%', background: tk.color, flexShrink: 0, boxShadow: on ? `0 0 0 6px ${tk.color}22` : 'none', transition: 'box-shadow 0.3s' }} />
+                </div>
               </Fade>
             )
           })}
@@ -499,7 +497,7 @@ function HomeFooter() {
             </p>
           </div>
           <div style={{ display: 'flex', gap: 'clamp(32px,5vw,72px)', flexWrap: 'wrap' }}>
-            <FooterCol title="Evento" links={[['Información', '/informacion'], ['Temáticas', '/tematicas'], ['Cronograma', '/cronograma']]} />
+            <FooterCol title="Evento" links={[['Información', '/informacion'], ['Cronograma', '/cronograma']]} />
             <FooterCol title="Asistentes" links={[['Inscripciones', '/inscripciones'], ['Mi perfil', '/perfil']]} />
           </div>
         </div>

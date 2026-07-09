@@ -7,11 +7,13 @@ import {
   updateAdminAula,
 } from '../../api/admin'
 import AdminModal from '../../components/admin/AdminModal'
+import SearchInput from '../../components/admin/SearchInput'
 import AlertMessage from '../../components/ui/AlertMessage'
 import LoadingState from '../../components/ui/LoadingState'
 import { INPUT_CLASS } from '../../constants/formStyles'
 import { queryKeys } from '../../constants/queryKeys'
 import { getApiErrorMessage } from '../../utils/apiErrors'
+import { matchesQuery } from '../../utils/text'
 
 const EMPTY_FORM = { numero: '', edificio: '', capacidad: '' }
 
@@ -26,6 +28,8 @@ export default function AdminAulas() {
   const [form, setForm] = useState(EMPTY_FORM)
   const [error, setError] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(null)
+  const [search, setSearch] = useState('')
+  const aulasFiltradas = aulas.filter((a) => matchesQuery(search, a.numero, a.edificio))
 
   const openCrear = () => {
     setForm(EMPTY_FORM)
@@ -68,15 +72,18 @@ export default function AdminAulas() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="text-xl font-bold text-ucr-blue-dark">Aulas</h1>
-        <button
-          type="button"
-          onClick={openCrear}
-          className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors"
-        >
-          + Nueva aula
-        </button>
+        <div className="flex items-center gap-2">
+          <SearchInput value={search} onChange={setSearch} placeholder="Buscar aula..." />
+          <button
+            type="button"
+            onClick={openCrear}
+            className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap"
+          >
+            + Nueva aula
+          </button>
+        </div>
       </div>
 
       <AlertMessage message={error} />
@@ -85,6 +92,8 @@ export default function AdminAulas() {
         <LoadingState message="Cargando aulas..." />
       ) : aulas.length === 0 ? (
         <p className="text-gray-500 text-sm">No hay aulas registradas.</p>
+      ) : aulasFiltradas.length === 0 ? (
+        <p className="text-gray-500 text-sm">No se encontraron aulas para "{search}".</p>
       ) : (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <table className="w-full text-sm">
@@ -98,7 +107,7 @@ export default function AdminAulas() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {aulas.map((aula) => (
+              {aulasFiltradas.map((aula) => (
                 <tr key={aula.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3 font-medium text-gray-900">{aula.numero}</td>
                   <td className="px-4 py-3 text-gray-600">{aula.edificio}</td>

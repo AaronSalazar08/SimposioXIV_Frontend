@@ -10,7 +10,6 @@ const publicNavItems = [
 ]
 
 const authNavItems = [
-  { to: '/tematicas', label: 'Temáticas' },
   { to: '/agenda', label: 'Agenda' },
   { to: '/inscripciones', label: 'Inscripciones' },
 ]

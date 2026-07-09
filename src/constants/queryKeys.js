@@ -4,6 +4,7 @@ export const queryKeys = {
   misInscripciones: () => ['mis-inscripciones'],
   adminUsuarios: () => ['admin', 'usuarios'],
   adminEventos: () => ['admin', 'eventos'],
+  adminEventoInscritos: (eventoId) => ['admin', 'eventos', eventoId, 'inscritos'],
   adminHorarios: () => ['admin', 'horarios'],
   adminAulas: () => ['admin', 'aulas'],
   adminPonentes: () => ['admin', 'ponentes'],

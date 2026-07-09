@@ -4,6 +4,7 @@ import { fetchAdminUsuarios } from '../../api/admin'
 import { fetchAdminEventos } from '../../api/admin'
 import { fetchAdminHorarios } from '../../api/admin'
 import { fetchAdminAulas } from '../../api/admin'
+import HorarioGrid from '../../components/admin/HorarioGrid'
 import { queryKeys } from '../../constants/queryKeys'
 import { useAuth } from '../../context/useAuth'
 
@@ -44,6 +45,10 @@ export default function AdminDashboard() {
             <span className="text-sm font-medium">{label}</span>
           </Link>
         ))}
+      </div>
+
+      <div className="mt-8">
+        <HorarioGrid eventos={eventos} />
       </div>
     </div>
   )
