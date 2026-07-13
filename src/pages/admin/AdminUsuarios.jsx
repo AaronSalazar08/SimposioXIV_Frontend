@@ -253,7 +253,7 @@ export default function AdminUsuarios() {
                           </button>
                         )}
                         <button type="button" onClick={() => openEditar(u)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
-                        <button type="button" onClick={() => setConfirmDelete(u)} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                        <button type="button" onClick={() => { setError(''); setConfirmDelete(u) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
                       </div>
                     </td>
                   </tr>
@@ -337,6 +337,7 @@ export default function AdminUsuarios() {
 
       {/* Modal eliminar */}
       <AdminModal open={!!confirmDelete} title="Eliminar usuario" onClose={() => setConfirmDelete(null)}>
+        <AlertMessage message={error} />
         <p className="text-gray-600 text-sm mb-5">
           ¿Eliminás al usuario <strong>{confirmDelete?.nombre}</strong> ({confirmDelete?.email})?
           Se revocarán todos sus tokens. Esta acción no se puede deshacer.

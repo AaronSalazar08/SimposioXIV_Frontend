@@ -123,7 +123,7 @@ export default function AdminAulas() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => setConfirmDelete(aula)}
+                        onClick={() => { setError(''); setConfirmDelete(aula) }}
                         className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors"
                       >
                         Eliminar
@@ -174,6 +174,7 @@ export default function AdminAulas() {
         title="Eliminar aula"
         onClose={() => setConfirmDelete(null)}
       >
+        <AlertMessage message={error} />
         <p className="text-gray-600 text-sm mb-5">
           ¿Eliminás el aula <strong>{confirmDelete?.numero}</strong> ({confirmDelete?.edificio})?
           Esta acción no se puede deshacer.

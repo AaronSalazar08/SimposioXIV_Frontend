@@ -44,6 +44,10 @@ function formatHora(dt) {
   return dt
 }
 
+function nombreCompletoPonente(p) {
+  return p.nombre_completo ?? `${p.nombre} ${p.apellidos}`.trim()
+}
+
 export default function AdminEventos() {
   const qc = useQueryClient()
   const navigate = useNavigate()
@@ -59,6 +63,7 @@ export default function AdminEventos() {
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [search, setSearch] = useState('')
   const [ponenteSearch, setPonenteSearch] = useState('')
+  const [verPonentes, setVerPonentes] = useState(null)
 
   const eventosFiltrados = eventos.filter((ev) => matchesQuery(search, ev.titulo, TIPO_LABELS[ev.tipo]))
   const ponentesVisibles = ponentes.filter(
@@ -150,7 +155,7 @@ export default function AdminEventos() {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                {['Tipo', 'Título', 'Horario', 'Cupos', 'Estado', 'Inscritos', ''].map((h) => (
+                {['Tipo', 'Título', 'Ponente(s)', 'Horario', 'Cupos', 'Estado', 'Inscritos', ''].map((h) => (
                   <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -164,6 +169,21 @@ export default function AdminEventos() {
                     </span>
                   </td>
                   <td className="px-4 py-3 font-medium text-gray-900 max-w-xs truncate">{ev.titulo}</td>
+                  <td className="px-4 py-3 text-gray-600 text-xs max-w-[180px]">
+                    {(ev.ponentes ?? []).length === 0 ? (
+                      <span className="text-gray-400">—</span>
+                    ) : ev.ponentes.length === 1 ? (
+                      <span className="truncate block">{nombreCompletoPonente(ev.ponentes[0])}</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setVerPonentes(ev)}
+                        className="text-ucr-blue hover:text-ucr-blue-dark font-medium px-2 py-1 -mx-2 rounded-lg hover:bg-ucr-blue-muted transition-colors whitespace-nowrap"
+                      >
+                        Ver ponentes ({ev.ponentes.length})
+                      </button>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-gray-500 text-xs">
                     {ev.horario
                       ? `Día ${ev.horario.numero_dia} · ${formatHora(ev.horario.hora_inicio)}–${formatHora(ev.horario.hora_fin)}`
@@ -187,7 +207,7 @@ export default function AdminEventos() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2 justify-end">
                       <button type="button" onClick={() => openEditar(ev)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
-                      <button type="button" onClick={() => setConfirmDelete(ev)} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                      <button type="button" onClick={() => { setError(''); setConfirmDelete(ev) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
                     </div>
                   </td>
                 </tr>
@@ -310,7 +330,20 @@ export default function AdminEventos() {
         </form>
       </AdminModal>
 
+      <AdminModal open={!!verPonentes} title="Ponentes del evento" onClose={() => setVerPonentes(null)}>
+        <p className="text-sm font-medium text-gray-900 mb-4">{verPonentes?.titulo}</p>
+        <ul className="space-y-2">
+          {(verPonentes?.ponentes ?? []).map((p) => (
+            <li key={p.id} className="border border-gray-100 rounded-lg px-3 py-2">
+              <p className="text-sm font-medium text-gray-900">{nombreCompletoPonente(p)}</p>
+              {p.grado_academico && <p className="text-xs text-gray-400 mt-0.5">{p.grado_academico}</p>}
+            </li>
+          ))}
+        </ul>
+      </AdminModal>
+
       <AdminModal open={!!confirmDelete} title="Eliminar evento" onClose={() => setConfirmDelete(null)}>
+        <AlertMessage message={error} />
         <p className="text-gray-600 text-sm mb-5">
           ¿Eliminás el evento <strong>{confirmDelete?.titulo}</strong>? Esta acción no se puede deshacer.
         </p>

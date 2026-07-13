@@ -52,11 +52,13 @@ function useParallax(speed = 0.12) {
   useEffect(() => {
     if (REDUCE) return
     let raf = 0
-    const on = () => { if (raf) return; raf = requestAnimationFrame(() => {
-      raf = 0; const el = ref.current; if (!el) return
-      const r = el.getBoundingClientRect()
-      setOff(-(r.top + r.height / 2 - window.innerHeight / 2) * speed)
-    }) }
+    const on = () => {
+      if (raf) return; raf = requestAnimationFrame(() => {
+        raf = 0; const el = ref.current; if (!el) return
+        const r = el.getBoundingClientRect()
+        setOff(-(r.top + r.height / 2 - window.innerHeight / 2) * speed)
+      })
+    }
     window.addEventListener('scroll', on, { passive: true })
     window.addEventListener('resize', on); on()
     return () => { window.removeEventListener('scroll', on); window.removeEventListener('resize', on) }
@@ -110,11 +112,11 @@ function Fade({ children, delay = 0, y = 20, style, className }) {
 // ─── Data ─────────────────────────────────────────────────────────
 const TRACKS = [
   { n: '01', name: 'OPT – Área de Tendencias de Gestión de la Informática en las Organizaciones', blurb: 'Estrategia, gobierno de TI y administración de proyectos y servicios tecnológicos.', color: '#21BBEF' },
-  { n: '02', name: 'OPT – Área de Tendencias de Desarrollo de Software',                          blurb: 'Ingeniería, arquitecturas modernas y buenas prácticas para construir software de calidad.', color: '#3B82F6' },
-  { n: '03', name: 'OPT – Área de Tendencia de Ingeniería de Datos',                               blurb: 'Modelado, procesamiento y aprovechamiento de datos para la toma de decisiones.', color: '#F59E0B' },
+  { n: '02', name: 'OPT – Área de Tendencias de Desarrollo de Software', blurb: 'Ingeniería, arquitecturas modernas y buenas prácticas para construir software de calidad.', color: '#3B82F6' },
+  { n: '03', name: 'OPT – Área de Tendencia de Ingeniería de Datos', blurb: 'Modelado, procesamiento y aprovechamiento de datos para la toma de decisiones.', color: '#F59E0B' },
   { n: '04', name: 'OPT – Área de Tendencias de Arquitectura e Infraestructura de Sistemas Computacionales', blurb: 'Redes, cómputo en la nube y sistemas distribuidos: la base que sostiene todo lo demás.', color: '#EF4444' },
-  { n: '05', name: 'Conocimientos Básicos para la Informática',                                    blurb: 'Los fundamentos matemáticos, lógicos y técnicos que sostienen toda la carrera.', color: '#10B981' },
-  { n: '06', name: 'Humanística',                                                                  blurb: 'Comunicación, ética y cultura: las habilidades humanas que dan sentido a la tecnología.', color: '#8B5CF6' },
+  { n: '05', name: 'Conocimientos Básicos para la Informática', blurb: 'Los fundamentos matemáticos, lógicos y técnicos que sostienen toda la carrera.', color: '#10B981' },
+  { n: '06', name: 'Humanística', blurb: 'Comunicación, ética y cultura: las habilidades humanas que dan sentido a la tecnología.', color: '#8B5CF6' },
 ]
 
 const DAYS = [
@@ -124,10 +126,9 @@ const DAYS = [
 ]
 
 const NUMS = [
-  ['32', 'Ponentes', 'nacionales e internacionales'],
-  ['48', 'Sesiones', 'charlas, talleres y paneles'],
-  ['06', 'Ejes', 'IA, cloud, datos, negocio…'],
-  ['03', 'Días', 'inmersión total en Guanacaste'],
+  ['32', 'Ponentes', ''],
+  ['48', 'Ponencias', ''],
+  ['03', 'Días', ''],
 ]
 
 const MARQUEE_WORDS = ['INTELIGENCIA ARTIFICIAL', 'CLOUD', 'DATOS', 'CIBERSEGURIDAD', 'PRODUCTO', 'GUANACASTE 2026']
@@ -200,13 +201,13 @@ function Hero({ user }) {
         <Fade delay={0.62} style={{ marginTop: 'clamp(28px,4vh,42px)' }}>
           <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
             <Link to="/inscripciones" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, height: 58, padding: '0 30px', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(0.95rem,1.2vw,1.1rem)', borderRadius: 9999, background: '#21BBEF', color: '#05070E', border: '1px solid transparent', textDecoration: 'none', transition: `all 200ms ${EASE_OUT}`, boxShadow: '0 0 32px rgba(33,187,239,0.35)' }}
-              onMouseEnter={e => e.currentTarget.style.background='#44C9F3'}
-              onMouseLeave={e => e.currentTarget.style.background='#21BBEF'}>
+              onMouseEnter={e => e.currentTarget.style.background = '#44C9F3'}
+              onMouseLeave={e => e.currentTarget.style.background = '#21BBEF'}>
               Reservar mi lugar <span style={{ fontFamily: "var(--font-pixel)" }}>→</span>
             </Link>
             <Link to="/agenda" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, height: 58, padding: '0 30px', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(0.95rem,1.2vw,1.1rem)', borderRadius: 9999, background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.25)', textDecoration: 'none', transition: `all 200ms ${EASE_OUT}` }}
-              onMouseEnter={e => e.currentTarget.style.background='rgba(255,255,255,0.07)'}
-              onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.07)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
               Ver Agenda
             </Link>
           </div>
@@ -239,12 +240,14 @@ function Manifesto() {
   useEffect(() => {
     if (REDUCE) return
     let raf = 0
-    const on = () => { if (raf) return; raf = requestAnimationFrame(() => {
-      raf = 0; const el = ref.current; if (!el) return
-      const r = el.getBoundingClientRect(); const vh = window.innerHeight
-      const passed = (vh * 0.82) - r.top
-      setP(Math.max(0, Math.min(1, passed / (r.height * 0.72))))
-    }) }
+    const on = () => {
+      if (raf) return; raf = requestAnimationFrame(() => {
+        raf = 0; const el = ref.current; if (!el) return
+        const r = el.getBoundingClientRect(); const vh = window.innerHeight
+        const passed = (vh * 0.82) - r.top
+        setP(Math.max(0, Math.min(1, passed / (r.height * 0.72))))
+      })
+    }
     window.addEventListener('scroll', on, { passive: true })
     window.addEventListener('resize', on); on()
     return () => { window.removeEventListener('scroll', on); window.removeEventListener('resize', on) }
@@ -321,16 +324,18 @@ function Days() {
   useEffect(() => {
     if (REDUCE || stack) return
     let raf = 0
-    const on = () => { if (raf) return; raf = requestAnimationFrame(() => {
-      raf = 0; const wrap = wrapRef.current, track = trackRef.current; if (!wrap || !track) return
-      const r = wrap.getBoundingClientRect(); const vh = window.innerHeight
-      const scrollable = wrap.offsetHeight - vh
-      const passed = Math.min(Math.max(-r.top, 0), scrollable)
-      const prog = scrollable > 0 ? passed / scrollable : 0
-      const maxX = Math.max(0, track.scrollWidth - window.innerWidth)
-      setX(prog * maxX)
-      setIdx(Math.min(DAYS.length - 1, Math.round(prog * (DAYS.length - 1))))
-    }) }
+    const on = () => {
+      if (raf) return; raf = requestAnimationFrame(() => {
+        raf = 0; const wrap = wrapRef.current, track = trackRef.current; if (!wrap || !track) return
+        const r = wrap.getBoundingClientRect(); const vh = window.innerHeight
+        const scrollable = wrap.offsetHeight - vh
+        const passed = Math.min(Math.max(-r.top, 0), scrollable)
+        const prog = scrollable > 0 ? passed / scrollable : 0
+        const maxX = Math.max(0, track.scrollWidth - window.innerWidth)
+        setX(prog * maxX)
+        setIdx(Math.min(DAYS.length - 1, Math.round(prog * (DAYS.length - 1))))
+      })
+    }
     window.addEventListener('scroll', on, { passive: true })
     window.addEventListener('resize', on); on()
     return () => { window.removeEventListener('scroll', on); window.removeEventListener('resize', on) }
@@ -502,8 +507,8 @@ function HomeFooter() {
           </div>
         </div>
         <div style={{ marginTop: 'clamp(53px,8vh,85px)', paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, alignItems: 'center', fontFamily: "var(--font-pixel)", fontSize: 19, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-            <span>© 2026 Universidad de Costa Rica</span>
-            <span>Liberia, Guanacaste · 05–07 AGO 2026</span>
+          <span>© 2026 Universidad de Costa Rica</span>
+          <span>Liberia, Guanacaste · 05–07 AGO 2026</span>
         </div>
       </div>
     </footer>

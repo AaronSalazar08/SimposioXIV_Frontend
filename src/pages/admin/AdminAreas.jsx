@@ -96,7 +96,7 @@ export default function AdminAreas() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2 justify-end">
                       <button type="button" onClick={() => openEditar(area)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
-                      <button type="button" onClick={() => setConfirmDelete(area)} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                      <button type="button" onClick={() => { setError(''); setConfirmDelete(area) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
                     </div>
                   </td>
                 </tr>
@@ -134,6 +134,7 @@ export default function AdminAreas() {
       </AdminModal>
 
       <AdminModal open={!!confirmDelete} title="Eliminar área" onClose={() => setConfirmDelete(null)}>
+        <AlertMessage message={error} />
         <p className="text-gray-600 text-sm mb-5">
           ¿Eliminás el área <strong>{confirmDelete?.nombre}</strong>? Esta acción no se puede deshacer.
         </p>

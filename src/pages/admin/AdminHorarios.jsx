@@ -106,7 +106,7 @@ export default function AdminHorarios() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2 justify-end">
                       <button type="button" onClick={() => openEditar(h)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
-                      <button type="button" onClick={() => setConfirmDelete(h)} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                      <button type="button" onClick={() => { setError(''); setConfirmDelete(h) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
                     </div>
                   </td>
                 </tr>
@@ -154,6 +154,7 @@ export default function AdminHorarios() {
       </AdminModal>
 
       <AdminModal open={!!confirmDelete} title="Eliminar horario" onClose={() => setConfirmDelete(null)}>
+        <AlertMessage message={error} />
         <p className="text-gray-600 text-sm mb-5">
           ¿Eliminás el horario del <strong>Día {confirmDelete?.numero_dia}</strong> ({formatHora(confirmDelete?.hora_inicio)} – {formatHora(confirmDelete?.hora_fin)})? Esta acción no se puede deshacer.
         </p>
