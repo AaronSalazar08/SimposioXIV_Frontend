@@ -150,9 +150,10 @@ Esta app compila a archivos estáticos (`dist/`) — no necesita un servidor Nod
 
 ### Stack recomendado
 
-- Hosting estático: [Vercel](https://vercel.com/), [Netlify](https://www.netlify.com/), Cloudflare Pages, o Nginx propio sirviendo `dist/`
-- HTTPS obligatorio (el backend en producción también debe estar en HTTPS; no mezclar HTTP/HTTPS por contenido mixto)
-- El backend ([`SimposioXIV_Backend`](../SimposioXIV_Backend/README.md)) debe estar desplegado y accesible públicamente antes de apuntar `VITE_API_URL` a él
+- **Servidor**: DigitalOcean, provisionado y administrado por **Laravel Forge** (guía completa abajo) — esta es la vía documentada y soportada para este proyecto.
+- Alternativas más simples si no se usa Forge: [Vercel](https://vercel.com/), [Netlify](https://www.netlify.com/), Cloudflare Pages.
+- HTTPS obligatorio (el backend en producción también debe estar en HTTPS; no mezclar HTTP/HTTPS por contenido mixto).
+- El backend ([`SimposioXIV_Backend`](../SimposioXIV_Backend/README.md)) debe estar desplegado y accesible públicamente antes de apuntar `VITE_API_URL` a él.
 
 ### Build
 
@@ -163,7 +164,7 @@ npm run build
 
 Esto genera `dist/` con los assets listos para servir. Como es una SPA con rutas de cliente (React Router), el servidor debe redirigir cualquier ruta desconocida a `index.html` (rewrite/fallback):
 
-- **Nginx**: `try_files $uri /index.html;`
+- **Nginx**: `try_files $uri $uri/ /index.html;`
 - **Vercel/Netlify**: configuración de rewrite `/* → /index.html` (`vercel.json` / `netlify.toml` o detección automática del framework)
 
 ### Variables de entorno en producción
@@ -181,6 +182,128 @@ Las variables `VITE_*` se incrustan en el build en tiempo de compilación — si
 - [ ] Rewrite/fallback a `index.html` configurado en el host (evita 404 al refrescar rutas como `/inscripciones` o `/admin/usuarios`)
 - [ ] `npm run build` corrido con las variables de entorno de producción correctas
 - [ ] Verificar login, inscripción/cancelación y panel de admin contra el backend real antes de publicar
+
+---
+
+## Despliegue en DigitalOcean con Laravel Forge (paso a paso)
+
+Forge no "ejecuta" esta app (es un SPA estático, no hay PHP en runtime) — lo que hace es: provisionar el droplet en DigitalOcean, clonar el repo, correr el build de Node en cada deploy, y servir la carpeta `dist/` resultante con Nginx. Esta sección asume que ya tenés (o vas a desplegar por separado) el backend accesible en HTTPS — necesitás su URL pública para `VITE_API_URL`.
+
+### Requisitos previos
+
+- Cuenta en [Laravel Forge](https://forge.laravel.com/) con un plan activo.
+- Cuenta en [DigitalOcean](https://www.digitalocean.com/) con un método de pago configurado.
+- Repositorio en GitHub (o GitLab/Bitbucket) con este proyecto, accesible desde tu cuenta.
+- Un dominio o subdominio para el frontend (ej. `simposio.ucr.ac.cr` o `app.tudominio.com`) con acceso a su configuración DNS.
+- El backend ya desplegado y con una URL pública HTTPS conocida (ver [README del backend](../SimposioXIV_Backend/README.md#poner-en-producción)).
+
+### 1. Conectar DigitalOcean a Forge
+
+1. En DigitalOcean: **API** → **Tokens** → **Generate New Token**, con permisos de lectura y escritura. Copiá el token (solo se muestra una vez).
+2. En Forge: **Account** → **API Providers** → **DigitalOcean** → **Connect Account**, pegá el token.
+
+### 2. Provisionar el servidor
+
+1. Forge → **Servers** → **Create Server**.
+2. **Provider**: DigitalOcean.
+3. **Server Type**: "App Server" (no hace falta Load Balancer ni base de datos gestionada — el frontend no usa ninguna).
+4. **Región**: la más cercana a tus usuarios (ej. la región de DigitalOcean más próxima a Costa Rica).
+5. **Tamaño**: el droplet más pequeño alcanza de sobra (solo sirve archivos estáticos vía Nginx).
+6. **PHP Version**: dejá la que venga por defecto — este sitio no la usa en runtime, pero Forge la pide para poder provisionar Nginx.
+7. **Create Server** y esperá (~5 minutos) a que Forge termine de provisionar el droplet, instalar Nginx, configurar el firewall (UFW), etc.
+
+### 3. Instalar Node.js en el servidor
+
+1. Dentro del servidor recién creado, andá a la pestaña **Node**.
+2. Instalá Node 20 (o superior, según lo que pida `package.json`) y marcalo como la versión activa.
+3. Confirmá que `node -v` / `npm -v` respondan por SSH (Forge da acceso SSH directo desde la pestaña del servidor).
+
+### 4. Crear el Site
+
+1. Servidor → **Sites** → **Create Site**.
+2. **Root Domain**: el dominio/subdominio del frontend (ej. `app.simposio.ucr.ac.cr`).
+3. **Project Type**: **Static HTML** — le indica a Forge que no necesita PHP-FPM para este sitio.
+4. Dejá **Create Database** desmarcado (no aplica).
+
+### 5. Conectar el repositorio Git
+
+1. En el site → pestaña **Apps** (Git Repository).
+2. Conectá tu proveedor Git (autorización OAuth) si es la primera vez.
+3. **Repository**: `<tu-usuario>/SimposioXIV_Frontend`.
+4. **Branch**: `main`.
+5. **Install Repository** — Forge clona el repo en `/home/forge/<dominio>`.
+
+### 6. Variable de entorno `VITE_API_URL`
+
+Como esta variable se incrusta **en tiempo de build** (no en runtime), tiene que existir en el archivo `.env` del checkout antes de correr `npm run build`:
+
+1. Site → pestaña **Environment**.
+2. Reemplazá el contenido por:
+   ```env
+   VITE_API_URL=https://api.tudominio.com/api
+   ```
+3. Forge guarda esto como `.env` en la raíz del checkout (`$FORGE_SITE_PATH/.env`) — Vite lo lee automáticamente al buildear.
+
+### 7. Configurar el Deploy Script
+
+Site → pestaña **Apps** → **Deploy Script**. Reemplazá el script por defecto (viene pensado para PHP/Laravel) por:
+
+```bash
+cd $FORGE_SITE_PATH
+git pull origin $FORGE_SITE_BRANCH
+
+# Cargar nvm para tener node/npm disponibles en el script de deploy
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+nvm use 20
+
+npm ci
+npm run build
+```
+
+> Si el script falla con `nvm: command not found`, confirmá la ruta exacta de instalación de Node en la pestaña **Node** del servidor y ajustá `NVM_DIR` según lo que Forge indique ahí.
+
+### 8. Apuntar Nginx a `dist/` + fallback de SPA
+
+El build queda en `$FORGE_SITE_PATH/dist`, no en la raíz del checkout — hay que decirle a Nginx dónde está y agregar el fallback para que las rutas de React Router no den 404 al recargar:
+
+1. Site → **Files** → **Edit Nginx Configuration**.
+2. Cambiá la directiva `root` para que apunte a `dist`:
+   ```nginx
+   root /home/forge/app.tudominio.com/dist;
+   ```
+3. Dentro del bloque `location / { ... }`, agregá (o reemplazá) el `try_files`:
+   ```nginx
+   location / {
+       try_files $uri $uri/ /index.html;
+   }
+   ```
+4. Guardá — Forge reinicia Nginx automáticamente.
+
+### 9. DNS
+
+En tu proveedor de DNS (o en DigitalOcean si administrás el dominio ahí), creá un registro **A** apuntando el dominio/subdominio a la IP pública del droplet (visible en la vista del servidor en Forge). Esperá la propagación.
+
+### 10. SSL (HTTPS)
+
+1. Site → pestaña **SSL**.
+2. **Let's Encrypt** → ingresá el dominio → **Obtain Certificate**.
+3. Forge configura HTTPS y su renovación automática.
+
+### 11. Quick Deploy + primer despliegue
+
+1. Site → **Apps** → activá **Quick Deploy** (cada push a la rama configurada dispara el deploy script automáticamente).
+2. Click **Deploy Now** para forzar el primer despliegue.
+
+### 12. Verificación final
+
+- [ ] `https://app.tudominio.com` carga la SPA correctamente.
+- [ ] Recargar una ruta interna (ej. `/inscripciones`, `/admin/usuarios`) no da 404 — confirma que el `try_files` del paso 8 quedó bien puesto.
+- [ ] Login contra el backend real funciona (revisá la consola del navegador por errores de CORS — si aparecen, revisá `SANCTUM_STATEFUL_DOMAINS` y CORS en el backend, ver su README).
+- [ ] Panel de administración (`/admin`) accesible y funcional con un usuario admin real.
+- [ ] Certificado HTTPS válido (candado verde, sin advertencias de contenido mixto).
+
+Si más adelante cambia la URL del backend, actualizá `VITE_API_URL` en la pestaña **Environment** y forzá **Deploy Now** — cambiar la variable sola no alcanza, necesita un rebuild.
 
 ## Equipo / contexto
 
