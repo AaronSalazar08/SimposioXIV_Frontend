@@ -10,5 +10,6 @@ export function patchEventoTrasInscripcion(evento, deltaCupos) {
     numero_inscritos: Math.max(0, evento.numero_inscritos - deltaCupos),
     cupos_disponibles: cupos,
     tiene_capacidad_disponible: cupos > 0,
+    usuario_inscrito: deltaCupos < 0,
   }
 }
