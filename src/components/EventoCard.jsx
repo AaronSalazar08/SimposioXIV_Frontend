@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { TIPO_LABELS } from '../constants/eventos'
 import Spinner from './ui/Spinner'
 
@@ -12,10 +12,19 @@ export default function EventoCard({
   inscripcionId = null, mensajeAccion = null,
 }) {
   const rootRef = useRef(null)
+  const descripcionRef = useRef(null)
+  const [expandido, setExpandido] = useState(false)
+  const [necesitaToggle, setNecesitaToggle] = useState(false)
+
   useEffect(() => {
     if (mensajeAccion?.type === 'error' && rootRef.current)
       rootRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
   }, [mensajeAccion])
+
+  useLayoutEffect(() => {
+    const el = descripcionRef.current
+    if (el) setNecesitaToggle(el.scrollHeight > el.clientHeight)
+  }, [evento.descripcion])
 
   const inscrito  = !!inscripcionId || !!evento.usuario_inscrito
   const sinCupos  = !evento.tiene_capacidad_disponible
@@ -93,12 +102,34 @@ export default function EventoCard({
 
           {/* Description */}
           {evento.descripcion && (
-            <p style={{
-              margin: '6px 0 0', fontSize: 15, color: '#9CA3AF', lineHeight: 1.55,
-              display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-            }}>
-              {evento.descripcion}
-            </p>
+            <div style={{ marginTop: 6 }}>
+              <p
+                ref={descripcionRef}
+                style={{
+                  margin: 0, fontSize: 15, color: '#9CA3AF', lineHeight: 1.55,
+                  ...(expandido ? {} : {
+                    display: '-webkit-box', WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                  }),
+                }}
+              >
+                {evento.descripcion}
+              </p>
+              {necesitaToggle && (
+                <button
+                  type="button"
+                  onClick={() => setExpandido(v => !v)}
+                  style={{
+                    marginTop: 4, padding: 0,
+                    background: 'none', border: 'none',
+                    color: '#21BBEF', fontSize: 14, fontWeight: 600,
+                    cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif",
+                  }}
+                >
+                  {expandido ? 'Ver menos' : 'Ver más'}
+                </button>
+              )}
+            </div>
           )}
 
           {/* Cupos + día */}
