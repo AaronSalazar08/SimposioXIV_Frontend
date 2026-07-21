@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { TIPO_LABELS } from '../constants/eventos'
+import { nombresPonentesEvento } from '../utils/ponentes'
 import Spinner from './ui/Spinner'
 
 const TIPO_ACCENT = { apertura: '#10B981', clausura: '#EF4444', taller: '#F59E0B', charla: '#21BBEF' }
@@ -25,9 +26,7 @@ export default function EventoCard({
   const tipoBg    = TIPO_BG[tipo]    ?? 'rgba(100,116,139,0.1)'
   const tipoFg    = TIPO_FG[tipo]    ?? '#334155'
 
-  const ponenteNombre = evento.ponente
-    ? (evento.ponente.nombre_completo || `${evento.ponente.nombre} ${evento.ponente.apellidos}`)
-    : null
+  const ponentesTexto = nombresPonentesEvento(evento).join(', ')
 
   return (
     <div
@@ -84,10 +83,10 @@ export default function EventoCard({
             {evento.titulo}
           </h3>
 
-          {/* Ponente */}
-          {ponenteNombre && (
+          {/* Ponentes */}
+          {ponentesTexto && (
             <p style={{ margin: '7px 0 0', fontSize: 16, color: '#6B7280', fontFamily: "'Space Grotesk', sans-serif" }}>
-              {ponenteNombre}
+              {ponentesTexto}
             </p>
           )}
 

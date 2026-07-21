@@ -6,6 +6,7 @@ import { DIAS_SIMPOSIO } from '../constants/eventos'
 import { useEventos } from '../hooks/queries/useEventos'
 import { getApiErrorMessage } from '../utils/apiErrors'
 import { formatHora } from '../utils/date'
+import { nombresPonentesEvento } from '../utils/ponentes'
 
 // ─── Day column config ────────────────────────────────────────────
 const DIAS_META = [
@@ -52,11 +53,7 @@ function EventCard({ evento }) {
   const badge = area?.nombre?.toUpperCase() ?? evento.tipo?.toUpperCase() ?? 'GENERAL'
   const star  = evento.tipo === 'apertura' || evento.tipo === 'clausura'
 
-  const ponente = evento.ponente
-  const ponenteNombre = ponente
-    ? (ponente.nombre_completo || `${ponente.nombre ?? ''} ${ponente.apellidos ?? ''}`.trim())
-    : null
-  const ponenteOrg = ponente?.organizacion || ponente?.empresa || ponente?.empresa_nombre || null
+  const ponentesTexto = nombresPonentesEvento(evento).join(', ')
 
   const endTime = evento.horario?.hora_fin ? formatHora(evento.horario.hora_fin) : null
   const durMin  = evento.horario?.hora_inicio && evento.horario?.hora_fin
@@ -85,10 +82,10 @@ function EventCard({ evento }) {
         {evento.titulo}
       </h4>
 
-      {/* Speaker */}
-      {ponenteNombre && (
+      {/* Speakers */}
+      {ponentesTexto && (
         <p style={{ margin: 0, fontSize: 16, color: 'rgba(255,255,255,0.75)', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 400 }}>
-          {ponenteNombre}{ponenteOrg && <span style={{ opacity: 0.7 }}> · {ponenteOrg}</span>}
+          {ponentesTexto}
         </p>
       )}
 
