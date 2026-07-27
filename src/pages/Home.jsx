@@ -126,8 +126,8 @@ const DAYS = [
 ]
 
 const NUMS = [
-  ['32', 'Ponentes', ''],
-  ['48', 'Ponencias', ''],
+  ['44', 'Ponentes', ''],
+  ['31', 'Ponencias', ''],
   ['03', 'Días', ''],
 ]
 
