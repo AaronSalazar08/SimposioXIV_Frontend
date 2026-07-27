@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { TIPO_LABELS, TIPO_COLORS, TIPO_COLOR_DEFAULT } from '../../constants/eventos'
 import { formatFecha, formatHora } from '../../utils/date'
+import { nombresPonentesEvento } from '../../utils/ponentes'
 import Spinner from '../ui/Spinner'
 
 const TIPO_ACCENT = {
@@ -26,6 +27,7 @@ export default function ConfirmacionInscripcionModal({ evento, inscribiendo, onC
   const tipoLabel = TIPO_LABELS[tipo] ?? tipo
   const tipoColor = TIPO_COLORS[tipo] ?? TIPO_COLOR_DEFAULT
   const tipoAccent = TIPO_ACCENT[tipo] ?? '#64748B'
+  const ponentesTexto = nombresPonentesEvento(evento).join(', ')
 
   return (
     <div
@@ -91,12 +93,12 @@ export default function ConfirmacionInscripcionModal({ evento, inscribiendo, onC
               <span>Aula {evento.horario.aula.numero} · {evento.horario.aula.edificio}</span>
             </div>
           )}
-          {evento.ponente && (
+          {ponentesTexto && (
             <div className="flex items-start gap-2.5">
               <svg className="w-4 h-4 text-ucr-blue flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
-              <span>{evento.ponente.nombre_completo || `${evento.ponente.nombre} ${evento.ponente.apellidos}`}</span>
+              <span>{ponentesTexto}</span>
             </div>
           )}
 

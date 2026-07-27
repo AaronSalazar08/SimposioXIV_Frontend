@@ -11,6 +11,7 @@ import { getApiErrorMessage } from '../utils/apiErrors'
 import { formatFechaConAnio, formatHora } from '../utils/date'
 import { countConfirmadas, groupInscripcionesPorDia } from '../utils/inscripciones'
 import { pluralize } from '../utils/pluralize'
+import { nombresPonentesEvento } from '../utils/ponentes'
 
 const TIPO_ACCENT_CRONO = { apertura: '#10B981', clausura: '#EF4444', taller: '#F59E0B', charla: '#21BBEF' }
 const TIPO_BG_CRONO     = { apertura: '#ECFDF5', clausura: '#FEF2F2', taller: '#FFFBEB', charla: '#EFF8FF' }
@@ -221,9 +222,7 @@ export default function Cronograma() {
                   const accent  = TIPO_ACCENT_CRONO[e.tipo] ?? '#64748B'
                   const tipoBg  = TIPO_BG_CRONO[e.tipo]    ?? 'rgba(100,116,139,0.1)'
                   const tipoFg  = TIPO_FG_CRONO[e.tipo]    ?? '#334155'
-                  const ponente = e.ponente
-                    ? (e.ponente.nombre_completo || `${e.ponente.nombre} ${e.ponente.apellidos}`)
-                    : null
+                  const ponentesTexto = nombresPonentesEvento(e).join(', ')
 
                   return (
                     <li key={i.id} className="flex flex-col sm:flex-row items-start" style={{ listStyle: 'none', margin: 0 }}>
@@ -266,10 +265,10 @@ export default function Cronograma() {
                             <h3 style={{ margin: 0, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 'clamp(1.15rem,1.8vw,1.35rem)', lineHeight: 1.25, letterSpacing: '-0.01em', color: '#111827' }}>
                               {e.titulo}
                             </h3>
-                            {/* Ponente */}
-                            {ponente && (
+                            {/* Ponentes */}
+                            {ponentesTexto && (
                               <p style={{ margin: '7px 0 0', fontSize: 16, color: '#6B7280', fontFamily: "'Space Grotesk', sans-serif" }}>
-                                {ponente}
+                                {ponentesTexto}
                               </p>
                             )}
                             {/* Error feedback */}
