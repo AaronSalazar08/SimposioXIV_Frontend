@@ -13,11 +13,7 @@ import { useMisInscripciones } from '../hooks/queries/useMisInscripciones'
 import { useTimedFeedback } from '../hooks/useTimedFeedback'
 import { getApiErrorMessage } from '../utils/apiErrors'
 import { cx } from '../utils/cx'
-import {
-  buildEventosApiFilters,
-  conteosBadgeDiaTabs,
-  countPorDiaSimposio,
-} from '../utils/eventoFilters'
+import { buildEventosApiFilters, countPorDiaSimposio } from '../utils/eventoFilters'
 import { groupEventosPorFranjaHoraria } from '../utils/eventoGrouping'
 import { formatHora } from '../utils/date'
 import { buildInscripcionesPorEvento } from '../utils/inscripciones'
@@ -113,17 +109,11 @@ export default function Inscripciones() {
 
   const totalInscrito = inscripcionesPorEvento.size
 
-  const conteosPorDia = useMemo(() => {
-    const inscripcionesPorDia = countPorDiaSimposio(
-      inscripciones,
-      (i) => i.evento?.horario?.numero_dia,
-    )
-    const eventosPorDia = countPorDiaSimposio(
-      todosEventosQuery.data ?? [],
-      (e) => e.horario?.numero_dia,
-    )
-    return conteosBadgeDiaTabs({ inscripcionesPorDia, eventosPorDia })
-  }, [inscripciones, todosEventosQuery.data])
+  // Total de eventos por día — así la pestaña siempre muestra cuántos eventos hay, no cuántos llevo reservados.
+  const conteosPorDia = useMemo(
+    () => countPorDiaSimposio(todosEventosQuery.data ?? [], (e) => e.horario?.numero_dia),
+    [todosEventosQuery.data],
+  )
 
   const franjasOrdenadas = useMemo(() => groupEventosPorFranjaHoraria(eventos), [eventos])
 

@@ -318,7 +318,7 @@ export default function EventoSlotCarousel({ children, initialIndex = 0 }) {
   if (count === 0) return null
 
   if (count === 1) {
-    return <div className="w-full max-w-xl mx-auto min-w-0">{slides[0]}</div>
+    return <div className="w-full max-w-xl min-w-0">{slides[0]}</div>
   }
 
   const useDesktopGrid = count <= DESKTOP_VISIBLE

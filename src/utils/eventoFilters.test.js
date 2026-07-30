@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildEventosApiFilters, conteosBadgeDiaTabs, countPorDiaSimposio } from './eventoFilters'
+import { buildEventosApiFilters, countPorDiaSimposio } from './eventoFilters'
 
 describe('buildEventosApiFilters', () => {
   it('omite valores vacíos', () => {
@@ -29,16 +29,5 @@ describe('countPorDiaSimposio', () => {
       2: 0,
       3: 2,
     })
-  })
-})
-
-describe('conteosBadgeDiaTabs', () => {
-  it('prioriza inscripciones sobre total de eventos', () => {
-    expect(
-      conteosBadgeDiaTabs({
-        inscripcionesPorDia: { 1: 2, 2: 0, 3: 0 },
-        eventosPorDia: { 1: 5, 2: 3, 3: 4 },
-      }),
-    ).toEqual({ '1': 2, '2': 3, '3': 4 })
   })
 })

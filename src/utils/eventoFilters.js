@@ -16,12 +16,3 @@ export function countPorDiaSimposio(items, getNumeroDia) {
   }
   return counts
 }
-
-/** Badge en pestaña: inscripciones del usuario si hay; si no, total de eventos del día. */
-export function conteosBadgeDiaTabs({ inscripcionesPorDia, eventosPorDia }) {
-  return {
-    '1': inscripcionesPorDia[1] || eventosPorDia[1] || 0,
-    '2': inscripcionesPorDia[2] || eventosPorDia[2] || 0,
-    '3': inscripcionesPorDia[3] || eventosPorDia[3] || 0,
-  }
-}
