@@ -506,11 +506,11 @@ function HomeFooter() {
             <FooterCol title="Asistentes" links={[['Inscripciones', '/inscripciones'], ['Mi perfil', '/perfil']]} />
           </div>
         </div>
-        <div style={{ marginTop: 'clamp(53px,8vh,85px)', paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, alignItems: 'center', fontFamily: "var(--font-pixel)", fontSize: 19, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <CreditsRow />
+        <div style={{ marginTop: 'clamp(40px,6vh,60px)', paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, alignItems: 'center', fontFamily: "var(--font-pixel)", fontSize: 19, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           <span>© 2026 Universidad de Costa Rica</span>
           <span>Liberia, Guanacaste · 05–07 AGO 2026</span>
         </div>
-        <CreditsRow />
       </div>
     </footer>
   )
@@ -526,18 +526,27 @@ const CREDITOS = [
 
 function CreditsRow() {
   return (
-    <div style={{ marginTop: 20, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexWrap: 'wrap', gap: '10px 32px' }}>
-      {CREDITOS.map(({ rol, nombre, email }) => (
-        <div key={email} style={{ fontSize: 13, lineHeight: 1.5, color: 'rgba(255,255,255,0.4)' }}>
-          <span style={{ textTransform: 'uppercase', letterSpacing: '0.06em', color: 'rgba(255,255,255,0.3)' }}>{rol}:</span>{' '}
-          <span style={{ color: 'rgba(255,255,255,0.55)' }}>{nombre}</span>{' '}
-          <a href={`mailto:${email}`} style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}
-            onMouseEnter={e => e.currentTarget.style.color = '#21BBEF'}
-            onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.4)'}>
-            {email}
-          </a>
-        </div>
-      ))}
+    <div style={{ marginTop: 'clamp(40px,6vh,60px)', paddingTop: 32, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+      <span style={{ display: 'block', fontFamily: "var(--font-pixel)", fontSize: 20, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#21BBEF', marginBottom: 22 }}>
+        Créditos
+      </span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
+        {CREDITOS.map(({ rol, nombre, email }) => (
+          <div key={email} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <span style={{ fontFamily: "var(--font-pixel)", fontSize: 14, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.45)' }}>
+              {rol}
+            </span>
+            <span style={{ fontSize: 'clamp(18px,2vw,22px)', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: '#fff', letterSpacing: '-0.01em' }}>
+              {nombre}
+            </span>
+            <a href={`mailto:${email}`} style={{ fontSize: 15, color: 'rgba(255,255,255,0.6)', textDecoration: 'none', transition: 'color 150ms' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#21BBEF'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.6)'}>
+              {email}
+            </a>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
