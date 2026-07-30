@@ -510,8 +510,35 @@ function HomeFooter() {
           <span>© 2026 Universidad de Costa Rica</span>
           <span>Liberia, Guanacaste · 05–07 AGO 2026</span>
         </div>
+        <CreditsRow />
       </div>
     </footer>
+  )
+}
+
+// ─── Credits ──────────────────────────────────────────────────────
+const CREDITOS = [
+  { rol: 'Coordinador', nombre: 'Mag. César Laravanegas', email: 'cesar.laravanegas@ucr.ac.cr' },
+  { rol: 'Diseño web', nombre: 'Estudiante Aaron Salazar Mata', email: 'aaron.salazarmata@ucr.ac.cr' },
+  { rol: 'Diseño gráfico', nombre: 'Estudiante Gerardo Rojas Ramos', email: 'gerardo.rojasramos@ucr.ac.cr' },
+  { rol: 'Infraestructura', nombre: 'Lic. Iván Chavarría Cubero', email: 'ivan.chavarriacubero@ucr.ac.cr' },
+]
+
+function CreditsRow() {
+  return (
+    <div style={{ marginTop: 20, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexWrap: 'wrap', gap: '10px 32px' }}>
+      {CREDITOS.map(({ rol, nombre, email }) => (
+        <div key={email} style={{ fontSize: 13, lineHeight: 1.5, color: 'rgba(255,255,255,0.4)' }}>
+          <span style={{ textTransform: 'uppercase', letterSpacing: '0.06em', color: 'rgba(255,255,255,0.3)' }}>{rol}:</span>{' '}
+          <span style={{ color: 'rgba(255,255,255,0.55)' }}>{nombre}</span>{' '}
+          <a href={`mailto:${email}`} style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}
+            onMouseEnter={e => e.currentTarget.style.color = '#21BBEF'}
+            onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.4)'}>
+            {email}
+          </a>
+        </div>
+      ))}
+    </div>
   )
 }
 
