@@ -68,7 +68,7 @@ export default function AdminHorarios() {
     <div>
       <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="text-xl font-bold text-ucr-blue-dark">Horarios</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
           <select className={`${SELECT_CLASS} w-auto`} value={filtroDia} onChange={(e) => setFiltroDia(e.target.value)}>
             {FILTRO_DIAS.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
           </select>
@@ -87,33 +87,55 @@ export default function AdminHorarios() {
       ) : horariosFiltrados.length === 0 ? (
         <p className="text-gray-500 text-sm">No hay horarios para el día seleccionado.</p>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                {['Día', 'Inicio', 'Fin', 'Aula', ''].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {horariosFiltrados.map((h) => (
-                <tr key={h.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 font-medium text-gray-900">Día {h.numero_dia}</td>
-                  <td className="px-4 py-3 text-gray-600">{formatHora(h.hora_inicio)}</td>
-                  <td className="px-4 py-3 text-gray-600">{formatHora(h.hora_fin)}</td>
-                  <td className="px-4 py-3 text-gray-500">{h.aula ? `${h.aula.numero} — ${h.aula.edificio}` : '—'}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2 justify-end">
-                      <button type="button" onClick={() => openEditar(h)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
-                      <button type="button" onClick={() => { setError(''); setConfirmDelete(h) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          {/* Móvil: tarjetas apiladas */}
+          <div className="sm:hidden space-y-3">
+            {horariosFiltrados.map((h) => (
+              <div key={h.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-medium text-gray-900">Día {h.numero_dia}</p>
+                  <p className="text-gray-600 text-sm">{formatHora(h.hora_inicio)} – {formatHora(h.hora_fin)}</p>
+                </div>
+                <p className="text-gray-500 text-xs mt-1">{h.aula ? `${h.aula.numero} — ${h.aula.edificio}` : 'Sin aula (actividad general)'}</p>
+                <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                  <button type="button" onClick={() => openEditar(h)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
+                  <button type="button" onClick={() => { setError(''); setConfirmDelete(h) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Escritorio: tabla */}
+          <div className="hidden sm:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-100">
+                  <tr>
+                    {['Día', 'Inicio', 'Fin', 'Aula', ''].map((h) => (
+                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {horariosFiltrados.map((h) => (
+                    <tr key={h.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 font-medium text-gray-900">Día {h.numero_dia}</td>
+                      <td className="px-4 py-3 text-gray-600">{formatHora(h.hora_inicio)}</td>
+                      <td className="px-4 py-3 text-gray-600">{formatHora(h.hora_fin)}</td>
+                      <td className="px-4 py-3 text-gray-500">{h.aula ? `${h.aula.numero} — ${h.aula.edificio}` : '—'}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2 justify-end">
+                          <button type="button" onClick={() => openEditar(h)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
+                          <button type="button" onClick={() => { setError(''); setConfirmDelete(h) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
 
       <AdminModal open={modal.open} title={modal.horario ? 'Editar horario' : 'Nuevo horario'} onClose={closeModal}>
@@ -134,7 +156,7 @@ export default function AdminHorarios() {
               {DIAS.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
             </select>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Hora inicio</label>
               <input className={INPUT_CLASS} type="time" value={form.hora_inicio} onChange={set('hora_inicio')} required />

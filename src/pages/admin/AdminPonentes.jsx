@@ -59,7 +59,7 @@ export default function AdminPonentes() {
     <div>
       <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="text-xl font-bold text-ucr-blue-dark">Ponentes</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
           <SearchInput value={search} onChange={setSearch} placeholder="Buscar ponente..." />
           <button type="button" onClick={openCrear} className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
             + Nuevo ponente
@@ -76,38 +76,58 @@ export default function AdminPonentes() {
       ) : ponentesFiltrados.length === 0 ? (
         <p className="text-gray-500 text-sm">No se encontraron ponentes para "{search}".</p>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                {['Nombre', 'Grado académico', 'Educación', ''].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {ponentesFiltrados.map((p) => (
-                <tr key={p.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 font-medium text-gray-900">{p.nombre} {p.apellidos}</td>
-                  <td className="px-4 py-3 text-gray-600">{p.grado_academico ?? '—'}</td>
-                  <td className="px-4 py-3 text-gray-500 max-w-xs truncate">{p.educacion ?? '—'}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2 justify-end">
-                      <button type="button" onClick={() => openEditar(p)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
-                      <button type="button" onClick={() => { setError(''); setConfirmDelete(p) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          {/* Móvil: tarjetas apiladas */}
+          <div className="sm:hidden space-y-3">
+            {ponentesFiltrados.map((p) => (
+              <div key={p.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <p className="font-medium text-gray-900">{p.nombre} {p.apellidos}</p>
+                <p className="text-gray-600 text-xs mt-1">{p.grado_academico ?? '—'}</p>
+                {p.educacion && <p className="text-gray-500 text-xs mt-0.5">{p.educacion}</p>}
+                <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                  <button type="button" onClick={() => openEditar(p)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
+                  <button type="button" onClick={() => { setError(''); setConfirmDelete(p) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Escritorio: tabla */}
+          <div className="hidden sm:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-100">
+                  <tr>
+                    {['Nombre', 'Grado académico', 'Educación', ''].map((h) => (
+                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {ponentesFiltrados.map((p) => (
+                    <tr key={p.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 font-medium text-gray-900">{p.nombre} {p.apellidos}</td>
+                      <td className="px-4 py-3 text-gray-600">{p.grado_academico ?? '—'}</td>
+                      <td className="px-4 py-3 text-gray-500 max-w-xs truncate">{p.educacion ?? '—'}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2 justify-end">
+                          <button type="button" onClick={() => openEditar(p)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
+                          <button type="button" onClick={() => { setError(''); setConfirmDelete(p) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
 
       <AdminModal open={modal.open} title={modal.ponente ? 'Editar ponente' : 'Nuevo ponente'} onClose={closeModal}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <AlertMessage message={error} />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Nombre</label>
               <input className={INPUT_CLASS} value={form.nombre} onChange={set('nombre')} required placeholder="Juan" />

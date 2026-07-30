@@ -59,7 +59,7 @@ export default function AdminAreas() {
     <div>
       <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="text-xl font-bold text-ucr-blue-dark">Áreas temáticas</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
           <SearchInput value={search} onChange={setSearch} placeholder="Buscar área..." />
           <button type="button" onClick={openCrear} className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
             + Nueva área
@@ -76,34 +76,56 @@ export default function AdminAreas() {
       ) : areasFiltradas.length === 0 ? (
         <p className="text-gray-500 text-sm">No se encontraron áreas para "{search}".</p>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                {['Color', 'Nombre', 'Descripción', ''].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {areasFiltradas.map((area) => (
-                <tr key={area.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3">
-                    <span className="inline-block w-5 h-5 rounded-full border border-gray-200" style={{ backgroundColor: area.color ?? '#6b7280' }} />
-                  </td>
-                  <td className="px-4 py-3 font-medium text-gray-900">{area.nombre}</td>
-                  <td className="px-4 py-3 text-gray-500 max-w-xs truncate">{area.descripcion ?? '—'}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2 justify-end">
-                      <button type="button" onClick={() => openEditar(area)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
-                      <button type="button" onClick={() => { setError(''); setConfirmDelete(area) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          {/* Móvil: tarjetas apiladas */}
+          <div className="sm:hidden space-y-3">
+            {areasFiltradas.map((area) => (
+              <div key={area.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-4 h-4 rounded-full border border-gray-200 shrink-0" style={{ backgroundColor: area.color ?? '#6b7280' }} />
+                  <p className="font-medium text-gray-900">{area.nombre}</p>
+                </div>
+                {area.descripcion && <p className="text-gray-500 text-xs mt-1.5">{area.descripcion}</p>}
+                <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                  <button type="button" onClick={() => openEditar(area)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
+                  <button type="button" onClick={() => { setError(''); setConfirmDelete(area) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Escritorio: tabla */}
+          <div className="hidden sm:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-100">
+                  <tr>
+                    {['Color', 'Nombre', 'Descripción', ''].map((h) => (
+                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {areasFiltradas.map((area) => (
+                    <tr key={area.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3">
+                        <span className="inline-block w-5 h-5 rounded-full border border-gray-200" style={{ backgroundColor: area.color ?? '#6b7280' }} />
+                      </td>
+                      <td className="px-4 py-3 font-medium text-gray-900">{area.nombre}</td>
+                      <td className="px-4 py-3 text-gray-500 max-w-xs truncate">{area.descripcion ?? '—'}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2 justify-end">
+                          <button type="button" onClick={() => openEditar(area)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
+                          <button type="button" onClick={() => { setError(''); setConfirmDelete(area) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
 
       <AdminModal open={modal.open} title={modal.area ? 'Editar área' : 'Nueva área'} onClose={closeModal}>

@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
-import { TIPO_LABELS, TIPO_COLORS, TIPO_COLOR_DEFAULT } from '../../constants/eventos'
 import { formatFecha, formatHora } from '../../utils/date'
 import { nombresPonentesEvento } from '../../utils/ponentes'
 import Spinner from '../ui/Spinner'
+import TipoChip from '../ui/TipoChip'
 
 const TIPO_ACCENT = {
   apertura: '#10B981',
@@ -24,8 +24,6 @@ export default function ConfirmacionInscripcionModal({ evento, inscribiendo, onC
   if (!open) return null
 
   const tipo = evento.tipo
-  const tipoLabel = TIPO_LABELS[tipo] ?? tipo
-  const tipoColor = TIPO_COLORS[tipo] ?? TIPO_COLOR_DEFAULT
   const tipoAccent = TIPO_ACCENT[tipo] ?? '#64748B'
   const ponentesTexto = nombresPonentesEvento(evento).join(', ')
 
@@ -36,25 +34,19 @@ export default function ConfirmacionInscripcionModal({ evento, inscribiendo, onC
       style={{ background: 'rgba(0,15,35,0.55)', backdropFilter: 'blur(4px)' }}
     >
       <div
-        className="bg-white w-full max-w-md animate-scale-in overflow-hidden"
+        className="bg-white w-full max-w-md animate-scale-in overflow-hidden rounded-[20px] shadow-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-title"
-        style={{
-          borderRadius: 20,
-          boxShadow: '0 24px 64px -12px rgba(0,0,0,0.35), 0 8px 24px -4px rgba(0,0,0,0.15)',
-        }}
       >
         {/* Top accent stripe */}
         <div className="h-[3px] w-full" style={{ background: `linear-gradient(90deg, ${tipoAccent} 0%, rgba(0,93,164,0.5) 100%)` }} />
 
         {/* Header */}
-        <div className="px-6 pt-5 pb-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+        <div className="px-6 pt-5 pb-4 border-b border-slate-100">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <span className={`inline-block text-sm font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full border mb-2.5 ${tipoColor}`}>
-                {tipoLabel}
-              </span>
+              <TipoChip tipo={tipo} className="mb-2.5" />
               <h2 id="confirm-title" className="text-[15px] font-bold text-ucr-blue-dark leading-snug font-display" style={{ letterSpacing: '-0.01em' }}>
                 {evento.titulo}
               </h2>
@@ -103,11 +95,8 @@ export default function ConfirmacionInscripcionModal({ evento, inscribiendo, onC
           )}
 
           {/* Cupos badge */}
-          <div
-            className="inline-flex items-center gap-2 mt-1 px-3 py-1.5 rounded-xl text-sm font-semibold font-mono-accent"
-            style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.25)', color: '#065f46' }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-none" />
+          <div className="inline-flex items-center gap-2 mt-1 px-3 py-1.5 rounded-xl text-sm font-semibold font-mono-accent border border-status-open/25 bg-status-open/10 text-slate-800">
+            <span className="w-1.5 h-1.5 rounded-full bg-status-open flex-none" />
             {evento.cupos_disponibles} cupos disponibles
           </div>
         </div>
@@ -119,17 +108,16 @@ export default function ConfirmacionInscripcionModal({ evento, inscribiendo, onC
           </p>
         </div>
 
+        {/* Perforation — el "desprendible" antes de confirmar la reserva */}
+        <div className="ticket-perforation mx-6 mt-2" style={{ '--notch-color': '#fff' }} />
+
         {/* Actions */}
-        <div
-          className="px-6 py-4 flex flex-col-reverse sm:flex-row gap-2.5 sm:justify-end mt-2"
-          style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}
-        >
+        <div className="px-6 pt-4 pb-5 flex flex-col-reverse sm:flex-row gap-2.5 sm:justify-end">
           <button
             type="button"
             onClick={onCancelar}
             disabled={inscribiendo}
-            className="px-5 py-2.5 text-sm font-semibold rounded-xl border transition-all duration-200 hover:bg-gray-50 active:scale-[0.97] disabled:opacity-50"
-            style={{ borderColor: 'rgba(0,0,0,0.12)', color: '#374151' }}
+            className="px-5 py-2.5 text-sm font-semibold rounded-xl border border-slate-200 text-slate-700 transition-transform duration-200 ease-out hover:bg-slate-50 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan disabled:opacity-50"
           >
             Cancelar
           </button>
@@ -137,8 +125,7 @@ export default function ConfirmacionInscripcionModal({ evento, inscribiendo, onC
             type="button"
             onClick={onConfirmar}
             disabled={inscribiendo}
-            className="px-5 py-2.5 text-sm font-semibold rounded-xl text-white transition-all duration-200 active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            style={{ background: 'linear-gradient(135deg, #005DA4, #003A6E)', boxShadow: '0 4px 12px 0 rgba(0,93,164,0.25)' }}
+            className="px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-br from-ucr-blue to-ucr-blue-darker shadow-card transition-transform duration-200 ease-out hover:shadow-ticket-hover active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {inscribiendo ? (
               <><Spinner size="sm" />Inscribiendo...</>
