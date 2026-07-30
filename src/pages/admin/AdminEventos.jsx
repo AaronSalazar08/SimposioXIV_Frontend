@@ -134,7 +134,7 @@ export default function AdminEventos() {
     <div>
       <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="text-xl font-bold text-ucr-blue-dark">Eventos</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
           <SearchInput value={search} onChange={setSearch} placeholder="Buscar evento..." />
           <button type="button" onClick={openCrear} className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
             + Nuevo evento
@@ -151,70 +151,128 @@ export default function AdminEventos() {
       ) : eventosFiltrados.length === 0 ? (
         <p className="text-gray-500 text-sm">No se encontraron eventos para "{search}".</p>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                {['Tipo', 'Título', 'Ponente(s)', 'Horario', 'Cupos', 'Estado', 'Inscritos', ''].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {eventosFiltrados.map((ev) => (
-                <tr key={ev.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3">
+        <>
+          {/* Móvil: tarjetas apiladas */}
+          <div className="sm:hidden space-y-3">
+            {eventosFiltrados.map((ev) => (
+              <div key={ev.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${TIPO_COLORS[ev.tipo] ?? TIPO_COLOR_DEFAULT}`}>
                       {TIPO_LABELS[ev.tipo] ?? ev.tipo}
                     </span>
-                  </td>
-                  <td className="px-4 py-3 font-medium text-gray-900 max-w-xs truncate">{ev.titulo}</td>
-                  <td className="px-4 py-3 text-gray-600 text-xs max-w-[180px]">
+                    <p className="font-medium text-gray-900 mt-1.5 truncate">{ev.titulo}</p>
+                  </div>
+                  <span className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${ev.esta_activo ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
+                    {ev.esta_activo ? 'Activo' : 'Inactivo'}
+                  </span>
+                </div>
+                <div className="mt-2 space-y-1 text-xs text-gray-500">
+                  <p>
+                    {ev.horario
+                      ? `Día ${ev.horario.numero_dia} · ${formatHora(ev.horario.hora_inicio)}–${formatHora(ev.horario.hora_fin)}`
+                      : 'Sin horario asignado'}
+                  </p>
+                  <p>Cupos: {ev.numero_inscritos ?? 0} / {ev.capacidad}</p>
+                  <p>
                     {(ev.ponentes ?? []).length === 0 ? (
-                      <span className="text-gray-400">—</span>
+                      <span className="text-gray-400">Sin ponentes</span>
                     ) : ev.ponentes.length === 1 ? (
-                      <span className="truncate block">{nombreCompletoPonente(ev.ponentes[0])}</span>
+                      nombreCompletoPonente(ev.ponentes[0])
                     ) : (
                       <button
                         type="button"
                         onClick={() => setVerPonentes(ev)}
-                        className="text-ucr-blue hover:text-ucr-blue-dark font-medium px-2 py-1 -mx-2 rounded-lg hover:bg-ucr-blue-muted transition-colors whitespace-nowrap"
+                        className="text-ucr-blue hover:text-ucr-blue-dark font-medium"
                       >
                         Ver ponentes ({ev.ponentes.length})
                       </button>
                     )}
-                  </td>
-                  <td className="px-4 py-3 text-gray-500 text-xs">
-                    {ev.horario
-                      ? `Día ${ev.horario.numero_dia} · ${formatHora(ev.horario.hora_inicio)}–${formatHora(ev.horario.hora_fin)}`
-                      : '—'}
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">{ev.numero_inscritos ?? 0} / {ev.capacidad}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${ev.esta_activo ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
-                      {ev.esta_activo ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/admin/eventos/${ev.id}/inscritos`)}
-                      className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors"
-                    >
-                      Ver inscritos
-                    </button>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2 justify-end">
-                      <button type="button" onClick={() => openEditar(ev)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
-                      <button type="button" onClick={() => { setError(''); setConfirmDelete(ev) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/admin/eventos/${ev.id}/inscritos`)}
+                    className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors"
+                  >
+                    Ver inscritos
+                  </button>
+                  <button type="button" onClick={() => openEditar(ev)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
+                  <button type="button" onClick={() => { setError(''); setConfirmDelete(ev) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Escritorio: tabla */}
+          <div className="hidden sm:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-100">
+                  <tr>
+                    {['Tipo', 'Título', 'Ponente(s)', 'Horario', 'Cupos', 'Estado', 'Inscritos', ''].map((h) => (
+                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {eventosFiltrados.map((ev) => (
+                    <tr key={ev.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${TIPO_COLORS[ev.tipo] ?? TIPO_COLOR_DEFAULT}`}>
+                          {TIPO_LABELS[ev.tipo] ?? ev.tipo}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 font-medium text-gray-900 max-w-xs truncate">{ev.titulo}</td>
+                      <td className="px-4 py-3 text-gray-600 text-xs max-w-[180px]">
+                        {(ev.ponentes ?? []).length === 0 ? (
+                          <span className="text-gray-400">—</span>
+                        ) : ev.ponentes.length === 1 ? (
+                          <span className="truncate block">{nombreCompletoPonente(ev.ponentes[0])}</span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setVerPonentes(ev)}
+                            className="text-ucr-blue hover:text-ucr-blue-dark font-medium px-2 py-1 -mx-2 rounded-lg hover:bg-ucr-blue-muted transition-colors whitespace-nowrap"
+                          >
+                            Ver ponentes ({ev.ponentes.length})
+                          </button>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-gray-500 text-xs">
+                        {ev.horario
+                          ? `Día ${ev.horario.numero_dia} · ${formatHora(ev.horario.hora_inicio)}–${formatHora(ev.horario.hora_fin)}`
+                          : '—'}
+                      </td>
+                      <td className="px-4 py-3 text-gray-600">{ev.numero_inscritos ?? 0} / {ev.capacidad}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${ev.esta_activo ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
+                          {ev.esta_activo ? 'Activo' : 'Inactivo'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/admin/eventos/${ev.id}/inscritos`)}
+                          className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors"
+                        >
+                          Ver inscritos
+                        </button>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2 justify-end">
+                          <button type="button" onClick={() => openEditar(ev)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
+                          <button type="button" onClick={() => { setError(''); setConfirmDelete(ev) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
 
       <AdminModal open={modal.open} title={modal.evento ? 'Editar evento' : 'Nuevo evento'} onClose={closeModal}>
@@ -228,7 +286,7 @@ export default function AdminEventos() {
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Descripción</label>
             <textarea className={INPUT_CLASS} rows={3} value={form.descripcion} onChange={set('descripcion')} placeholder="Descripción del evento..." />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Tipo</label>
               <select className={SELECT_CLASS} value={form.tipo} onChange={set('tipo')} required>

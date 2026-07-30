@@ -12,15 +12,30 @@ import { useEventos } from '../hooks/queries/useEventos'
 import { useMisInscripciones } from '../hooks/queries/useMisInscripciones'
 import { useTimedFeedback } from '../hooks/useTimedFeedback'
 import { getApiErrorMessage } from '../utils/apiErrors'
-import {
-  buildEventosApiFilters,
-  conteosBadgeDiaTabs,
-  countPorDiaSimposio,
-} from '../utils/eventoFilters'
+import { cx } from '../utils/cx'
+import { buildEventosApiFilters, countPorDiaSimposio } from '../utils/eventoFilters'
 import { groupEventosPorFranjaHoraria } from '../utils/eventoGrouping'
 import { formatHora } from '../utils/date'
 import { buildInscripcionesPorEvento } from '../utils/inscripciones'
-import { pluralize } from '../utils/pluralize'
+
+/** Panel tipo "tablero de salidas": estado de reserva en vivo para el día activo. */
+function StatusTile({ label, value, accent = false }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm">
+      <div
+        className={cx(
+          'font-display text-[1.6rem] font-bold leading-none tracking-[-0.03em] sm:text-[2rem]',
+          accent ? 'text-brand-cyan' : 'text-white',
+        )}
+      >
+        {value}
+      </div>
+      <div className="mt-1.5 font-pixel text-[11px] uppercase tracking-[0.14em] text-white/45">
+        {label}
+      </div>
+    </div>
+  )
+}
 
 export default function Inscripciones() {
   const { feedback, showFeedback, clearFeedback } = useTimedFeedback(null, 6000)
@@ -94,19 +109,22 @@ export default function Inscripciones() {
 
   const totalInscrito = inscripcionesPorEvento.size
 
-  const conteosPorDia = useMemo(() => {
-    const inscripcionesPorDia = countPorDiaSimposio(
-      inscripciones,
-      (i) => i.evento?.horario?.numero_dia,
-    )
-    const eventosPorDia = countPorDiaSimposio(
-      todosEventosQuery.data ?? [],
-      (e) => e.horario?.numero_dia,
-    )
-    return conteosBadgeDiaTabs({ inscripcionesPorDia, eventosPorDia })
-  }, [inscripciones, todosEventosQuery.data])
+  // Total de eventos por día — así la pestaña siempre muestra cuántos eventos hay, no cuántos llevo reservados.
+  const conteosPorDia = useMemo(
+    () => countPorDiaSimposio(todosEventosQuery.data ?? [], (e) => e.horario?.numero_dia),
+    [todosEventosQuery.data],
+  )
 
   const franjasOrdenadas = useMemo(() => groupEventosPorFranjaHoraria(eventos), [eventos])
+
+  const inscritoEsteDia = useMemo(
+    () => eventos.filter((e) => inscripcionesPorEvento.has(e.id)).length,
+    [eventos, inscripcionesPorEvento],
+  )
+  const conCupoEsteDia = useMemo(
+    () => eventos.filter((e) => e.tiene_capacidad_disponible).length,
+    [eventos],
+  )
 
   const cardProps = {
     inscripcionesPorEvento,
@@ -142,19 +160,19 @@ export default function Inscripciones() {
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#21BBEF', flexShrink: 0 }} />
             Inscripciones · XIV Edición
           </span>
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-            <h1 style={{ margin: '14px 0 0', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(1.9rem,4.5vw,3.5rem)', lineHeight: 0.97, letterSpacing: '-0.04em', color: '#fff' }}>
-              Reservá tu cupo.
-            </h1>
-            {totalInscrito > 0 && (
-              <span style={{ fontFamily: "var(--font-pixel)", fontSize: 20, color: '#21BBEF', letterSpacing: '0.08em', textTransform: 'uppercase', paddingBottom: 4 }}>
-                {totalInscrito} {pluralize(totalInscrito, 'inscrito', 'inscritos')}
-              </span>
-            )}
-          </div>
+          <h1 style={{ margin: '14px 0 0', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(1.9rem,4.5vw,3.5rem)', lineHeight: 0.97, letterSpacing: '-0.04em', color: '#fff' }}>
+            Reservá tu <span className="ed" style={{ color: '#21BBEF' }}>lugar.</span>
+          </h1>
           <p style={{ margin: '16px 0 0', fontSize: 'clamp(0.9rem,1.2vw,1.05rem)', lineHeight: 1.6, color: 'rgba(255,255,255,0.5)', maxWidth: '52ch' }}>
             Explorá los eventos del simposio por día y hora. Los cupos se asignan por orden de inscripción.
           </p>
+
+          {/* Live status strip — tablero de estado del día activo */}
+          <div className="mt-6 grid grid-cols-3 gap-2.5 sm:mt-8 sm:max-w-xl sm:gap-3">
+            <StatusTile label="Reservadas hoy" value={inscritoEsteDia} accent={inscritoEsteDia > 0} />
+            <StatusTile label="Con cupo" value={`${conCupoEsteDia}/${eventos.length || 0}`} />
+            <StatusTile label="Total reservado" value={totalInscrito} />
+          </div>
         </div>
         <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 2, background: 'linear-gradient(90deg, transparent, #21BBEF 40%, #005DA4 70%, transparent)' }} />
       </section>
@@ -186,7 +204,19 @@ export default function Inscripciones() {
                   description="No hay eventos programados para este día."
                 />
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div className="relative flex flex-col gap-4">
+                  {/* Itinerary thread — connects the time nodes on desktop */}
+                  <div
+                    className="absolute bottom-0 top-[29px] hidden w-px sm:block"
+                    style={{
+                      left: 111,
+                      backgroundImage: 'repeating-linear-gradient(to bottom, var(--color-ucr-blue) 0 4px, transparent 4px 10px)',
+                      opacity: 0.18,
+                      WebkitMaskImage: 'linear-gradient(to bottom, #000 75%, transparent)',
+                      maskImage: 'linear-gradient(to bottom, #000 75%, transparent)',
+                    }}
+                    aria-hidden
+                  />
                   {franjasOrdenadas.map((grupo) => {
                     const indiceErrorEnGrupo =
                       feedback?.type === 'error'
@@ -195,32 +225,46 @@ export default function Inscripciones() {
                     const carouselKey =
                       indiceErrorEnGrupo >= 0 ? `${grupo.key}-alerta-${feedback.eventoId}` : grupo.key
                     const horaInicio = grupo.hora_inicio ? formatHora(grupo.hora_inicio) : '—'
+                    const horaFin = grupo.hora_fin ? formatHora(grupo.hora_fin) : null
                     const durMin = grupo.hora_inicio && grupo.hora_fin
                       ? Math.round((new Date(grupo.hora_fin) - new Date(grupo.hora_inicio)) / 60000)
                       : null
                     const anyInscrito = grupo.eventos.some(e => inscripcionesPorEvento.has(e.id))
                     return (
-                      <section key={grupo.key} className="flex flex-col sm:flex-row items-start">
+                      <section key={grupo.key} className="relative flex flex-col items-start sm:flex-row">
                         {/* Time info — horizontal row on mobile, vertical column on desktop */}
-                        <div className="flex sm:flex-col items-center sm:items-end gap-1.5 sm:gap-0 mb-2 sm:mb-0 sm:w-[100px] sm:shrink-0 sm:pt-[18px] sm:pr-[14px] sm:text-right">
-                          <div style={{ fontFamily: "var(--font-pixel)", fontWeight: 700, fontSize: 'clamp(17px,2vw,24px)', color: '#111827', letterSpacing: '-0.02em' }}>
+                        <div className="mb-2 flex items-center gap-1.5 sm:mb-0 sm:w-[100px] sm:shrink-0 sm:flex-col sm:items-end sm:gap-0 sm:pr-[14px] sm:pt-[18px] sm:text-right">
+                          <div className="font-pixel text-[clamp(17px,2vw,24px)] font-bold leading-[1.05] tracking-[-0.02em] text-slate-900">
                             {horaInicio}
                           </div>
+                          {horaFin && (
+                            <div className="font-pixel text-[clamp(15px,1.8vw,20px)] font-bold leading-[1.05] tracking-[-0.02em] text-slate-500">
+                              – {horaFin}
+                            </div>
+                          )}
                           {durMin && (
-                            <div style={{ fontFamily: "var(--font-pixel)", fontSize: 'clamp(13px,1.5vw,19px)', color: '#9CA3AF' }}>
+                            <div className="font-pixel text-[clamp(12px,1.4vw,16px)] text-slate-400">
                               {durMin} min
                             </div>
                           )}
                         </div>
-                        {/* Dot — visible only on desktop */}
-                        <div className="hidden sm:flex shrink-0 pt-[24px] w-[22px] justify-center">
-                          <div style={{ width: 11, height: 11, borderRadius: '50%', background: anyInscrito ? '#21BBEF' : '#D1D5DB' }} />
+                        {/* Node — visible only on desktop */}
+                        <div className="z-[1] hidden w-[22px] shrink-0 justify-center pt-[24px] sm:flex">
+                          <span
+                            className={cx(
+                              'h-[11px] w-[11px] rounded-full border-2 border-white transition-transform duration-300 ease-out',
+                              anyInscrito ? 'bg-brand-cyan shadow-glow-cyan' : 'bg-slate-300',
+                            )}
+                          />
                         </div>
                         {/* Carousel */}
-                        <div className="flex-1 w-full sm:ml-[14px] min-w-0">
+                        <div className="min-w-0 w-full flex-1 sm:ml-[14px]">
                           {grupo.eventos.length > 1 && (
-                            <div style={{ marginBottom: 10 }}>
-                              <span style={{ fontFamily: "var(--font-pixel)", fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#92400E', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 9999, padding: '4px 12px' }}>
+                            <div className="mb-2.5">
+                              <span className="inline-flex items-center gap-1.5 rounded-full border border-status-scarce/25 bg-status-scarce/10 px-3 py-1 font-pixel text-[12px] font-bold uppercase tracking-wider text-status-scarce">
+                                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4M16 17H4m0 0l4 4m-4-4l4-4" />
+                                </svg>
                                 {grupo.eventos.length} en paralelo
                               </span>
                             </div>

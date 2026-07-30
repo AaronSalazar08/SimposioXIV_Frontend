@@ -150,7 +150,7 @@ export default function AdminUsuarios() {
     <div>
       <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="text-xl font-bold text-ucr-blue-dark">Usuarios</h1>
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
           <SearchInput value={search} onChange={setSearch} placeholder="Buscar usuario..." />
           <button
             type="button"
@@ -209,59 +209,108 @@ export default function AdminUsuarios() {
       ) : usuariosFiltrados.length === 0 ? (
         <p className="text-gray-500 text-sm">No se encontraron usuarios para "{search}".</p>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                {['Nombre', 'Correo', 'Carnet', 'Tipo', ''].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {usuariosFiltrados.map((u) => {
-                const enviandoEste = enviandoCorreoId === u.id
-                return (
-                  <tr key={u.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-gray-900">{u.nombre}</td>
-                    <td className="px-4 py-3 text-gray-600">{u.email}</td>
-                    <td className="px-4 py-3 text-gray-500">{u.carnet ?? '—'}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${TIPO_BADGE[u.tipo_usuario] ?? TIPO_BADGE.participante}`}>
-                        {u.tipo_usuario === 'admin' ? 'Admin' : 'Participante'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2 justify-end">
-                        {u.tipo_usuario !== 'admin' && (
-                          <button
-                            type="button"
-                            onClick={() => { setEmailFeedback(null); enviarCorreoMutation.mutate(u.id) }}
-                            disabled={enviandoEste || enviarTodosMutation.isPending}
-                            className="flex items-center gap-1 text-emerald-700 hover:text-emerald-800 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-emerald-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {enviandoEste ? (
-                              <><Spinner size="sm" className="border-emerald-500" />Enviando...</>
-                            ) : (
-                              <>
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                                Enviar correo
-                              </>
-                            )}
-                          </button>
+        <>
+          {/* Móvil: tarjetas apiladas */}
+          <div className="sm:hidden space-y-3">
+            {usuariosFiltrados.map((u) => {
+              const enviandoEste = enviandoCorreoId === u.id
+              return (
+                <div key={u.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-medium text-gray-900 truncate">{u.nombre}</p>
+                      <p className="text-gray-500 text-xs truncate mt-0.5">{u.email}</p>
+                      <p className="text-gray-400 text-xs mt-0.5">Carnet: {u.carnet ?? '—'}</p>
+                    </div>
+                    <span className={`shrink-0 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${TIPO_BADGE[u.tipo_usuario] ?? TIPO_BADGE.participante}`}>
+                      {u.tipo_usuario === 'admin' ? 'Admin' : 'Participante'}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                    {u.tipo_usuario !== 'admin' && (
+                      <button
+                        type="button"
+                        onClick={() => { setEmailFeedback(null); enviarCorreoMutation.mutate(u.id) }}
+                        disabled={enviandoEste || enviarTodosMutation.isPending}
+                        className="flex items-center gap-1 text-emerald-700 hover:text-emerald-800 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-emerald-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {enviandoEste ? (
+                          <><Spinner size="sm" className="border-emerald-500" />Enviando...</>
+                        ) : (
+                          <>
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            Enviar correo
+                          </>
                         )}
-                        <button type="button" onClick={() => openEditar(u)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
-                        <button type="button" onClick={() => { setError(''); setConfirmDelete(u) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
-                      </div>
-                    </td>
+                      </button>
+                    )}
+                    <button type="button" onClick={() => openEditar(u)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
+                    <button type="button" onClick={() => { setError(''); setConfirmDelete(u) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Escritorio: tabla */}
+          <div className="hidden sm:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-100">
+                  <tr>
+                    {['Nombre', 'Correo', 'Carnet', 'Tipo', ''].map((h) => (
+                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
+                    ))}
                   </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {usuariosFiltrados.map((u) => {
+                    const enviandoEste = enviandoCorreoId === u.id
+                    return (
+                      <tr key={u.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-4 py-3 font-medium text-gray-900">{u.nombre}</td>
+                        <td className="px-4 py-3 text-gray-600">{u.email}</td>
+                        <td className="px-4 py-3 text-gray-500">{u.carnet ?? '—'}</td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${TIPO_BADGE[u.tipo_usuario] ?? TIPO_BADGE.participante}`}>
+                            {u.tipo_usuario === 'admin' ? 'Admin' : 'Participante'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2 justify-end">
+                            {u.tipo_usuario !== 'admin' && (
+                              <button
+                                type="button"
+                                onClick={() => { setEmailFeedback(null); enviarCorreoMutation.mutate(u.id) }}
+                                disabled={enviandoEste || enviarTodosMutation.isPending}
+                                className="flex items-center gap-1 text-emerald-700 hover:text-emerald-800 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-emerald-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {enviandoEste ? (
+                                  <><Spinner size="sm" className="border-emerald-500" />Enviando...</>
+                                ) : (
+                                  <>
+                                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                    Enviar correo
+                                  </>
+                                )}
+                              </button>
+                            )}
+                            <button type="button" onClick={() => openEditar(u)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
+                            <button type="button" onClick={() => { setError(''); setConfirmDelete(u) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
 
       {/* Modal crear / editar */}

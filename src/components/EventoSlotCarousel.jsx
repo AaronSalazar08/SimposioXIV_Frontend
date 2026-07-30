@@ -1,8 +1,13 @@
 import { Children, useCallback, useRef, useState } from 'react'
+import { cx } from '../utils/cx'
 
 const DESKTOP_VISIBLE = 3
+const DESKTOP_PEEK_FRACTION = 0.16
+const MOBILE_SLIDE_PERCENT = 82
+const MOBILE_PEEK_PERCENT = (100 - MOBILE_SLIDE_PERCENT) / 2
 const SWIPE_RATIO_THRESHOLD = 0.18
 const DRAG_START_PX = 12
+const EASE_CURVE = 'cubic-bezier(0.22, 1, 0.36, 1)'
 
 /** Móvil: un evento por slide, con arrastre horizontal. */
 function MobileCarousel({ slides, initialIndex }) {
@@ -112,14 +117,14 @@ function MobileCarousel({ slides, initialIndex }) {
     }
   }
 
-  const translate = `calc(-${activeIndex * 100}% + ${dragOffsetPx}px)`
+  const translate = `calc(-${activeIndex * MOBILE_SLIDE_PERCENT}% + ${MOBILE_PEEK_PERCENT}% + ${dragOffsetPx}px)`
 
   return (
     <div className="relative w-full min-w-0">
       <div
         ref={viewportRef}
-        className="rounded-2xl overflow-x-hidden overflow-y-visible select-none"
-        style={{ background: 'rgba(0,93,164,0.03)', border: '1px solid rgba(0,93,164,0.08)', touchAction: 'pan-y' }}
+        className="rounded-2xl overflow-x-hidden overflow-y-visible select-none border border-ucr-blue/10 bg-ucr-blue/[0.03]"
+        style={{ touchAction: 'pan-y' }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerEnd}
@@ -129,18 +134,31 @@ function MobileCarousel({ slides, initialIndex }) {
         aria-label="Deslizá horizontalmente para ver otros eventos en este horario"
       >
         <div
-          className={`flex items-start ${isDragging ? '' : 'transition-transform duration-300 ease-out'}`}
-          style={{ transform: `translateX(${translate})` }}
+          className="flex items-start"
+          style={{
+            transform: `translateX(${translate})`,
+            transition: isDragging ? 'none' : `transform 380ms ${EASE_CURVE}`,
+          }}
         >
-          {slides.map((slide, i) => (
-            <div
-              key={i}
-              className="w-full shrink-0 basis-full min-w-0 self-start px-2 sm:px-4 py-3 box-border"
-              aria-hidden={i !== activeIndex}
-            >
-              <div className="max-w-xl mx-auto w-full min-w-0">{slide}</div>
-            </div>
-          ))}
+          {slides.map((slide, i) => {
+            const isActive = i === activeIndex
+            return (
+              <div
+                key={i}
+                className="shrink-0 min-w-0 self-start px-1.5 sm:px-2.5 py-3 box-border"
+                style={{
+                  flex: `0 0 ${MOBILE_SLIDE_PERCENT}%`,
+                  maxWidth: `${MOBILE_SLIDE_PERCENT}%`,
+                  opacity: isActive ? 1 : 0.4,
+                  transform: isActive ? 'scale(1)' : 'scale(0.93)',
+                  transition: isDragging ? 'none' : `opacity 380ms ${EASE_CURVE}, transform 380ms ${EASE_CURVE}`,
+                }}
+                aria-hidden={!isActive}
+              >
+                <div className="max-w-xl mx-auto w-full min-w-0">{slide}</div>
+              </div>
+            )
+          })}
         </div>
       </div>
 
@@ -148,8 +166,7 @@ function MobileCarousel({ slides, initialIndex }) {
         <button
           type="button"
           onClick={() => go(-1)}
-          className="p-2 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
-          style={{ background: 'linear-gradient(135deg, #005DA4, #003A6E)', boxShadow: '0 2px 8px 0 rgba(0,93,164,0.25)', color: '#fff' }}
+          className="p-2 rounded-xl text-white bg-gradient-to-br from-ucr-blue to-ucr-blue-darker shadow-card transition-transform duration-200 ease-out hover:scale-105 hover:shadow-ticket-hover active:scale-95"
           aria-label="Evento anterior"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
@@ -165,20 +182,17 @@ function MobileCarousel({ slides, initialIndex }) {
               aria-selected={i === activeIndex}
               aria-label={`Evento ${i + 1} de ${count}`}
               onClick={() => setIndex(i)}
-              className="h-2 rounded-full transition-all duration-300"
-              style={
-                i === activeIndex
-                  ? { width: '1.5rem', background: 'linear-gradient(90deg, #21BBEF, #005DA4)' }
-                  : { width: '0.5rem', background: 'rgba(0,93,164,0.2)' }
-              }
+              className={cx(
+                'h-2 w-6 origin-left rounded-full transition-transform duration-300 ease-out',
+                i === activeIndex ? 'scale-x-100 bg-gradient-to-r from-brand-cyan to-ucr-blue' : 'scale-x-[0.33] bg-ucr-blue/20',
+              )}
             />
           ))}
         </div>
         <button
           type="button"
           onClick={() => go(1)}
-          className="p-2 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
-          style={{ background: 'linear-gradient(135deg, #005DA4, #003A6E)', boxShadow: '0 2px 8px 0 rgba(0,93,164,0.25)', color: '#fff' }}
+          className="p-2 rounded-xl text-white bg-gradient-to-br from-ucr-blue to-ucr-blue-darker shadow-card transition-transform duration-200 ease-out hover:scale-105 hover:shadow-ticket-hover active:scale-95"
           aria-label="Siguiente evento"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
@@ -186,7 +200,7 @@ function MobileCarousel({ slides, initialIndex }) {
           </svg>
         </button>
       </div>
-      <p className="text-center text-sm mt-1 font-mono-accent" style={{ color: 'rgba(0,93,164,0.5)' }}>
+      <p className="text-center text-sm mt-1 font-mono-accent text-ucr-blue/50">
         {activeIndex + 1} / {count} en este horario · deslizá para cambiar
       </p>
     </div>
@@ -205,7 +219,9 @@ function DesktopWindowCarousel({ slides, initialIndex }) {
     setIndex((i) => Math.max(0, Math.min(maxIndex, i + dir)))
   }
 
-  const innerWidthPercent = (count / visible) * 100
+  // La ventana muestra `visible` tarjetas completas más un asomo (peek) de la
+  // siguiente, para que al mover con las flechas se note que hay más contenido.
+  const innerWidthPercent = (count / (visible + DESKTOP_PEEK_FRACTION)) * 100
   const slideWidthPercentOfInner = 100 / count
   const translatePercent = activeIndex * slideWidthPercentOfInner
 
@@ -214,12 +230,19 @@ function DesktopWindowCarousel({ slides, initialIndex }) {
 
   return (
     <div className="relative w-full min-w-0">
-      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(0,93,164,0.03)', border: '1px solid rgba(0,93,164,0.08)' }}>
+      <div
+        className="rounded-2xl overflow-hidden border border-ucr-blue/10 bg-ucr-blue/[0.03]"
+        style={{
+          WebkitMaskImage: 'linear-gradient(to right, #000 0%, #000 92%, transparent 100%)',
+          maskImage: 'linear-gradient(to right, #000 0%, #000 92%, transparent 100%)',
+        }}
+      >
         <div
-          className="flex items-stretch transition-transform duration-300 ease-out"
+          className="flex items-stretch"
           style={{
             width: `${innerWidthPercent}%`,
             transform: `translateX(-${translatePercent}%)`,
+            transition: `transform 380ms ${EASE_CURVE}`,
           }}
         >
           {slides.map((slide, i) => (
@@ -239,23 +262,21 @@ function DesktopWindowCarousel({ slides, initialIndex }) {
           type="button"
           onClick={() => go(-1)}
           disabled={activeIndex === 0}
-          className="p-2 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100"
-          style={{ background: 'linear-gradient(135deg, #005DA4, #003A6E)', boxShadow: '0 2px 8px 0 rgba(0,93,164,0.25)', color: '#fff' }}
+          className="p-2 rounded-xl text-white bg-gradient-to-br from-ucr-blue to-ucr-blue-darker shadow-card transition-transform duration-200 ease-out hover:scale-105 hover:shadow-ticket-hover active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100"
           aria-label="Ver eventos anteriores"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <p className="text-sm tabular-nums min-w-[7rem] text-center font-mono-accent" style={{ color: 'rgba(0,93,164,0.5)' }}>
+        <p className="text-sm tabular-nums min-w-[7rem] text-center font-mono-accent text-ucr-blue/50">
           Mostrando {rangeStart}–{rangeEnd} de {count}
         </p>
         <button
           type="button"
           onClick={() => go(1)}
           disabled={activeIndex >= maxIndex}
-          className="p-2 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100"
-          style={{ background: 'linear-gradient(135deg, #005DA4, #003A6E)', boxShadow: '0 2px 8px 0 rgba(0,93,164,0.25)', color: '#fff' }}
+          className="p-2 rounded-xl text-white bg-gradient-to-br from-ucr-blue to-ucr-blue-darker shadow-card transition-transform duration-200 ease-out hover:scale-105 hover:shadow-ticket-hover active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100"
           aria-label="Ver más eventos"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
@@ -297,7 +318,7 @@ export default function EventoSlotCarousel({ children, initialIndex = 0 }) {
   if (count === 0) return null
 
   if (count === 1) {
-    return <div className="w-full max-w-xl mx-auto min-w-0">{slides[0]}</div>
+    return <div className="w-full max-w-xl min-w-0">{slides[0]}</div>
   }
 
   const useDesktopGrid = count <= DESKTOP_VISIBLE

@@ -74,7 +74,7 @@ export default function AdminAulas() {
     <div>
       <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="text-xl font-bold text-ucr-blue-dark">Aulas</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
           <SearchInput value={search} onChange={setSearch} placeholder="Buscar aula..." />
           <button
             type="button"
@@ -95,46 +95,80 @@ export default function AdminAulas() {
       ) : aulasFiltradas.length === 0 ? (
         <p className="text-gray-500 text-sm">No se encontraron aulas para "{search}".</p>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                {['Número', 'Edificio', 'Capacidad', ''].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {aulasFiltradas.map((aula) => (
-                <tr key={aula.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 font-medium text-gray-900">{aula.numero}</td>
-                  <td className="px-4 py-3 text-gray-600">{aula.edificio}</td>
-                  <td className="px-4 py-3 text-gray-600">{aula.capacidad}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2 justify-end">
-                      <button
-                        type="button"
-                        onClick={() => openEditar(aula)}
-                        className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => { setError(''); setConfirmDelete(aula) }}
-                        className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors"
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          {/* Móvil: tarjetas apiladas */}
+          <div className="sm:hidden space-y-3">
+            {aulasFiltradas.map((aula) => (
+              <div key={aula.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-medium text-gray-900">{aula.numero}</p>
+                  <p className="text-gray-500 text-xs">Capacidad: {aula.capacidad}</p>
+                </div>
+                <p className="text-gray-500 text-xs mt-1">{aula.edificio}</p>
+                <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => openEditar(aula)}
+                    className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setError(''); setConfirmDelete(aula) }}
+                    className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Escritorio: tabla */}
+          <div className="hidden sm:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-100">
+                  <tr>
+                    {['Número', 'Edificio', 'Capacidad', ''].map((h) => (
+                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {aulasFiltradas.map((aula) => (
+                    <tr key={aula.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 font-medium text-gray-900">{aula.numero}</td>
+                      <td className="px-4 py-3 text-gray-600">{aula.edificio}</td>
+                      <td className="px-4 py-3 text-gray-600">{aula.capacidad}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2 justify-end">
+                          <button
+                            type="button"
+                            onClick={() => openEditar(aula)}
+                            className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors"
+                          >
+                            Editar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setError(''); setConfirmDelete(aula) }}
+                            className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
 
       {/* Modal crear / editar */}

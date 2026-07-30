@@ -29,6 +29,20 @@ describe('groupEventosPorFranjaHoraria', () => {
     expect(grupos[1].eventos).toHaveLength(1)
   })
 
+  it('con la misma hora de inicio, coloca el bloque de menor duración antes que el más largo', () => {
+    const eventos = [
+      slot(1, '2026-06-01T10:00:00.000Z', '2026-06-01T11:30:00.000Z', 'Taller largo', 1),
+      slot(1, '2026-06-01T10:00:00.000Z', '2026-06-01T10:30:00.000Z', 'Charla corta', 2),
+      slot(1, '2026-06-01T11:30:00.000Z', '2026-06-01T12:00:00.000Z', 'Siguiente hora', 3),
+    ]
+    const grupos = groupEventosPorFranjaHoraria(eventos)
+    expect(grupos.map((g) => g.eventos[0].titulo)).toEqual([
+      'Charla corta',
+      'Taller largo',
+      'Siguiente hora',
+    ])
+  })
+
   it('coloca eventos sin horario al final', () => {
     const eventos = [
       { id: 1, titulo: 'Sin agenda', horario: null },

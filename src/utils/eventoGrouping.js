@@ -40,7 +40,13 @@ export function groupEventosPorFranjaHoraria(eventosList) {
 
   arr.sort((a, b) => {
     if (a.dia !== b.dia) return a.dia - b.dia
-    return new Date(a.hora_inicio) - new Date(b.hora_inicio)
+    const t0a = new Date(a.hora_inicio).getTime()
+    const t0b = new Date(b.hora_inicio).getTime()
+    if (t0a !== t0b) return t0a - t0b
+    // Misma hora de inicio: el bloque más corto va primero, el más largo queda abajo.
+    const durA = new Date(a.hora_fin) - new Date(a.hora_inicio)
+    const durB = new Date(b.hora_fin) - new Date(b.hora_inicio)
+    return durA - durB
   })
 
   if (sinHorario.length) {

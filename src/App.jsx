@@ -25,6 +25,7 @@ import AdminHorarios from './pages/admin/AdminHorarios'
 import AdminAulas from './pages/admin/AdminAulas'
 import AdminPonentes from './pages/admin/AdminPonentes'
 import AdminAreas from './pages/admin/AdminAreas'
+import DebugInscripciones from './pages/DebugInscripciones'
 
 export default function App() {
   return (
@@ -70,6 +71,8 @@ export default function App() {
           <Route path="ponentes" element={<AdminPonentes />} />
           <Route path="areas" element={<AdminAreas />} />
         </Route>
+
+        <Route path="/debug-inscripciones" element={<DebugInscripciones />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
