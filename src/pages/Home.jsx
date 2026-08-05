@@ -181,7 +181,7 @@ function Hero({ user }) {
         </Fade>
 
         {/* Headline */}
-        <h1 style={{ margin: 0, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(2.2rem, 8.6vw, 8.6rem)', lineHeight: 0.92, letterSpacing: '-0.045em', color: '#fff' }}>
+        <h1 style={{ margin: 0, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(1.8rem, 6.4vw, 6.2rem)', lineHeight: 0.92, letterSpacing: '-0.045em', color: '#fff' }}>
           <Lines lines={[
             'El futuro',
             'se construye',
@@ -300,7 +300,7 @@ function Tracks() {
                   style={{ display: 'grid', gridTemplateColumns: 'auto minmax(0,1fr) auto', alignItems: 'center', gap: 'clamp(16px,3vw,44px)', padding: 'clamp(20px,3.2vh,34px) clamp(8px,1.5vw,20px)', borderBottom: '1px solid rgba(0,0,0,0.08)', background: on ? '#fff' : 'transparent', boxShadow: on ? '0 4px 24px rgba(0,0,0,0.07)' : 'none', borderRadius: on ? 12 : 0, transform: on ? 'translateX(6px)' : 'none', transition: `all 0.4s ${EASE_OUT}` }}>
                   <span style={{ fontFamily: "var(--font-pixel)", fontSize: 'clamp(19px,1.3vw,22px)', color: on ? tk.color : 'rgba(0,0,0,0.25)', width: 30, transition: 'color 0.3s' }}>{tk.n}</span>
                   <div style={{ minWidth: 0 }}>
-                    <h3 style={{ margin: 0, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(1.4rem,3.4vw,2.6rem)', lineHeight: 1.02, letterSpacing: '-0.03em', color: '#05070E' }}>{tk.name}</h3>
+                    <h3 style={{ margin: 0, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 'clamp(1.05rem,2.2vw,1.7rem)', lineHeight: 1.15, letterSpacing: '-0.02em', color: '#05070E' }}>{tk.name}</h3>
                     <p style={{ margin: '8px 0 0', fontSize: 'clamp(0.9rem,1.1vw,1rem)', color: '#6B7280', maxHeight: on ? 60 : 0, opacity: on ? 1 : 0, overflow: 'hidden', transition: `all 0.45s ${EASE_OUT}` }}>{tk.blurb}</p>
                   </div>
                   <span style={{ width: 12, height: 12, borderRadius: '50%', background: tk.color, flexShrink: 0, boxShadow: on ? `0 0 0 6px ${tk.color}22` : 'none', transition: 'box-shadow 0.3s' }} />
@@ -506,12 +506,58 @@ function HomeFooter() {
             <FooterCol title="Asistentes" links={[['Inscripciones', '/inscripciones'], ['Mi perfil', '/perfil']]} />
           </div>
         </div>
-        <div style={{ marginTop: 'clamp(53px,8vh,85px)', paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, alignItems: 'center', fontFamily: "var(--font-pixel)", fontSize: 19, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <CreditsRow />
+        <div style={{ marginTop: 'clamp(40px,6vh,60px)', paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, alignItems: 'center', fontFamily: "var(--font-pixel)", fontSize: 19, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           <span>© 2026 Universidad de Costa Rica</span>
           <span>Liberia, Guanacaste · 05–07 AGO 2026</span>
         </div>
       </div>
     </footer>
+  )
+}
+
+// ─── Credits ──────────────────────────────────────────────────────
+const CREDITOS = [
+  { rol: 'Coordinador', nombre: 'Mag. César Laravanegas', email: 'cesar.laravanegas@ucr.ac.cr' },
+  { rol: 'Diseño web', nombre: 'Estudiante Aaron Salazar Mata', email: 'aaron.salazarmata@ucr.ac.cr' },
+  { rol: 'Diseño gráfico', nombre: 'Estudiante Gerardo Rojas Ramos', email: 'gerardo.rojasramos@ucr.ac.cr' },
+  { rol: 'Infraestructura', nombre: 'Lic. Iván Chavarría Cubero', email: 'ivan.chavarriacubero@ucr.ac.cr' },
+]
+
+function CreditEntry({ rol, nombre, email }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <span style={{ fontFamily: "var(--font-pixel)", fontSize: 14, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.45)' }}>
+        {rol}
+      </span>
+      <span style={{ fontSize: 'clamp(18px,2vw,22px)', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: '#fff', letterSpacing: '-0.01em' }}>
+        {nombre}
+      </span>
+      <a href={`mailto:${email}`} style={{ fontSize: 15, color: 'rgba(255,255,255,0.6)', textDecoration: 'none', transition: 'color 150ms' }}
+        onMouseEnter={e => e.currentTarget.style.color = '#21BBEF'}
+        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.6)'}>
+        {email}
+      </a>
+    </div>
+  )
+}
+
+function CreditsRow() {
+  const [izquierda, derecha] = [CREDITOS.slice(0, 2), CREDITOS.slice(2)]
+  return (
+    <div style={{ marginTop: 'clamp(40px,6vh,60px)', paddingTop: 32, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+      <span style={{ display: 'block', fontFamily: "var(--font-pixel)", fontSize: 20, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#21BBEF', marginBottom: 22 }}>
+        Créditos
+      </span>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'clamp(28px,5vw,64px)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 22, flex: '1 1 260px' }}>
+          {izquierda.map(c => <CreditEntry key={c.email} {...c} />)}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 22, flex: '1 1 260px' }}>
+          {derecha.map(c => <CreditEntry key={c.email} {...c} />)}
+        </div>
+      </div>
+    </div>
   )
 }
 
