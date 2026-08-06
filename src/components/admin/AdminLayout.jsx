@@ -72,6 +72,8 @@ const NAV_ITEMS = [
 function SidebarContent({ onClose }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const isStaff = user?.tipo_usuario === 'staff'
+  const navItems = isStaff ? NAV_ITEMS.filter((item) => item.to === '/admin/eventos') : NAV_ITEMS
 
   const handleLogout = async () => {
     await logout()
@@ -108,7 +110,7 @@ function SidebarContent({ onClose }) {
         <p className="text-[10px] font-semibold uppercase tracking-[0.1em] px-3.5 pb-1.5 pt-0.5 font-mono-accent" style={{ color: 'rgba(255,255,255,0.28)' }}>
           Gestión
         </p>
-        {NAV_ITEMS.map(({ to, label, icon, end }) => (
+        {navItems.map(({ to, label, icon, end }) => (
           <NavLink
             key={to}
             to={to}

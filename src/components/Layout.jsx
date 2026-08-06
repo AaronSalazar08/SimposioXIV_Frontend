@@ -39,7 +39,7 @@ function AdminPreviewBanner() {
 
 export default function Layout({ noTopPad = false }) {
   const { user } = useAuth()
-  const isAdmin = user?.tipo_usuario === 'admin'
+  const isAdmin = user?.tipo_usuario === 'admin' || user?.tipo_usuario === 'staff'
   const bannerOffset = isAdmin ? ADMIN_BANNER_H : 0
 
   return (

@@ -23,7 +23,14 @@ const EMPTY_FORM = { nombre: '', email: '', carnet: '', password: '', tipo_usuar
 
 const TIPO_BADGE = {
   admin: 'bg-ucr-blue text-white',
+  staff: 'bg-indigo-100 text-indigo-700',
   participante: 'bg-gray-100 text-gray-600',
+}
+
+const TIPO_LABEL = {
+  admin: 'Admin',
+  staff: 'Staff',
+  participante: 'Participante',
 }
 
 function EmailFeedbackBanner({ feedback, onClose }) {
@@ -144,7 +151,7 @@ export default function AdminUsuarios() {
   const handleSubmit = (e) => { e.preventDefault(); setError(''); saveMutation.mutate(form) }
   const set = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }))
 
-  const participantesCount = usuarios.filter((u) => u.tipo_usuario !== 'admin').length
+  const participantesCount = usuarios.filter((u) => u.tipo_usuario === 'participante').length
 
   return (
     <div>
@@ -223,7 +230,7 @@ export default function AdminUsuarios() {
                       <p className="text-gray-400 text-xs mt-0.5">Carnet: {u.carnet ?? '—'}</p>
                     </div>
                     <span className={`shrink-0 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${TIPO_BADGE[u.tipo_usuario] ?? TIPO_BADGE.participante}`}>
-                      {u.tipo_usuario === 'admin' ? 'Admin' : 'Participante'}
+                      {TIPO_LABEL[u.tipo_usuario] ?? 'Participante'}
                     </span>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-gray-100">
@@ -275,7 +282,7 @@ export default function AdminUsuarios() {
                         <td className="px-4 py-3 text-gray-500">{u.carnet ?? '—'}</td>
                         <td className="px-4 py-3">
                           <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${TIPO_BADGE[u.tipo_usuario] ?? TIPO_BADGE.participante}`}>
-                            {u.tipo_usuario === 'admin' ? 'Admin' : 'Participante'}
+                            {TIPO_LABEL[u.tipo_usuario] ?? 'Participante'}
                           </span>
                         </td>
                         <td className="px-4 py-3">
@@ -372,6 +379,7 @@ export default function AdminUsuarios() {
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Tipo de usuario</label>
             <select className={SELECT_CLASS} value={form.tipo_usuario} onChange={set('tipo_usuario')}>
               <option value="participante">Participante</option>
+              <option value="staff">Staff (control de asistencia)</option>
               <option value="admin">Administrador</option>
             </select>
           </div>

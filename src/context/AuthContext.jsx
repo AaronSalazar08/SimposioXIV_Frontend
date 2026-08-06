@@ -57,7 +57,7 @@ export function AuthProvider({ children }) {
     const me = await getMe()
     const normalizedUser = normalizeAuthUser(me)
     setUser(normalizedUser)
-    navigate(normalizedUser?.tipo_usuario === 'admin' ? '/admin' : '/')
+    navigate(['admin', 'staff'].includes(normalizedUser?.tipo_usuario) ? '/admin' : '/')
   }, [navigate])
 
   const logout = useCallback(async () => {

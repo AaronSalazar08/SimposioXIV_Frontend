@@ -17,6 +17,7 @@ import LoadingState from '../../components/ui/LoadingState'
 import { INPUT_CLASS, SELECT_CLASS } from '../../constants/formStyles'
 import { queryKeys } from '../../constants/queryKeys'
 import { TIPO_LABELS, TIPO_COLORS, TIPO_COLOR_DEFAULT } from '../../constants/eventos'
+import { useAuth } from '../../context/useAuth'
 import { getApiErrorMessage } from '../../utils/apiErrors'
 import { matchesQuery } from '../../utils/text'
 
@@ -51,11 +52,13 @@ function nombreCompletoPonente(p) {
 export default function AdminEventos() {
   const qc = useQueryClient()
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const isStaff = user?.tipo_usuario === 'staff'
 
   const { data: eventos = [], isLoading } = useQuery({ queryKey: queryKeys.adminEventos(), queryFn: fetchAdminEventos })
-  const { data: horarios = [] } = useQuery({ queryKey: queryKeys.adminHorarios(), queryFn: fetchAdminHorarios })
-  const { data: ponentes = [] } = useQuery({ queryKey: queryKeys.adminPonentes(), queryFn: fetchAdminPonentes })
-  const { data: areas = [] } = useQuery({ queryKey: queryKeys.adminAreas(), queryFn: fetchAdminAreas })
+  const { data: horarios = [] } = useQuery({ queryKey: queryKeys.adminHorarios(), queryFn: fetchAdminHorarios, enabled: !isStaff })
+  const { data: ponentes = [] } = useQuery({ queryKey: queryKeys.adminPonentes(), queryFn: fetchAdminPonentes, enabled: !isStaff })
+  const { data: areas = [] } = useQuery({ queryKey: queryKeys.adminAreas(), queryFn: fetchAdminAreas, enabled: !isStaff })
 
   const [modal, setModal] = useState({ open: false, evento: null })
   const [form, setForm] = useState(EMPTY_FORM)
@@ -136,9 +139,11 @@ export default function AdminEventos() {
         <h1 className="text-xl font-bold text-ucr-blue-dark">Eventos</h1>
         <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
           <SearchInput value={search} onChange={setSearch} placeholder="Buscar evento..." />
-          <button type="button" onClick={openCrear} className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
-            + Nuevo evento
-          </button>
+          {!isStaff && (
+            <button type="button" onClick={openCrear} className="px-4 py-2 bg-ucr-blue hover:bg-ucr-blue-dark text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
+              + Nuevo evento
+            </button>
+          )}
         </div>
       </div>
 
@@ -198,8 +203,12 @@ export default function AdminEventos() {
                   >
                     Ver inscritos
                   </button>
-                  <button type="button" onClick={() => openEditar(ev)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
-                  <button type="button" onClick={() => { setError(''); setConfirmDelete(ev) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                  {!isStaff && (
+                    <>
+                      <button type="button" onClick={() => openEditar(ev)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
+                      <button type="button" onClick={() => { setError(''); setConfirmDelete(ev) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
@@ -211,7 +220,10 @@ export default function AdminEventos() {
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
-                    {['Tipo', 'Título', 'Ponente(s)', 'Horario', 'Cupos', 'Estado', 'Inscritos', ''].map((h) => (
+                    {(isStaff
+                      ? ['Tipo', 'Título', 'Ponente(s)', 'Horario', 'Cupos', 'Estado', 'Inscritos']
+                      : ['Tipo', 'Título', 'Ponente(s)', 'Horario', 'Cupos', 'Estado', 'Inscritos', '']
+                    ).map((h) => (
                       <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
@@ -260,12 +272,14 @@ export default function AdminEventos() {
                           Ver inscritos
                         </button>
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2 justify-end">
-                          <button type="button" onClick={() => openEditar(ev)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
-                          <button type="button" onClick={() => { setError(''); setConfirmDelete(ev) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
-                        </div>
-                      </td>
+                      {!isStaff && (
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2 justify-end">
+                            <button type="button" onClick={() => openEditar(ev)} className="text-ucr-blue hover:text-ucr-blue-dark text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-ucr-blue-muted transition-colors">Editar</button>
+                            <button type="button" onClick={() => { setError(''); setConfirmDelete(ev) }} className="text-rose-600 hover:text-rose-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">Eliminar</button>
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
