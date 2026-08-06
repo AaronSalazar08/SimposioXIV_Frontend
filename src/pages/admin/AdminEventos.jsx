@@ -304,7 +304,7 @@ export default function AdminEventos() {
               <option value="">Seleccioná un horario...</option>
               {horarios.map((h) => (
                 <option key={h.id} value={h.id}>
-                  Día {h.numero_dia} · {formatHora(h.hora_inicio)}–{formatHora(h.hora_fin)}{h.aula ? ` (${h.aula.numero})` : ''}
+                  Día {h.numero_dia} · {formatHora(h.hora_inicio)}–{formatHora(h.hora_fin)} — {h.aula ? `Aula ${h.aula.numero}, ${h.aula.edificio}` : 'Sin aula (actividad general)'}
                 </option>
               ))}
             </select>

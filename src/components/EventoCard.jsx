@@ -66,7 +66,7 @@ function ReservadoStub({ onCancelar, cancelando }) {
           'hover:text-status-full active:scale-95 disabled:opacity-50',
         )}
       >
-        {cancelando ? <Spinner size="sm" /> : 'Cancelar'}
+        {cancelando ? <Spinner size="sm" /> : 'Cancelar inscripcion'}
       </button>
     </div>
   )
