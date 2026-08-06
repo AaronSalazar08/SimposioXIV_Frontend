@@ -38,6 +38,9 @@ export const deleteAdminEvento = (id) =>
 export const fetchAdminEventoInscritos = (eventoId) =>
   apiClient.get(`/admin/eventos/${eventoId}/inscritos`).then((r) => r.data?.data ?? [])
 
+export const updateAsistenciaInscrito = (eventoId, inscripcionId, asistio) =>
+  apiClient.put(`/admin/eventos/${eventoId}/inscritos/${inscripcionId}/asistencia`, { asistio }).then((r) => r.data)
+
 // ── Horarios ─────────────────────────────────────────────────────────────────
 export const fetchAdminHorarios = () =>
   apiClient.get('/admin/horarios').then((r) => r.data?.data ?? [])
